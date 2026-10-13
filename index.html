@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en" data-side="pretty">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!--SKELETON-END-->
+<title>Pretty Killer Shop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sniglet:wght@400;800&family=Nunito:wght@400;600;800&family=Anton&family=Bodoni+Moda:wght@700;900&family=Special+Elite&family=Rubik+Mono+One&family=IBM+Plex+Mono:wght@400;600&family=Karla:wght@400;600;800&family=Yellowtail&display=swap">
+<style>
+/* ============ TOKENS ============
+   Two worlds, picked by the clock (see setSide in the script).
+   pretty = AM (ILLIT / NewJeans x the cover's pink collage + ransom-note type)
+   killer = PM (aespa / KATSEYE: black, chrome, hot pink)          */
+:root{
+  --ground:#f8d2e1; --ground-2:#fbe2ec; --surface:#fffafc; --ink:#161015; --muted:#8e5a73;
+  --accent:#f25fc4; --accent-ink:#161015; --accent-2:#f7b8d4; --accent-3:#ffffff; --line:#e9b1c9;
+  --art-bg:#f6c6d9; --art-ink:#ffffff; --art-1:#f25fc4; --art-2:#f7b8d4; --art-3:#d9a3bb;
+  --display:"Bodoni Moda","Didot",Georgia,serif;
+  --body:"Karla",system-ui,sans-serif;
+  --mono:"Special Elite","Courier New",monospace;
+  --radius:3px; --radius-sm:3px; --shadow:0 18px 28px -14px rgba(120,30,75,.45);
+  --btn-weight:800; --label-case:none; --label-track:.04em;
+  color-scheme:light;
+}
+:root[data-side="killer"]{
+  --ground:#09080a; --ground-2:#121014; --surface:#141216; --ink:#f2ecf0; --muted:#8c8390;
+  --accent:#ff3fae; --accent-ink:#0a0a0a; --accent-2:#cfcbd3; --accent-3:#ff3fae; --line:#2c272f;
+  --art-bg:#1c191e; --art-ink:#0b0a0c; --art-1:#ff3fae; --art-2:#d9d6dc; --art-3:#6e6874;
+  --display:"Anton","Impact",sans-serif;
+  --body:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --radius:0px; --radius-sm:0px; --shadow:6px 6px 0 0 #ff3fae;
+  --btn-weight:600; --label-case:uppercase; --label-track:.14em;
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  overflow-x:clip;
+  background:var(--ground); color:var(--ink); font:16px/1.55 var(--body);
+  padding-inline:16px; transition:background-color .5s ease,color .5s ease;
+  min-height:100vh;
+}
+.wrap{max-width:1120px;margin-inline:auto}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+[hidden]{display:none!important}
+.label{font:600 12px/1.2 var(--mono);text-transform:var(--label-case);letter-spacing:var(--label-track);color:var(--muted)}
+
+/* ============ HEADER ============ */
+header.bar{
+  position:sticky;top:env(safe-area-inset-top,0px);z-index:20;
+  display:flex;align-items:center;gap:12px;justify-content:space-between;
+  padding-block:14px;margin-inline:-16px;padding-inline:16px;
+  background:color-mix(in srgb,var(--ground) 88%,transparent);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.brand{display:flex;flex-direction:column;line-height:1.1}
+.brand b{font:400 20px/1 var(--display);letter-spacing:.02em}
+[data-side="killer"] .brand b{letter-spacing:.06em;text-transform:uppercase}
+.brand span{font-size:12px;color:var(--muted)}
+.side-pill{
+  display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:var(--radius-sm);
+  border:1.5px solid var(--line);background:var(--surface);font:600 12px/1 var(--mono);
+  text-transform:var(--label-case);letter-spacing:var(--label-track);white-space:nowrap;
+}
+.side-pill i{width:8px;height:8px;border-radius:50%;background:var(--accent);display:block}
+.side-pill em{font-style:normal;color:var(--muted)}
+.cart-btn{
+  display:inline-flex;align-items:center;gap:8px;border:0;cursor:pointer;
+  background:var(--accent);color:var(--accent-ink);padding:10px 16px;border-radius:var(--radius-sm);
+  font-weight:var(--btn-weight);text-transform:var(--label-case);letter-spacing:var(--label-track);font-size:14px;
+}
+.cart-btn .count{background:var(--ink);color:var(--ground);min-width:22px;height:22px;border-radius:11px;display:inline-grid;place-items:center;font-size:12px;padding-inline:6px}
+[data-side="killer"] .cart-btn .count{border-radius:0}
+
+/* ============ HERO ============ */
+.hero{padding-block:48px 28px;position:relative}
+.hero .label{margin-bottom:10px}
+.title{margin:0;line-height:.9;display:flex;flex-wrap:wrap;gap:.04em;font-size:clamp(76px,17vw,200px)}
+.title .ch{display:inline-block}
+/* both sides: ransom-note cutout letters, like the cover */
+.title .ch{
+  font-family:var(--f);color:var(--c);background:var(--b);padding:.02em .1em;
+  transform:rotate(var(--r));font-size:var(--s,1em);border:var(--bd,0);
+}
+[data-side="pretty"] .title .ch{box-shadow:0 6px 14px -6px rgba(90,20,55,.45);transition:transform .25s ease}
+[data-side="pretty"] .title:hover .ch{transform:rotate(calc(var(--r) * -1)) translateY(-4px)}
+
+/* pretty hero: pink photo-collage wall, like the bottom half of the cover */
+.collage{position:absolute;top:0;bottom:0;left:50%;width:100vw;margin-left:-50vw;display:grid;grid-template-columns:repeat(6,1fr);grid-template-rows:repeat(3,1fr);gap:3px;overflow:hidden;pointer-events:none;background:#f3bcd1}
+.collage > div{position:relative;overflow:hidden;display:grid;place-items:center}
+.collage .grid-tile{background:#f7c4d6;background-image:linear-gradient(#fbe0ea 2px,transparent 2px),linear-gradient(90deg,#fbe0ea 2px,transparent 2px);background-size:22px 22px}
+.collage .gingham{background:#fde9f0;background-image:linear-gradient(90deg,rgba(242,95,196,.28) 50%,transparent 50%),linear-gradient(rgba(242,95,196,.28) 50%,transparent 50%);background-size:18px 18px}
+.collage .dots{background:#f4a9c6;background-image:radial-gradient(#fff 22%,transparent 24%);background-size:16px 16px}
+.collage .glitter{background:radial-gradient(circle at 30% 30%,#fff 0 2px,transparent 3px),radial-gradient(circle at 70% 60%,#fce 0 3px,transparent 4px),radial-gradient(circle at 50% 80%,#fff 0 1.5px,transparent 2.5px),linear-gradient(135deg,#f0b6cf,#e7a0c0 60%,#f7d1e1);background-size:26px 26px,34px 34px,18px 18px,100% 100%}
+.collage .blush{background:linear-gradient(180deg,#fde1ea,#f2b3c9)}
+.collage .rose{background:#ee9fbf}
+.collage .love{font:44px/1 "Yellowtail",cursive;color:#fff;text-shadow:0 0 8px #fff,0 0 18px #ff8fcf}
+.collage .ticket{font:18px/1 "Special Elite",monospace;color:#c24a86;border:2px dashed #c24a86;padding:8px 12px;transform:rotate(-8deg);background:#ffd3e3}
+.collage .quote{font:800 15px/1.05 "Karla",sans-serif;color:#b83b79;text-transform:uppercase;text-align:center;transform:rotate(4deg);letter-spacing:.04em}
+.collage .vinyl{width:84px;height:84px;border-radius:50%;background:radial-gradient(circle,#f7b8d4 0 16%,#222 17% 20%,#2b2b2b 21% 100%);box-shadow:inset 0 0 0 6px #333,inset 0 0 0 14px #262626}
+.collage .hearts{background:#fbdbe7;background-image:radial-gradient(circle at 50% 50%,transparent 0,transparent 100%);color:#f25fc4;font-size:22px;letter-spacing:10px;line-height:1.5;text-align:center;padding:6px}
+.collage .knife{transform:rotate(-18deg)}
+.hero.pretty-hero{padding-block:56px 40px;min-height:420px}
+.hero > :not(.sparkles):not(.slashes):not(.collage){position:relative}
+[data-side="pretty"] .hero .label{display:inline-block;background:#161015;color:#f25fc4;padding:6px 10px;font-size:14px}
+[data-side="pretty"] .hero p.sub{background:#fffafc;padding:14px 16px;box-shadow:var(--shadow);transform:rotate(-.6deg);max-width:48ch}
+[data-side="pretty"] .hero .next{display:inline-block;background:#f25fc4;color:#161015;padding:6px 10px;font-family:var(--mono);transform:rotate(.8deg)}
+.hero p.sub{max-width:52ch;font-size:18px;margin:22px 0 0}
+.hero .next{margin-top:14px;font-size:14px;color:var(--muted)}
+.sparkles{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.sparkles span{position:absolute;color:var(--accent);font-size:28px;opacity:.8;animation:twinkle 3s ease-in-out infinite}
+.sparkles span:nth-child(2n){color:var(--accent-2)}
+.sparkles span:nth-child(3n){color:#c9b6ff}
+@keyframes twinkle{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.3) rotate(20deg)}}
+.slashes{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.slashes i{position:absolute;height:2px;background:var(--accent);transform-origin:left;opacity:.85}
+
+/* marquee band */
+.band{margin-inline:-16px;overflow:hidden;border-block:1.5px solid var(--line);background:var(--ground-2)}
+.band .track{display:flex;width:max-content;animation:scroll 28s linear infinite;padding-block:10px}
+.band span{font:400 22px/1 var(--display);padding-inline:14px;white-space:nowrap}
+[data-side="killer"] .band{background:var(--accent);border:0}
+[data-side="killer"] .band span{color:#0a0a0a;text-transform:uppercase;letter-spacing:.08em}
+[data-side="pretty"] .band{background:#161015;border:0}
+[data-side="pretty"] .band span{color:#f25fc4;font-weight:900;text-transform:uppercase;letter-spacing:.06em}
+
+/* pretty cards: paper scraps taped to the collage */
+[data-side="pretty"] main.wrap{position:relative}
+[data-side="pretty"] .card{border:0;box-shadow:var(--shadow);overflow:visible;position:relative;transform:rotate(var(--rot,0deg))}
+[data-side="pretty"] .card:nth-child(2){--rot:1.2deg}
+[data-side="pretty"] .card:nth-child(3){--rot:-1deg}
+[data-side="pretty"] .card:nth-child(4){--rot:.8deg}
+[data-side="pretty"] .card:nth-child(5){--rot:-1.3deg}
+[data-side="pretty"] .card:hover{transform:rotate(0) translateY(-4px)}
+[data-side="pretty"] .card::before{content:"";position:absolute;z-index:2;top:-10px;left:50%;width:84px;height:22px;transform:translateX(-50%) rotate(-3deg);background:rgba(255,255,255,.6);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+[data-side="pretty"] .card .art{margin:10px 10px 0;background:#f7c4d6;background-image:linear-gradient(#fbe0ea 2px,transparent 2px),linear-gradient(90deg,#fbe0ea 2px,transparent 2px);background-size:22px 22px}
+[data-side="pretty"] .card:nth-child(even) .art{background:#fde9f0;background-image:linear-gradient(90deg,rgba(242,95,196,.22) 50%,transparent 50%),linear-gradient(rgba(242,95,196,.22) 50%,transparent 50%);background-size:18px 18px}
+[data-side="pretty"] .card h3{font-weight:900}
+[data-side="pretty"] .tag{background:#161015;color:#f25fc4;font-size:12px}
+[data-side="pretty"] .tag.both{background:#fff;color:#161015}
+[data-side="pretty"] .btn,[data-side="pretty"] .cart-btn{background:#161015;color:#fff}
+[data-side="pretty"] .btn:hover,[data-side="pretty"] .cart-btn:hover{background:#f25fc4;color:#161015;filter:none}
+[data-side="pretty"] .btn:disabled{background:var(--line);color:var(--muted)}
+[data-side="pretty"] .btn.ghost{background:transparent;color:var(--ink)}
+[data-side="pretty"] .cart-btn .count{background:#f25fc4;color:#161015;border-radius:2px}
+[data-side="pretty"] .shop-head h2{font-weight:900;font-size:40px}
+[data-side="pretty"] .shop-head h2 em{font:44px/1 "Yellowtail",cursive;color:var(--accent);font-weight:400}
+[data-side="pretty"] .brand b{font-weight:900}
+@keyframes scroll{to{transform:translateX(-50%)}}
+
+/* ============ PRODUCTS ============ */
+.shop-head{display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap;padding-block:40px 18px}
+.shop-head h2{margin:0;font:400 36px/1 var(--display)}
+[data-side="killer"] .shop-head h2{text-transform:uppercase;letter-spacing:.04em}
+.shop-head p{margin:0;max-width:46ch;color:var(--muted);font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;padding-bottom:56px}
+.card{
+  background:var(--surface);border:1.5px solid var(--line);border-radius:var(--radius);
+  display:flex;flex-direction:column;overflow:hidden;transition:transform .2s ease,box-shadow .2s ease;
+}
+.card:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+.card.feature{grid-column:span 2}
+.card .art{background:var(--art-bg);aspect-ratio:4/3;display:grid;place-items:center;position:relative;max-width:100%}
+.card.feature .art{aspect-ratio:auto;min-height:260px}
+.card .art svg{width:78%;max-width:320px;height:auto}
+.card.feature .art svg{width:auto;height:240px}
+.tag{
+  position:absolute;top:12px;left:12px;padding:4px 10px;border-radius:var(--radius-sm);
+  background:var(--ink);color:var(--ground);font:600 11px/1.3 var(--mono);text-transform:var(--label-case);letter-spacing:var(--label-track);
+}
+.tag.both{background:var(--accent-3);color:#4b2239}
+[data-side="killer"] .tag.both{background:#f2ecf0;color:#0a0a0a}
+.card .body{padding:18px;display:flex;flex-direction:column;gap:8px;flex:1}
+.card h3{margin:0;font:400 22px/1.15 var(--display);text-wrap:balance}
+[data-side="killer"] .card h3{text-transform:uppercase;letter-spacing:.03em}
+.card .ver{font:600 12px/1 var(--mono);color:var(--accent);text-transform:var(--label-case);letter-spacing:var(--label-track)}
+.card p{margin:0;font-size:14px;color:var(--muted)}
+.card .art.clickable{cursor:pointer}
+.shop-tools{display:flex;flex-wrap:wrap;gap:12px 16px;align-items:end;padding-bottom:20px}
+.shop-tools .search,.shop-tools .sort{display:flex;flex-direction:column;gap:6px}
+.shop-tools .search{flex:1 1 220px}
+.shop-tools input,.shop-tools select{background:var(--surface);border:1.5px solid var(--line);border-radius:var(--radius-sm);padding:9px 12px;color:var(--ink);min-width:0;width:100%}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips button{background:var(--surface);border:1.5px solid var(--line);border-radius:var(--radius-sm);padding:8px 12px;cursor:pointer;font:600 13px/1 var(--mono);text-transform:var(--label-case);letter-spacing:var(--label-track);color:var(--ink)}
+.chips button[aria-pressed="true"]{background:var(--ink);color:var(--ground);border-color:var(--ink)}
+[data-side="pretty"] .chips button[aria-pressed="true"]{color:var(--accent)}
+.no-results{grid-column:1/-1;text-align:center;color:var(--muted);padding-block:40px;margin:0}
+.grid.filtered .card.full,.grid.filtered .card.feature{grid-column:auto;flex-direction:column}
+.grid.filtered .card.full .art,.grid.filtered .card.feature .art{min-height:0;flex-wrap:wrap}
+.grid.filtered .card.full .art svg{width:45%}
+.grid.filtered .card.feature .art svg{width:78%;height:auto}
+.bag-actions{display:flex;align-items:center;gap:10px}
+.linkish{background:none;border:0;padding:0;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:12px}
+.line .qty .linkish{margin-left:8px}
+.free{background:var(--accent);color:var(--accent-ink);padding:2px 8px;font-size:12px;border-radius:var(--radius-sm)}
+.ship{display:flex;flex-direction:column;gap:6px;font-size:13px}
+.ship i{display:block;height:6px;background:var(--line);border-radius:var(--radius-sm);overflow:hidden}
+.ship b{display:block;height:100%;background:var(--accent);transition:width .3s ease}
+[data-side="pretty"] .card .art.revealed{background:#fff1c4;background-image:radial-gradient(circle at 85% 12%,#ffe58a,transparent 55%)}
+[data-side="killer"] .card .art.revealed{background:#050406}
+.stand{font:600 13px/1.3 var(--mono);text-transform:var(--label-case);letter-spacing:var(--label-track);padding:10px 12px;border:1.5px dashed var(--accent);color:var(--ink);max-width:260px}
+.card.in-person .buy{align-items:center}
+.card.full{grid-column:1/-1;flex-direction:row}
+.card.full .art{flex:1.4;aspect-ratio:auto;min-height:240px;display:flex;align-items:center;justify-content:center;padding:28px 16px 16px}
+.card.full .art svg{width:20%;max-width:170px;height:auto}
+.card.full .body{flex:1;justify-content:center;padding:28px;gap:12px}
+.card.full h3{font-size:38px}
+.card.full .buy{margin-top:8px}
+.was{font-size:14px;font-weight:400;color:var(--muted)}
+.save{display:inline-block;vertical-align:middle;font:600 11px/1.3 var(--mono);text-transform:var(--label-case);letter-spacing:var(--label-track);background:var(--accent);color:var(--accent-ink);padding:3px 8px;border-radius:var(--radius-sm)}
+[data-side="pretty"] .card.full .art{margin:10px}
+.inside-btn{align-self:flex-start;background:none;border:1.5px solid var(--line);border-radius:var(--radius-sm);padding:5px 10px;cursor:pointer;font:600 12px/1 var(--mono);text-transform:var(--label-case);letter-spacing:var(--label-track);color:var(--ink)}
+.inside-btn span{color:var(--accent);margin-left:4px}
+.inside{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.inside li{font-size:13px;padding:4px 10px;border-radius:var(--radius-sm);background:var(--ground-2);border:1px solid var(--line)}
+[data-side="pretty"] .inside li{background:#f7b8d4;border-color:#f7b8d4;transform:rotate(-1deg)}
+[data-side="pretty"] .inside li:nth-child(even){background:#161015;color:#f25fc4;border-color:#161015;transform:rotate(1deg)}
+[data-side="killer"] .inside li{text-transform:uppercase;letter-spacing:.08em;font-size:11px}
+[data-side="killer"] .inside li:nth-child(odd){border-color:#ff3fae}
+.card .buy{margin-top:auto;padding-top:10px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.price{font:800 20px/1 var(--body);font-variant-numeric:tabular-nums}
+.stock{font-size:12px;color:var(--muted)}
+.stock.low{color:var(--accent);font-weight:600}
+.btn{
+  border:0;cursor:pointer;background:var(--accent);color:var(--accent-ink);padding:10px 16px;border-radius:var(--radius-sm);
+  font-weight:var(--btn-weight);font-size:14px;text-transform:var(--label-case);letter-spacing:var(--label-track);
+}
+.btn:hover{filter:brightness(1.06)}
+.btn:disabled{background:var(--line);color:var(--muted);cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+
+/* ============ FOOTER ============ */
+footer{border-top:1px solid var(--line);padding-block:24px 40px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+footer button{background:none;border:0;padding:0;color:var(--ink);text-decoration:underline;cursor:pointer;font-size:13px}
+.testhint{font-family:var(--mono)}
+.testhint kbd{border:1px solid var(--line);padding:1px 6px;border-radius:4px;background:var(--surface);color:var(--ink);font-family:inherit}
+
+/* ============ DRAWER + MODAL ============ */
+.scrim{position:fixed;inset:0;background:rgba(20,8,16,.45);z-index:40}
+.drawer{
+  position:fixed;top:0;right:0;bottom:0;width:min(420px,100%);z-index:50;background:var(--surface);
+  border-left:1.5px solid var(--line);display:flex;flex-direction:column;
+  padding:calc(env(safe-area-inset-top,0px) + 20px) 20px calc(env(safe-area-inset-bottom,0px) + 20px);
+}
+.drawer header,.modal header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.drawer h2,.modal h2{margin:0;font:400 28px/1 var(--display)}
+[data-side="killer"] .drawer h2,[data-side="killer"] .modal h2{text-transform:uppercase}
+.x{background:none;border:1.5px solid var(--line);width:36px;height:36px;border-radius:var(--radius-sm);cursor:pointer;font-size:18px;line-height:1}
+.lines{flex:1;overflow:auto;display:flex;flex-direction:column;gap:12px}
+.line{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.line .n{font-weight:800}
+.line .v{font-size:12px;color:var(--muted)}
+.qty{display:flex;align-items:center;gap:6px}
+.qty button{width:28px;height:28px;border-radius:var(--radius-sm);border:1.5px solid var(--line);background:none;cursor:pointer}
+.empty{color:var(--muted);text-align:center;padding-block:40px}
+.totals{border-top:1.5px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:12px}
+.totals .row{display:flex;justify-content:space-between;font-weight:800;font-size:18px;font-variant-numeric:tabular-nums}
+.note{font-size:12px;color:var(--muted);margin:0}
+.notice{background:var(--ground-2);border:1.5px dashed var(--accent);border-radius:calc(var(--radius) / 2);padding:12px;font-size:13px}
+
+.modal{
+  position:fixed;z-index:50;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:min(760px,calc(100% - 32px));max-height:calc(100% - 48px);overflow:auto;
+  background:var(--surface);border:1.5px solid var(--line);border-radius:var(--radius);padding:24px;
+}
+.pin{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+.field{display:flex;flex-direction:column;gap:6px}
+.field input,.stock-table input{
+  background:var(--ground-2);border:1.5px solid var(--line);border-radius:calc(var(--radius) / 2);padding:10px 12px;min-width:0;
+}
+.err{color:#d12a6a;font-size:13px;margin:8px 0 0}
+[data-side="killer"] .err{color:#ff6ab8}
+.table-wrap{overflow-x:auto}
+.stock-table{width:100%;border-collapse:collapse;font-size:14px}
+.stock-table th{text-align:left;padding:8px;border-bottom:1.5px solid var(--line)}
+.stock-table td{padding:8px;border-bottom:1px solid var(--line);vertical-align:middle}
+.stock-table input{width:96px;font-variant-numeric:tabular-nums}
+.stock-table .shared{font-size:12px;color:var(--muted);margin-left:6px}
+.admin-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;align-items:center}
+.admin-actions .note{flex:1 1 220px}
+
+.toast{
+  position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);transform:translateX(-50%);z-index:60;
+  background:var(--ink);color:var(--ground);padding:10px 18px;border-radius:var(--radius-sm);font-weight:600;font-size:14px;
+  box-shadow:0 8px 24px rgba(0,0,0,.2);
+}
+
+@media (max-width:860px){
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .card.feature{grid-column:span 2}
+  .card.feature ~ .card.feature{grid-column:auto}
+}
+@media (max-width:560px){
+  .grid{grid-template-columns:1fr}
+  .card.feature{grid-column:auto}
+  .card.full{flex-direction:column}
+  .card.full .art{flex-wrap:wrap}
+  .card.full .art svg{width:33%}
+  .card.full .art{min-height:0}
+  .card.feature .art svg{height:200px}
+  .side-pill em{display:none}
+  .brand span{display:none}
+  .collage{grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(6,1fr)}
+  .collage > div:nth-child(n+19){display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="bar">
+    <div class="brand"><b>Finn Shapiro</b><span>Pretty Killer Tour · Official Shop</span></div>
+    <div class="side-pill" id="sidePill"><i></i><span id="sideName">AM · Pretty side</span><em id="sideClock"></em></div>
+    <button class="cart-btn" id="openCart" type="button">Bag <span class="count" id="cartCount">0</span></button>
+  </header>
+
+  <section class="hero" id="hero">
+    <div class="sparkles" id="fx"></div>
+    <div class="label" id="heroEyebrow">Morning set · Pretty side</div>
+    <h1 class="title" id="heroTitle" aria-label="Pretty"></h1>
+    <p class="sub" id="heroSub"></p>
+    <div class="next" id="heroNext"></div>
+  </section>
+</div>
+
+<div class="band" aria-hidden="true"><div class="track" id="band"></div></div>
+
+<main class="wrap">
+  <div class="shop-head">
+    <h2 id="shopTitle">The pretty drop</h2>
+    <p id="shopNote"></p>
+  </div>
+  <div class="shop-tools">
+    <div class="search"><label class="label" for="search">Search</label><input id="search" type="search" placeholder="Search the shop" autocomplete="off"></div>
+    <div class="chips" role="group" aria-label="Filter by type">
+      <button type="button" data-cat="all" aria-pressed="true">All</button>
+      <button type="button" data-cat="bundles" aria-pressed="false">Bundles</button>
+      <button type="button" data-cat="music" aria-pressed="false">Music &amp; film</button>
+      <button type="button" data-cat="clothes" aria-pressed="false">Clothes</button>
+      <button type="button" data-cat="accessories" aria-pressed="false">Accessories</button>
+      <button type="button" data-cat="collectibles" aria-pressed="false">Collectibles</button>
+    </div>
+    <div class="sort"><label class="label" for="sort">Sort</label><select id="sort"><option value="featured">Featured</option><option value="low">Price: low to high</option><option value="high">Price: high to low</option></select></div>
+  </div>
+  <div class="grid" id="grid"></div>
+</main>
+
+<div class="wrap">
+  <footer>
+    <span>© 2026 Finn Shapiro · Pretty Killer Tour</span>
+    <span class="testhint">Test mode: type <kbd>am</kbd> or <kbd>pm</kbd> to switch sides, <kbd>auto</kbd> to follow the clock</span>
+    <button type="button" id="openAdmin">Admin</button>
+  </footer>
+</div>
+
+<!-- Cart drawer -->
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" hidden aria-label="Your bag">
+  <header><h2>Your bag</h2><div class="bag-actions"><button class="linkish" type="button" id="clearBag" hidden>Empty bag</button><button class="x" type="button" id="closeCart" aria-label="Close bag">×</button></div></header>
+  <div class="lines" id="lines"></div>
+  <div class="totals">
+    <div class="ship" id="ship" hidden></div>
+    <div class="row"><span>Subtotal</span><span id="subtotal">$0.00</span></div>
+    <div class="notice" id="checkoutNotice" hidden></div>
+    <button class="btn" type="button" id="checkout">Checkout</button>
+    <p class="note" id="checkoutNote"></p>
+  </div>
+</aside>
+
+<!-- Admin panel -->
+<section class="modal" id="admin" hidden aria-label="Admin panel">
+  <header><h2>Admin · Stock</h2><button class="x" type="button" id="closeAdmin" aria-label="Close admin">×</button></header>
+  <form id="pinForm" class="pin">
+    <div class="field"><label class="label" for="pinInput">Admin PIN</label><input id="pinInput" type="password" inputmode="numeric" autocomplete="off" placeholder="Enter PIN"></div>
+    <button class="btn" type="submit">Unlock</button>
+  </form>
+  <p class="err" id="pinErr" hidden>That PIN didn't match. The test PIN is set in CONFIG.adminPin (default 1234).</p>
+  <div id="adminBody" hidden>
+    <p class="note" style="margin-bottom:12px">Set how many of each item you have. The Tour Book and Movie share one stock across both sides; the CDs and stickers have a separate Pretty and Killer version.</p>
+    <div class="table-wrap">
+      <table class="stock-table">
+        <thead><tr><th>Product</th><th>Pretty side (AM)</th><th>Killer side (PM)</th></tr></thead>
+        <tbody id="stockRows"></tbody>
+      </table>
+    </div>
+    <div class="admin-actions">
+      <button class="btn" type="button" id="saveStock">Save stock</button>
+      <button class="btn ghost" type="button" id="resetStock">Reset to test stock</button>
+      <p class="note" id="storeNote"></p>
+    </div>
+  </div>
+</section>
+
+<div class="toast" id="toast" hidden></div>
+
+<script>
+/* =====================================================================
+   CONFIG — paste your keys here later
+   ===================================================================== */
+const CONFIG = {
+  // 1) FIREBASE: Firebase console → Project settings → Your apps → Web app → config
+  firebase: {
+    apiKey: "",
+    authDomain: "",
+    projectId: "",
+    storageBucket: "",
+    messagingSenderId: "",
+    appId: ""
+  },
+  // 2) STRIPE: Dashboard → Developers → API keys (publishable key only — NEVER put the secret key here)
+  stripe: {
+    publishableKey: "",            // "pk_test_..."
+    checkoutEndpoint: ""           // your server / Firebase Function that creates a Checkout Session, e.g. "/api/create-checkout-session"
+  },
+  // Test-only PIN. Once Firebase is connected, replace with Firebase Auth (see Store.isAdmin below).
+  adminPin: "1234",
+  // Placeholder: bag total that unlocks free shipping. Set to 0 to hide the free-shipping bar.
+  freeShippingAt: 50
+};
+
+/* =====================================================================
+   PRODUCTS — same 5 items on both sides.
+   shared: true  → one version, one stock (Tour Book, Movie)
+   variants      → a Pretty version (AM) and a Killer version (PM)
+   ===================================================================== */
+const PRODUCTS = [
+  // bundle: no stock of its own; it uses one of each item inside it (the CD matches the side you're on).
+  // Price = full price of everything inside, except the items in `free`.
+  { id:"finnschoice", kind:"bundle", name:"Finn's Choice", price:0, bundle:["kpopcd","book","movie","keychain","cards"], free:["movie"], variants:{
+    pretty:{ label:"With the Pretty ver. CD" },
+    killer:{ label:"With the Killer ver. CD" } } },
+  // inPerson: shown online on its side only, but sold at the merch stand (no Add to bag, no online stock)
+  { id:"mtee", kind:"mtee", name:"Good Morning Sun Tee", price:35, inPerson:"pretty", showLabel:"Morning show only", reveal:"Step into the sun", unreveal:"Back inside" },
+  { id:"ntee", kind:"ntee", name:"Killer Glow Tee", price:35, inPerson:"killer", showLabel:"Night show only", reveal:"Turn the lights off", unreveal:"Turn the lights on" },
+  { id:"book", kind:"book", name:"Pretty Killer Tour Book", price:40, shared:true },
+  { id:"kpopcd", kind:"kpop", name:"K-pop Style CD", price:28,
+    inside:["Lenticular card","Charm","Photocard","Stickers","Pokémon-style card","Scratch-off"],
+    variants:{
+    pretty:{ label:"Pretty ver." },
+    killer:{ label:"Killer ver." } } },
+  { id:"cd", kind:"cd", name:"Standard CD", price:15, variants:{
+    pretty:{ label:"Pretty cover" },
+    killer:{ label:"Killer cover" } } },
+  { id:"keychain", kind:"keychain", name:"Mini CD Keychain", price:15, variants:{
+    pretty:{ label:"Pretty ver." },
+    killer:{ label:"Killer ver." } } },
+  { id:"stickers", kind:"stickers", name:"Sticker Pack", price:8, variants:{
+    pretty:{ label:"Pretty pack" },
+    killer:{ label:"Killer pack" } } },
+  { id:"cards", kind:"cards", name:"Mystery Trading Cards", price:6, variants:{
+    pretty:{ label:"Pretty pack · 5 random cards" },
+    killer:{ label:"Killer pack · 5 random cards" } } },
+  { id:"poster", kind:"poster", name:"Tour Poster", price:20, variants:{
+    pretty:{ label:"Pretty poster · 18×24 in" },
+    killer:{ label:"Killer poster · 18×24 in" } } },
+  { id:"hat", kind:"hat", name:"Bucket Hat", price:30, variants:{
+    pretty:{ label:"Pretty hat" },
+    killer:{ label:"Killer hat" } } },
+  { id:"clips", kind:"clips", name:"Hair Clip Set", price:12, variants:{
+    pretty:{ label:"Bow clips" },
+    killer:{ label:"Knife clips" } } },
+  // digital: no stock limit
+  { id:"digital", kind:"digital", name:"Digital Album", price:10, digital:true, variants:{
+    pretty:{ label:"Pretty ver. · download" },
+    killer:{ label:"Killer ver. · download" } } },
+  { id:"movie", kind:"movie", name:"Pretty Killer: The Movie", price:25, shared:true }
+];
+
+PRODUCTS.filter(p => p.bundle).forEach(b => {
+  b.price = b.bundle.filter(id => !(b.free || []).includes(id)).reduce((a, id) => a + PRODUCTS.find(p => p.id === id).price, 0);
+});
+
+// shop filter categories
+const CATEGORY = {
+  finnschoice:"bundles",
+  kpopcd:"music", cd:"music", digital:"music", movie:"music",
+  mtee:"clothes", ntee:"clothes", hat:"clothes",
+  keychain:"accessories", clips:"accessories",
+  book:"collectibles", stickers:"collectibles", cards:"collectibles", poster:"collectibles"
+};
+
+const DEFAULT_STOCK = {
+  "book":50, "movie":40,
+  "kpopcd:pretty":30, "kpopcd:killer":4,
+  "cd:pretty":100, "cd:killer":100,
+  "stickers:pretty":200, "stickers:killer":200,
+  "hat:pretty":40, "hat:killer":40,
+  "clips:pretty":60, "clips:killer":60,
+  "keychain:pretty":80, "keychain:killer":80,
+  "cards:pretty":150, "cards:killer":150,
+  "poster:pretty":75, "poster:killer":75
+};
+const stockKey = (p, side) => p.shared ? p.id : `${p.id}:${side}`;
+
+/* =====================================================================
+   STORE — stock lives here. Right now it saves in this browser only.
+   When you add Firebase, swap the TODO blocks for Firestore calls so
+   stock is shared by everyone (and your admin edits go live).
+   ===================================================================== */
+const LS_KEY = "pk-shop-stock-v1";
+const Store = {
+  firebaseReady(){ return !!CONFIG.firebase.apiKey; },
+
+  async loadStock(){
+    // TODO(firebase): when connected, read from Firestore instead:
+    //   const snap = await getDoc(doc(db, "shop", "stock"));
+    //   if (snap.exists()) return { ...DEFAULT_STOCK, ...snap.data() };
+    try { const s = JSON.parse(localStorage.getItem(LS_KEY)); if (s) return { ...DEFAULT_STOCK, ...s }; } catch(e){}
+    return { ...DEFAULT_STOCK };
+  },
+
+  async saveStock(stock){
+    // TODO(firebase): await setDoc(doc(db, "shop", "stock"), stock);
+    // Lock this down with Firestore rules so only your admin account can write.
+    try { localStorage.setItem(LS_KEY, JSON.stringify(stock)); } catch(e){}
+  },
+
+  async isAdmin(pin){
+    // TODO(firebase): replace the PIN with Firebase Auth, e.g.
+    //   await signInWithEmailAndPassword(auth, email, password);
+    return pin === CONFIG.adminPin;
+  }
+};
+
+/* =====================================================================
+   CHECKOUT — Stripe goes here.
+   ===================================================================== */
+async function startCheckout(cartLines){
+  if (!CONFIG.stripe.publishableKey || !CONFIG.stripe.checkoutEndpoint){
+    return { test:true };   // not connected yet → run a test order
+  }
+  // TODO(stripe): your server creates a Checkout Session and returns its URL.
+  //   const res = await fetch(CONFIG.stripe.checkoutEndpoint, {
+  //     method:"POST", headers:{ "Content-Type":"application/json" },
+  //     body: JSON.stringify({ items: cartLines.map(l => ({ id:l.key, qty:l.qty })) })
+  //   });
+  //   const { url } = await res.json();
+  //   window.location.href = url;
+  //   (Then decrement stock in a Stripe webhook on the server, not here.)
+  return { test:false };
+}
+
+/* =====================================================================
+   SIDE (AM / PM) — AM = pretty, PM = killer. Typing am / pm overrides.
+   ===================================================================== */
+const SIDES = {
+  pretty:{
+    word:"pretty", pill:"AM · Pretty side", eyebrow:"Morning set · Pretty side",
+    sub:"The morning show. Pink, sweet, and still a little bit killer. Everything here comes in its pretty version until noon.",
+    next:"♡ The Killer side opens at 12:00 PM",
+    shopTitle:"The pretty drop",
+    shopNote:"You're shopping the Pretty side. CDs and stickers ship in their pink versions; the Tour Book and Movie are the same on both sides.",
+    band:"PRETTY ♡ FINN SHAPIRO ♡ PRETTY KILLER ♡ GOOD VIBES ONLY ♡ ",
+    // cutout letters like "PRETTY" and "Shapiro" on the cover
+    ransom:[
+      { f:"'Bodoni Moda', serif", c:"#f25fc4", b:"#161015", r:"-5deg", s:"1em" },
+      { f:"'Special Elite', monospace", c:"#161015", b:"#ffffff", r:"4deg", s:".85em" },
+      { f:"'Anton', sans-serif", c:"#ffffff", b:"#f25fc4", r:"-2deg", s:"1.08em" },
+      { f:"'Bodoni Moda', serif", c:"#f25fc4", b:"#ffffff", r:"3deg", s:".95em", bd:"3px solid #f25fc4" },
+      { f:"'Rubik Mono One', sans-serif", c:"#161015", b:"#f7b8d4", r:"-4deg", s:".8em" },
+      { f:"'Bodoni Moda', serif", c:"#ffffff", b:"#161015", r:"6deg", s:"1.05em" }
+    ]
+  },
+  killer:{
+    word:"KILLER", pill:"PM · Killer side", eyebrow:"Night set · Killer side",
+    sub:"The night show — louder, faster, all black. Every item here comes in its killer version until midnight.",
+    next:"✕ The Pretty side comes back at 12:00 AM",
+    shopTitle:"The killer drop",
+    shopNote:"You're shopping the Killer side. CDs and stickers ship in their black versions; the Tour Book and Movie are the same on both sides.",
+    band:"KILLER ✕ PRETTY KILLER ✕ LIGHTS OUT ✕ ",
+    ransom:[
+      { f:"'Bodoni Moda', serif", c:"#0a0a0a", b:"#f2ecf0", r:"-4deg", s:"1em" },
+      { f:"'Special Elite', monospace", c:"#f2ecf0", b:"transparent", r:"3deg", s:".9em", bd:"3px solid #f2ecf0" },
+      { f:"'Anton', sans-serif", c:"#0a0a0a", b:"#ff3fae", r:"-2deg", s:"1.05em" },
+      { f:"'Rubik Mono One', sans-serif", c:"#ff3fae", b:"transparent", r:"5deg", s:".85em" },
+      { f:"'Bodoni Moda', serif", c:"#f2ecf0", b:"#1d1a20", r:"-6deg", s:".95em" },
+      { f:"'Anton', sans-serif", c:"#f2ecf0", b:"transparent", r:"2deg", s:"1.1em" }
+    ]
+  }
+};
+
+let side = "pretty";
+let override = null;
+try { override = sessionStorage.getItem("pk-side-override"); } catch(e){}
+
+function clockSide(){ return new Date().getHours() < 12 ? "pretty" : "killer"; }
+
+function setSide(next, announce){
+  side = next;
+  document.documentElement.dataset.side = side;
+  const s = SIDES[side];
+  $("#sideName").textContent = s.pill;
+  $("#heroEyebrow").textContent = s.eyebrow;
+  $("#heroSub").textContent = s.sub;
+  renderNext();
+  $("#shopTitle").textContent = s.shopTitle;
+  $("#shopNote").textContent = s.shopNote;
+  renderTitle(); renderFx(); renderBand(); renderGrid(); renderCart();
+  if (announce) toast(side === "pretty" ? "Switched to AM · Pretty side" : "Switched to PM · Killer side");
+}
+
+function renderTitle(){
+  const s = SIDES[side], h = $("#heroTitle");
+  h.setAttribute("aria-label", s.word);
+  h.innerHTML = [...s.word].map((ch, i) => {
+    const st = s.ransom[i % s.ransom.length];
+    return `<span class="ch" aria-hidden="true" style="--f:${st.f};--c:${st.c};--b:${st.b};--r:${st.r};--s:${st.s};--bd:${st.bd||0}">${ch}</span>`;
+  }).join("");
+}
+
+function renderFx(){
+  const fx = $("#fx");
+  $("#hero").classList.toggle("pretty-hero", side === "pretty");
+  if (side === "pretty"){
+    fx.className = "collage";
+    const knife = `<svg class="knife" width="120" height="30" viewBox="0 0 120 30" aria-hidden="true"><path d="M44 10 L116 12 Q104 26 44 22 Z" fill="#e9e6ea" stroke="#9a96a0"/><rect x="4" y="9" width="42" height="14" rx="3" fill="#1a1a1a"/><circle cx="16" cy="16" r="2" fill="#bbb"/><circle cx="32" cy="16" r="2" fill="#bbb"/></svg>`;
+    const tiles = [
+      ["grid-tile",""], ["rose",`<span class="love">love</span>`], ["gingham",""], ["glitter",""], ["dots",""], ["blush",`<span class="ticket">TICKET</span>`],
+      ["blush",`<span class="vinyl"></span>`], ["grid-tile",""], ["rose",`<span class="quote">good<br>vibes<br>only</span>`], ["hearts","♡ ♡ ♡<br>♡ ♡ ♡"], ["glitter",""], ["grid-tile",knife],
+      ["dots",""], ["blush",`<span class="quote">do all<br>things<br>with love</span>`], ["glitter",""], ["rose",""], ["gingham",""], ["blush",`<span class="love">xoxo</span>`]
+    ];
+    fx.innerHTML = tiles.map(([c,h]) => `<div class="${c}">${h}</div>`).join("");
+  } else {
+    fx.className = "slashes";
+    const cuts = [[58,22,40,-14],[64,30,32,-12],[70,64,26,9],[50,78,44,-4]];
+    fx.innerHTML = cuts.map(([x,y,w,r])=>`<i style="left:${x}%;top:${y}%;width:${w}%;transform:rotate(${r}deg)"></i>`).join("");
+  }
+}
+
+function renderBand(){
+  const t = SIDES[side].band.repeat(6);
+  $("#band").innerHTML = `<span>${t}</span><span>${t}</span>`;
+}
+
+/* ---------- product art (drawn, no photos) ---------- */
+function art(p, on){
+  const D = "font-family:var(--display)";
+  // ransom-note letters for the pretty-side art, centered on cx
+  const PP = [
+    { f:"'Bodoni Moda',serif", w:900, c:"#161015", b:"#ffffff" }, { f:"'Anton',sans-serif", c:"#ffffff", b:"#161015" },
+    { f:"'Special Elite',monospace", c:"#161015", b:"#f7b8d4" }, { f:"'Bodoni Moda',serif", w:900, c:"#f25fc4", b:"#161015" },
+    { f:"'Rubik Mono One',sans-serif", c:"#161015", b:"#ffffff" }, { f:"'Anton',sans-serif", c:"#f25fc4", b:"#ffffff" }
+  ];
+  const rs = (word, cx, y, sz, off = 0) => {
+    const w = sz * .78, step = w + 2, x0 = cx - (word.length * step) / 2;
+    return [...word].map((ch, i) => {
+      const st = PP[(i + off) % PP.length], x = x0 + i * step, r = [-6,4,-3,5,-4,3][i % 6];
+      return `<g transform="rotate(${r} ${x + w/2} ${y})"><rect x="${x}" y="${y - sz*.82}" width="${w}" height="${sz*1.05}" fill="${st.b}"/><text x="${x + w/2}" y="${y}" text-anchor="middle" style="font:${st.w||400} ${sz*.8}px ${st.f}" fill="${st.c}">${ch}</text></g>`;
+    }).join("");
+  };
+  const tiles = (x, y, w, h) => `<rect x="${x}" y="${y}" width="${w/2}" height="${h/2}" fill="#f7c4d6"/><rect x="${x+w/2}" y="${y}" width="${w/2}" height="${h/2}" fill="#ee9fbf"/><rect x="${x}" y="${y+h/2}" width="${w/2}" height="${h/2}" fill="#fde1ea"/><rect x="${x+w/2}" y="${y+h/2}" width="${w/2}" height="${h/2}" fill="#f4a9c6"/>`;
+  const split = (x,y,w,h,title,sub) => `
+    <rect x="${x}" y="${y}" width="${w}" height="${h/2}" fill="#111"/>
+    <rect x="${x}" y="${y+h/2}" width="${w}" height="${h/2}" fill="#f7b8d4"/>
+    <text x="${x+w/2}" y="${y+h*.34}" text-anchor="middle" style="font:800 ${w*.2}px 'Sniglet',sans-serif" fill="#ff5fc0">pretty</text>
+    <text x="${x+w/2}" y="${y+h*.72}" text-anchor="middle" style="font:900 ${w*.2}px 'Bodoni Moda',serif" fill="#111">KILLER</text>
+    <text x="${x+w/2}" y="${y+h*.9}" text-anchor="middle" style="font:600 ${w*.075}px 'IBM Plex Mono',monospace;letter-spacing:.1em" fill="#111">${sub}</text>
+    <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="none" stroke="var(--ink)" stroke-opacity=".25"/>`;
+  switch(p.kind){
+    case "book": return `<svg viewBox="0 0 240 240" role="img" aria-label="Tour book">
+      <rect x="62" y="30" width="126" height="182" fill="var(--art-3)" opacity=".5" transform="rotate(6 125 121)"/>
+      <g transform="rotate(-4 120 120)">${split(52,26,130,184,"","TOUR BOOK 2026")}
+      <rect x="52" y="26" width="8" height="184" fill="#000" opacity=".25"/></g></svg>`;
+    case "movie": return `<svg viewBox="0 0 200 200" role="img" aria-label="Movie DVD">
+      <g transform="rotate(3 100 100)">
+      <rect x="44" y="18" width="112" height="164" rx="6" fill="var(--art-2)" opacity=".4"/>
+      ${split(52,24,96,152,"","THE MOVIE")}
+      ${[0,1,2,3,4,5].map(i=>`<rect x="${56+i*15}" y="28" width="8" height="6" fill="#fff" opacity=".8"/><rect x="${56+i*15}" y="166" width="8" height="6" fill="#111" opacity=".6"/>`).join("")}
+      </g></svg>`;
+    case "kpop": return side==="pretty" ? `<svg viewBox="0 0 200 200" role="img" aria-label="K-pop style CD, pretty version">
+      <g transform="rotate(-10 88 58)"><rect x="62" y="20" width="52" height="76" fill="#fff"/><rect x="67" y="25" width="42" height="54" fill="#f7b8d4"/>
+      <path d="M88 44c-4-5-12-1-8 5l8 7 8-7c4-6-4-10-8-5z" fill="#f25fc4"/><text x="88" y="90" text-anchor="middle" style="font:8px 'Special Elite',monospace" fill="#161015">finn ♡</text></g>
+      <circle cx="134" cy="112" r="46" fill="#f5dde8"/><circle cx="134" cy="112" r="32" fill="none" stroke="#e6aecb"/><circle cx="134" cy="112" r="10" fill="#f6c6d9"/>
+      <rect x="34" y="64" width="96" height="112" fill="#f4a9c6"/>${tiles(34,64,96,112)}
+      ${rs("pretty", 82, 124, 17)}
+      <rect x="44" y="148" width="76" height="16" fill="#161015"/><text x="82" y="159.5" text-anchor="middle" style="font:9px 'Special Elite',monospace;letter-spacing:.1em" fill="#f25fc4">PRETTY VER.</text></svg>`
+      : `<svg viewBox="0 0 200 200" role="img" aria-label="K-pop style CD, killer version">
+      <rect x="62" y="20" width="52" height="76" fill="#d9d6dc" transform="rotate(-10 88 58)"/>
+      <rect x="68" y="26" width="40" height="52" fill="#3a353e" transform="rotate(-10 88 58)"/>
+      <circle cx="134" cy="112" r="46" fill="#cfcbd3"/><circle cx="134" cy="112" r="30" fill="none" stroke="#9a96a0"/><circle cx="134" cy="112" r="10" fill="var(--art-bg)"/>
+      <rect x="34" y="64" width="96" height="112" fill="#0b0a0c" stroke="#d9d6dc" stroke-width="2"/>
+      <text x="82" y="124" text-anchor="middle" style="${D};font-size:28px;letter-spacing:.04em" fill="#ff3fae">KILLER</text>
+      <text x="82" y="146" text-anchor="middle" style="font:600 9px 'IBM Plex Mono',monospace;letter-spacing:.2em" fill="#d9d6dc">KILLER VER.</text>
+      <line x1="44" y1="90" x2="120" y2="84" stroke="#ff3fae" stroke-width="2"/></svg>`;
+    case "cd": return `<svg viewBox="0 0 200 200" role="img" aria-label="Standard CD">
+      <circle cx="128" cy="92" r="52" fill="${side==="pretty"?"#fff":"#cfcbd3"}" stroke="var(--art-3)" stroke-width="2"/><circle cx="128" cy="92" r="12" fill="var(--art-bg)"/>
+      <rect x="36" y="46" width="112" height="112" fill="${side==="pretty"?"#f7b8d4":"#111"}" stroke="var(--ink)" stroke-opacity=".3"/>
+      ${side==="pretty" ? tiles(36,46,112,112) : ""}
+      <rect x="36" y="46" width="10" height="112" fill="#000" opacity=".15"/>
+      ${side==="pretty"
+        ? `${rs("pretty", 97, 108, 20, 1)}<rect x="56" y="138" width="82" height="15" fill="#161015"/>`
+        : `<text x="97" y="112" text-anchor="middle" style="font:900 26px 'Bodoni Moda',serif" fill="#f2ecf0">KILLER</text><line x1="52" y1="126" x2="140" y2="118" stroke="#ff3fae" stroke-width="2"/>`}
+      <text x="97" y="148" text-anchor="middle" style="font:600 8px 'IBM Plex Mono',monospace;letter-spacing:.2em" fill="${side==="pretty"?"#f25fc4":"#8c8390"}">FINN SHAPIRO</text></svg>`;
+    case "mtee": {
+      // pink shirt, black text; "good morning" is sun-reactive ink: hidden indoors, turns black in sunlight
+      const shirt = "#f7b8d4";
+      const body = "M80 20 Q120 40 160 20 L210 45 L192 85 L170 76 L170 204 L70 204 L70 76 L48 85 L30 45 Z";
+      return `<svg viewBox="0 0 240 220" role="img" aria-label="Good Morning Sun Tee${on ? ", in the sun" : ""}">
+        ${on ? `<g fill="#ffcf4d"><circle cx="206" cy="30" r="16"/>${[0,45,90,135,180,225,270,315].map(a => `<rect x="204" y="4" width="4" height="9" rx="2" transform="rotate(${a} 206 30)"/>`).join("")}</g>` : ""}
+        <path d="${body}" fill="${shirt}" stroke="#161015" stroke-opacity=".35" stroke-width="2"/>
+        <path d="M94 21 Q120 46 146 21" fill="none" stroke="#161015" stroke-width="5"/>
+        <text x="120" y="78" text-anchor="middle" style="font:900 26px 'Bodoni Moda',serif;letter-spacing:.04em" fill="#161015">pretty</text>
+        <text x="120" y="130" text-anchor="middle" style="font:34px 'Yellowtail',cursive" ${on ? `fill="#161015"` : `fill="#fbd0e1" opacity=".6"`}>good morning</text>
+        ${on ? "" : `<text x="120" y="146" text-anchor="middle" style="font:6.5px 'Special Elite',monospace;letter-spacing:.1em" fill="#161015" opacity=".55">( appears in the sun )</text>`}
+        <rect x="80" y="160" width="80" height="13" fill="#161015"/>
+        <text x="120" y="169.5" text-anchor="middle" style="font:7px 'Special Elite',monospace;letter-spacing:.12em" fill="${shirt}">MORNING SET · IN PERSON</text>
+      </svg>`;
+    }
+    case "ntee": {
+      // black shirt, pink text; "KILLER" is glow-in-the-dark ink
+      return `<svg viewBox="0 0 240 220" role="img" aria-label="Killer Glow Tee${on ? ", in the dark" : ""}">
+        <defs><filter id="darkglow" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+        <path d="M80 20 Q120 40 160 20 L210 45 L192 85 L170 76 L170 204 L70 204 L70 76 L48 85 L30 45 Z" fill="#0b0a0c" stroke="#3a353e" stroke-width="2" opacity="${on ? .5 : 1}"/>
+        <path d="M94 21 Q120 46 146 21" fill="none" stroke="#ff3fae" stroke-width="5" opacity="${on ? .25 : 1}"/>
+        <text x="120" y="118" text-anchor="middle" style="font:44px 'Anton',sans-serif;letter-spacing:.06em" fill="${on ? "#ff7fd0" : "#ff3fae"}" ${on ? `filter="url(#darkglow)"` : ""}>KILLER</text>
+        <line x1="78" y1="128" x2="164" y2="122" stroke="#ff3fae" stroke-width="2" opacity="${on ? .2 : 1}"/>
+        <text x="120" y="160" text-anchor="middle" style="font:7px 'IBM Plex Mono',monospace;letter-spacing:.18em" fill="#ff3fae" opacity="${on ? .2 : 1}">NIGHT SET · IN PERSON</text>
+        ${on ? `<text x="120" y="190" text-anchor="middle" style="font:7px 'IBM Plex Mono',monospace;letter-spacing:.14em" fill="#ff7fd0" opacity=".7">GLOWS IN THE DARK</text>` : ""}
+      </svg>`;
+    }
+    case "digital": {
+      const pretty = side === "pretty";
+      return `<svg viewBox="0 0 200 200" role="img" aria-label="Digital album, ${pretty ? "pretty" : "killer"} version">
+        <rect x="58" y="16" width="84" height="168" rx="14" fill="#161015"/>
+        <rect x="64" y="28" width="72" height="144" rx="6" fill="${pretty ? "#fffafc" : "#141216"}"/>
+        ${pretty ? tiles(70, 36, 60, 60) + rs("pretty", 100, 72, 11) : `<rect x="70" y="36" width="60" height="60" fill="#0b0a0c" stroke="#3a353e"/><text x="100" y="74" text-anchor="middle" style="font:18px 'Anton',sans-serif;letter-spacing:.04em" fill="#ff3fae">KILLER</text>`}
+        <text x="100" y="112" text-anchor="middle" style="font:7px ${pretty ? "'Special Elite'" : "'IBM Plex Mono'"},monospace;letter-spacing:.1em" fill="${pretty ? "#161015" : "#f2ecf0"}">${pretty ? "PRETTY VER." : "KILLER VER."}</text>
+        <rect x="72" y="124" width="56" height="3" fill="${pretty ? "#f7b8d4" : "#2c272f"}"/><rect x="72" y="124" width="22" height="3" fill="${pretty ? "#f25fc4" : "#ff3fae"}"/>
+        <circle cx="100" cy="148" r="11" fill="${pretty ? "#f25fc4" : "#ff3fae"}"/><path d="M96 142 L106 148 L96 154 Z" fill="${pretty ? "#fff" : "#0a0a0a"}"/>
+        <path d="M78 144 L78 152 L72 148 Z M122 144 L122 152 L128 148 Z" fill="${pretty ? "#161015" : "#8c8390"}"/>
+      </svg>`;
+    }
+    case "poster": {
+      const pretty = side === "pretty";
+      const tape = (x, y, r) => `<rect x="${x}" y="${y}" width="30" height="11" fill="#fff" opacity=".7" transform="rotate(${r} ${x+15} ${y+5})"/>`;
+      return `<svg viewBox="0 0 200 200" role="img" aria-label="Tour poster, ${pretty ? "pretty" : "killer"} version">
+        <g transform="rotate(-3 100 100)">
+          <rect x="52" y="18" width="96" height="164" fill="${pretty ? "#fffafc" : "#0b0a0c"}" stroke="${pretty ? "#e9b1c9" : "#3a353e"}" stroke-width="2"/>
+          ${pretty
+            ? `${tiles(60, 26, 80, 84)}${rs("pretty", 100, 76, 14)}
+               <text x="100" y="132" text-anchor="middle" style="font:900 13px 'Bodoni Moda',serif;letter-spacing:.06em" fill="#161015">FINN SHAPIRO</text>
+               <text x="100" y="150" text-anchor="middle" style="font:16px 'Yellowtail',cursive" fill="#f25fc4">the morning set</text>
+               <rect x="66" y="160" width="68" height="12" fill="#161015"/><text x="100" y="168.5" text-anchor="middle" style="font:6.5px 'Special Elite',monospace;letter-spacing:.14em" fill="#f25fc4">PRETTY KILLER TOUR</text>`
+            : `<text x="100" y="92" text-anchor="middle" style="font:34px 'Anton',sans-serif;letter-spacing:.04em" fill="#ff3fae">KILLER</text>
+               <line x1="58" y1="102" x2="142" y2="94" stroke="#ff3fae" stroke-width="2"/>
+               <path d="M70 124 L130 116 Q122 128 70 130 Z" fill="#d9d6dc"/><rect x="58" y="121" width="16" height="9" fill="#ff3fae" transform="rotate(-6 66 125)"/>
+               <text x="100" y="152" text-anchor="middle" style="font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.16em" fill="#f2ecf0">FINN SHAPIRO</text>
+               <text x="100" y="168" text-anchor="middle" style="font:6.5px 'IBM Plex Mono',monospace;letter-spacing:.18em" fill="#8c8390">THE NIGHT SET · PRETTY KILLER TOUR</text>`}
+          ${tape(60, 12, -12)}${tape(110, 12, 10)}
+        </g></svg>`;
+    }
+    case "keychain": {
+      const pretty = side === "pretty";
+      const links = [0,1,2].map(i => `<ellipse cx="${82 + i*7}" cy="${58 + i*9}" rx="5" ry="3.2" transform="rotate(50 ${82 + i*7} ${58 + i*9})" fill="none" stroke="#b9b6bd" stroke-width="2.5"/>`).join("");
+      return `<svg viewBox="0 0 200 200" role="img" aria-label="Mini CD keychain, ${pretty ? "pretty" : "killer"} version">
+        <circle cx="70" cy="42" r="17" fill="none" stroke="#b9b6bd" stroke-width="5"/>${links}
+        <g transform="rotate(-6 128 126)">
+          <circle cx="150" cy="112" r="30" fill="${pretty ? "#f5dde8" : "#cfcbd3"}"/><circle cx="150" cy="112" r="6" fill="var(--art-bg)"/>
+          <rect x="84" y="80" width="88" height="88" fill="${pretty ? "#f7b8d4" : "#0b0a0c"}" stroke="${pretty ? "#e0579b" : "#d9d6dc"}" stroke-width="2"/>
+          <rect x="84" y="80" width="88" height="88" fill="#fff" opacity=".14"/>
+          <circle cx="96" cy="84" r="4" fill="#b9b6bd"/>
+          ${pretty ? `${tiles(92,88,72,72)}${rs("PK", 128, 132, 24)}` : `<text x="128" y="138" text-anchor="middle" style="font:900 36px 'Bodoni Moda',serif" fill="#ff3fae">K</text><line x1="96" y1="150" x2="160" y2="142" stroke="#ff3fae" stroke-width="2"/>`}
+        </g></svg>`;
+    }
+    case "cards": {
+      const pretty = side === "pretty";
+      const back = pretty ? "#f25fc4" : "#141216", face = pretty ? "#fffafc" : "#0b0a0c", edge = pretty ? "#161015" : "#ff3fae";
+      return `<svg viewBox="0 0 200 200" role="img" aria-label="Mystery trading cards, ${pretty ? "pretty" : "killer"} pack">
+        <rect x="62" y="40" width="80" height="116" rx="6" fill="${back}" stroke="${edge}" stroke-width="2" transform="rotate(-16 102 98)"/>
+        <rect x="62" y="40" width="80" height="116" rx="6" fill="${pretty ? "#f7b8d4" : "#2c272f"}" stroke="${edge}" stroke-width="2" transform="rotate(-4 102 98)"/>
+        <g transform="rotate(10 102 98)">
+          <rect x="62" y="40" width="80" height="116" rx="6" fill="${face}" stroke="${edge}" stroke-width="2"/>
+          <rect x="70" y="48" width="64" height="100" rx="3" fill="none" stroke="${pretty ? "#f25fc4" : "#d9d6dc"}" stroke-dasharray="4 3"/>
+          <text x="102" y="112" text-anchor="middle" style="font:900 58px 'Bodoni Moda',serif" fill="${pretty ? "#f25fc4" : "#ff3fae"}">?</text>
+          <rect x="70" y="124" width="64" height="16" fill="${pretty ? "#161015" : "#ff3fae"}"/>
+          <text x="102" y="135.5" text-anchor="middle" style="font:9px ${pretty ? "'Special Elite'" : "'IBM Plex Mono'"},monospace;letter-spacing:.14em" fill="${pretty ? "#f25fc4" : "#0a0a0a"}">MYSTERY</text>
+          <path d="M126 56 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3z" fill="${pretty ? "#ffffff" : "#d9d6dc"}"/>
+        </g></svg>`;
+    }
+    case "clips": {
+      const bow = (x, y, r, fill, knot) => `<g transform="translate(${x} ${y}) rotate(${r})">
+        <rect x="-44" y="-3" width="88" height="6" rx="3" fill="#d9d6dc"/>
+        <path d="M0 0 C-10 -20 -38 -22 -36 0 C-38 22 -10 20 0 0Z" fill="${fill}" stroke="#e0579b" stroke-width="1.5"/>
+        <path d="M0 0 C10 -20 38 -22 36 0 C38 22 10 20 0 0Z" fill="${fill}" stroke="#e0579b" stroke-width="1.5"/>
+        <path d="M-4 4 L-14 30 L-5 27Z M4 4 L14 30 L5 27Z" fill="#e0579b"/>
+        <rect x="-6" y="-7" width="12" height="14" rx="3" fill="${knot}"/></g>`;
+      const knife = (x, y, r, handle) => `<g transform="translate(${x} ${y}) rotate(${r})">
+        <rect x="-52" y="-3" width="104" height="6" fill="#6e6874"/>
+        <path d="M-8 -9 L56 -2 Q46 10 -8 9 Z" fill="#d9d6dc" stroke="#9a96a0"/>
+        <rect x="-50" y="-10" width="42" height="20" fill="${handle}"/>
+        <circle cx="-38" cy="0" r="2.5" fill="#d9d6dc"/><circle cx="-20" cy="0" r="2.5" fill="#d9d6dc"/></g>`;
+      return `<svg viewBox="0 0 200 200" role="img" aria-label="Hair clip set, ${side === "pretty" ? "bow" : "knife"} clips">
+        ${side === "pretty"
+          ? bow(100, 70, -8, "#f25fc4", "#161015") + bow(100, 140, 6, "#ffffff", "#f25fc4")
+          : knife(96, 72, -10, "#0b0a0c") + knife(104, 136, 8, "#ff3fae")}</svg>`;
+    }
+    case "hat": {
+      const pretty = side === "pretty";
+      const crown = "M62 70 Q100 52 138 70 L148 118 H52 Z";
+      const brim = "M28 122 Q100 100 172 122 Q178 142 150 148 Q100 136 50 148 Q22 142 28 122 Z";
+      const stitch = pretty
+        ? `<path d="M100 84c-6-8-20-2-12 9l12 10 12-10c8-11-6-17-12-9z" fill="#f25fc4" stroke="#fff" stroke-width="1.5" stroke-dasharray="2 2"/>`
+        : `<g transform="rotate(-24 100 90)"><path d="M100 84 L140 86 Q132 96 100 94 Z" fill="#d9d6dc"/><rect x="72" y="84" width="28" height="10" rx="2" fill="#ff3fae"/></g>`;
+      return `<svg viewBox="0 0 200 200" role="img" aria-label="Bucket hat, ${pretty ? "pretty" : "killer"} version">
+        ${pretty ? `<defs><pattern id="ging" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="12" height="12" fill="#fde9f0"/><rect width="6" height="12" fill="#f25fc4" opacity=".3"/><rect width="12" height="6" fill="#f25fc4" opacity=".3"/></pattern></defs>` : ""}
+        <ellipse cx="100" cy="160" rx="70" ry="8" fill="#000" opacity=".12"/>
+        <path d="${brim}" fill="${pretty ? "url(#ging)" : "#141216"}" stroke="${pretty ? "#e0579b" : "#3a353e"}" stroke-width="2"/>
+        <path d="${crown}" fill="${pretty ? "#f7b8d4" : "#0b0a0c"}" stroke="${pretty ? "#e0579b" : "#3a353e"}" stroke-width="2"/>
+        <path d="M52 108 H148 L150 120 H50 Z" fill="${pretty ? "#161015" : "#ff3fae"}"/>
+        <text x="100" y="117.5" text-anchor="middle" style="font:${pretty ? "8px 'Special Elite',monospace" : "8px 'IBM Plex Mono',monospace"};letter-spacing:.2em" fill="${pretty ? "#f25fc4" : "#0a0a0a"}">${pretty ? "PRETTY KILLER" : "KILLER"}</text>
+        ${stitch}</svg>`;
+    }
+    case "stickers": {
+      const sheet = side==="pretty" ? "#fff" : "#1d1a20";
+      const bits = side==="pretty"
+        ? `<path d="M68 58c-7-9-22-2-14 10l14 12 14-12c8-12-7-19-14-10z" fill="#f25fc4"/>
+           <text x="128" y="76" text-anchor="middle" style="font:30px 'Yellowtail',cursive" fill="#f7a6c9" stroke="#f25fc4" stroke-width=".6">love</text>
+           <g transform="rotate(-8 82 112)"><rect x="52" y="98" width="62" height="28" fill="#ffd3e3" stroke="#c24a86" stroke-dasharray="3 2"/><text x="83" y="116" text-anchor="middle" style="font:11px 'Special Elite',monospace" fill="#c24a86">TICKET</text></g>
+           ${rs("PK", 140, 124, 22, 3)}
+           <circle cx="72" cy="156" r="14" fill="#222"/><circle cx="72" cy="156" r="4" fill="#f7b8d4"/>
+           <g transform="rotate(18 128 158)"><rect x="120" y="156" width="16" height="16" fill="#d9b36a"/><path d="M121 156 V144 L135 140 V156 Z" fill="#e0579b"/></g>`
+        : `<polygon points="68,46 52,82 66,82 58,110 84,70 70,70 80,46" fill="#ff3fae"/>
+           <g stroke="#f2ecf0" stroke-width="6" stroke-linecap="square"><line x1="118" y1="54" x2="146" y2="82"/><line x1="146" y1="54" x2="118" y2="82"/></g>
+           <path d="M56 150 L120 126 L126 132 L64 158 Z" fill="#cfcbd3"/><rect x="120" y="120" width="22" height="10" fill="#ff3fae" transform="rotate(-20 131 125)"/>
+           <rect x="104" y="92" width="26" height="30" fill="#f2ecf0" transform="rotate(-6 117 107)"/><text x="117" y="116" text-anchor="middle" style="font:900 22px 'Bodoni Moda',serif" fill="#0a0a0a" transform="rotate(-6 117 107)">K</text>
+           <rect x="136" y="98" width="22" height="26" fill="#ff3fae" transform="rotate(8 147 111)"/><text x="147" y="118" text-anchor="middle" style="font:18px 'Anton',sans-serif" fill="#0a0a0a" transform="rotate(8 147 111)">!</text>
+           <circle cx="150" cy="160" r="12" fill="none" stroke="#ff3fae" stroke-width="3"/>`;
+      return `<svg viewBox="0 0 200 200" role="img" aria-label="Sticker pack">
+        <rect x="40" y="30" width="128" height="156" rx="${side==="pretty"?3:0}" fill="${side==="pretty"?"#f4a9c6":sheet}" opacity=".7" transform="rotate(6 104 108)"/>
+        <rect x="34" y="24" width="132" height="156" rx="${side==="pretty"?3:0}" fill="${sheet}" stroke="var(--ink)" stroke-opacity=".2"/>${bits}</svg>`;
+    }
+  }
+}
+
+/* ---------- shop grid ---------- */
+let stock = { ...DEFAULT_STOCK };
+let cart = [];  // { key, id, side, qty }
+try { cart = JSON.parse(localStorage.getItem("pk-cart")) || []; } catch(e){}
+const saveCart = () => { try { localStorage.setItem("pk-cart", JSON.stringify(cart)); } catch(e){} };
+
+const money = n => "$" + n.toFixed(2);
+const product = id => PRODUCTS.find(p => p.id === id);
+// stock keys a product uses up; a bundle uses one of each item inside it
+const keysFor = (p, s) => p.bundle ? p.bundle.map(id => stockKey(product(id), s)) : [stockKey(p, s)];
+const lineKeys = l => keysFor(product(l.id), l.side);
+const inCart = key => cart.reduce((a,l) => a + (lineKeys(l).includes(key) ? l.qty : 0), 0);
+const inStock = (p, s) => p.digital ? Infinity : Math.min(...keysFor(p, s).map(k => stock[k] ?? 0));
+const available = (p, s) => p.digital ? Infinity : Math.min(...keysFor(p, s).map(k => (stock[k] ?? 0) - inCart(k)));
+const variantLabel = (p, s) => p.shared ? "Same on both sides" : p.variants[s].label + (s==="pretty" ? " · Pretty side" : " · Killer side");
+
+const insideOpen = {};
+const view = { q:"", cat:"all", sort:"featured" };
+const esc = t => t.replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" })[c]);
+const searchText = p => [p.name, p.showLabel, CATEGORY[p.id], ...(p.inside || []),
+  ...(p.variants ? Object.values(p.variants).map(v => v.label) : []),
+  ...(p.bundle || []).map(id => product(id).name)].filter(Boolean).join(" ").toLowerCase();
+const revealed = {};   // UV / lights-off preview on the in-person tees
+function renderGrid(){
+  const q = view.q.trim().toLowerCase();
+  const filtering = !!q || view.cat !== "all" || view.sort !== "featured";
+  let list = PRODUCTS.filter(p => !p.inPerson || p.inPerson === side)
+    .filter(p => view.cat === "all" || CATEGORY[p.id] === view.cat)
+    .filter(p => !q || searchText(p).includes(q));
+  if (view.sort === "low") list = [...list].sort((a,b) => a.price - b.price);
+  if (view.sort === "high") list = [...list].sort((a,b) => b.price - a.price);
+  $("#grid").classList.toggle("filtered", filtering);
+  if (!list.length){
+    $("#grid").innerHTML = `<p class="no-results">Nothing matches${q ? ` “${esc(view.q.trim())}”` : ""}. Try another word or pick <b>All</b>.</p>`;
+    return;
+  }
+  $("#grid").innerHTML = list.map(p => {
+    const total = inStock(p, side);
+    const left = available(p, side);
+    const v = (p.shared || !p.variants) ? null : p.variants[side];
+    const stockText = p.digital ? "Instant download" : total <= 0 ? "Sold out" : left <= 0 ? "All in your bag" : left <= 10 ? `Only ${left} left` : `${left} in stock`;
+    const addBtn = `<button class="btn" type="button" data-add="${p.id}" ${left<=0?"disabled":""}>${total<=0 ? "Sold out" : "Add to bag"}</button>`;
+    if (p.inPerson){
+      const on = !!revealed[p.id];
+      return `<article class="card in-person">
+      <div class="art clickable ${on ? "revealed" : ""}" data-reveal="${p.id}"><span class="tag">${p.showLabel}</span>${art(p, on)}</div>
+      <div class="body">
+        <span class="ver">${p.showLabel} · In person</span>
+        <h3>${p.name}</h3>
+        <button class="inside-btn" type="button" data-reveal="${p.id}" aria-pressed="${on}">${on ? p.unreveal : p.reveal} <span aria-hidden="true">✦</span></button>
+        <div class="buy">
+          <div class="price">${money(p.price)}</div>
+          <div class="stand">Go to the merch stand to buy this item</div>
+        </div>
+      </div>
+    </article>`;
+    }
+    if (p.bundle){
+      const items = p.bundle.map(product);
+      const full = items.reduce((a,c)=>a+c.price,0);
+      return `<article class="card full">
+      <div class="art bundle-art"><span class="tag">Finn's pick</span>${items.map(art).join("")}</div>
+      <div class="body">
+        <span class="ver">${v.label}</span>
+        <h3>${p.name}</h3>
+        <ul class="inside">${items.map(c=>`<li>${c.name}${c.shared ? "" : " (" + c.variants[side].label + ")"}${(p.free||[]).includes(c.id) ? " · FREE" : ""}</li>`).join("")}</ul>
+        <div class="buy">
+          <div><div class="price">${money(p.price)} <s class="was">${money(full)}</s> <span class="save">${(p.free||[]).map(id => product(id).name.replace("Pretty Killer: ", "")).join(" + ")} free</span></div><div class="stock ${left<=10?"low":""}">${stockText}</div></div>
+          ${addBtn}
+        </div>
+      </div>
+    </article>`;
+    }
+    const inside = p.inside ? `
+        <button class="inside-btn" type="button" data-inside="${p.id}" aria-expanded="${insideOpen[p.id]?"true":"false"}" aria-controls="inside-${p.id}">What's inside <span aria-hidden="true">${insideOpen[p.id]?"−":"+"}</span></button>
+        <ul class="inside" id="inside-${p.id}" ${insideOpen[p.id]?"":"hidden"}>${p.inside.map(i=>`<li>${i}</li>`).join("")}</ul>` : "";
+    return `<article class="card ${p.feature ? "feature" : ""}">
+      <div class="art${p.inside ? " clickable" : ""}" ${p.inside ? `data-inside="${p.id}"` : ""}>${p.shared ? `<span class="tag both">Both sides</span>` : `<span class="tag">${side==="pretty"?"Pretty only":"Killer only"}</span>`}${art(p)}</div>
+      <div class="body">
+        <span class="ver">${v ? v.label : "Pretty + Killer"}</span>
+        <h3>${p.name}</h3>${inside}
+        <div class="buy">
+          <div><div class="price">${money(p.price)}</div><div class="stock ${left<=10?"low":""}">${stockText}</div></div>
+          ${addBtn}
+        </div>
+      </div>
+    </article>`;
+  }).join("");
+}
+
+document.addEventListener("click", e => {
+  const chip = e.target.closest("[data-cat]");
+  if (chip){
+    view.cat = chip.dataset.cat;
+    document.querySelectorAll("[data-cat]").forEach(b => b.setAttribute("aria-pressed", b === chip));
+    renderGrid(); return;
+  }
+  const rm = e.target.closest("[data-remove]");
+  if (rm){ cart = cart.filter(l => l.key !== rm.dataset.remove); saveCart(); renderGrid(); renderCart(); return; }
+  const rev = e.target.closest("[data-reveal]");
+  if (rev){ revealed[rev.dataset.reveal] = !revealed[rev.dataset.reveal]; renderGrid(); return; }
+  const ins = e.target.closest("[data-inside]");
+  if (ins){ insideOpen[ins.dataset.inside] = !insideOpen[ins.dataset.inside]; renderGrid(); return; }
+  const add = e.target.closest("[data-add]");
+  if (add){
+    const p = product(add.dataset.add), key = stockKey(p, side);
+    if (available(p, side) <= 0) return;
+    const line = cart.find(l => l.key === key);
+    line ? line.qty++ : cart.push({ key, id:p.id, side: p.shared ? "both" : side, qty:1 });
+    saveCart(); renderGrid(); renderCart();
+    toast(`Added ${p.name}${p.shared ? "" : " (" + p.variants[side].label + ")"}`);
+  }
+  const q = e.target.closest("[data-qty]");
+  if (q){
+    const line = cart.find(l => l.key === q.dataset.key);
+    if (!line) return;
+    const d = +q.dataset.qty;
+    if (d > 0 && available(product(line.id), line.side) <= 0) return toast("That's all we have left");
+    line.qty += d;
+    if (line.qty <= 0) cart = cart.filter(l => l !== line);
+    saveCart(); renderGrid(); renderCart();
+  }
+});
+
+/* ---------- cart ---------- */
+function renderCart(){
+  const count = cart.reduce((a,l)=>a+l.qty,0);
+  $("#cartCount").textContent = count;
+  if (!cart.length){
+    $("#lines").innerHTML = `<div class="empty">Your bag is empty.<br>${side==="pretty"?"Go get something pretty ♡":"Go get something killer ✕"}</div>`;
+  } else {
+    $("#lines").innerHTML = cart.map(l => {
+      const p = product(l.id);
+      return `<div class="line">
+        <div><div class="n">${p.name}</div><div class="v">${l.free ? "Secret code · free" : p.shared ? "Same on both sides" : variantLabel(p, l.side)}</div></div>
+        <div class="price" style="font-size:16px">${l.free ? `<span class="free">FREE</span>` : money(p.price*l.qty)}</div>
+        <div class="qty">${l.free ? "" : `<button type="button" data-qty="-1" data-key="${l.key}" aria-label="One less">−</button><span>${l.qty}</span><button type="button" data-qty="1" data-key="${l.key}" aria-label="One more">+</button>`}<button type="button" class="linkish" data-remove="${l.key}">Remove</button></div>
+      </div>`;
+    }).join("");
+  }
+  const subtotal = cart.reduce((a,l) => a + (l.free ? 0 : product(l.id).price*l.qty), 0);
+  $("#subtotal").textContent = money(subtotal);
+  $("#clearBag").hidden = !cart.length;
+  const goal = CONFIG.freeShippingAt, ship = $("#ship");
+  ship.hidden = !goal || !cart.length;
+  if (goal && cart.length){
+    const pct = Math.min(100, subtotal / goal * 100);
+    ship.innerHTML = `<span>${subtotal >= goal ? "You've got free shipping ♡" : `You're ${money(goal - subtotal)} away from free shipping`}</span><i><b style="width:${pct}%"></b></i>`;
+  }
+  const live = CONFIG.stripe.publishableKey && CONFIG.stripe.checkoutEndpoint;
+  $("#checkout").textContent = live ? "Checkout" : "Place test order";
+  $("#checkout").disabled = !cart.length;
+  $("#checkoutNote").textContent = live ? "You'll finish paying on Stripe's secure checkout." : "Stripe isn't connected yet, so this places a test order: no payment, but stock goes down so you can see it work.";
+}
+
+$("#checkout").addEventListener("click", async () => {
+  if (!cart.length) return;
+  const r = await startCheckout(cart);
+  if (r.test){
+    cart.filter(l => !product(l.id).digital).forEach(l => lineKeys(l).forEach(k => { stock[k] = Math.max(0, (stock[k] ?? 0) - l.qty); }));
+    await Store.saveStock(stock);
+    const n = cart.reduce((a,l)=>a+l.qty,0);
+    cart = []; saveCart(); renderGrid(); renderCart();
+    const note = $("#checkoutNotice");
+    note.textContent = `Test order placed: ${n} item${n>1?"s":""}. Stock updated. Add your Stripe keys in CONFIG to take real payments.`;
+    note.hidden = false;
+  }
+});
+
+$("#clearBag").addEventListener("click", () => { cart = []; saveCart(); renderGrid(); renderCart(); toast("Bag emptied"); });
+$("#search").addEventListener("input", e => { view.q = e.target.value; renderGrid(); });
+$("#sort").addEventListener("change", e => { view.sort = e.target.value; renderGrid(); });
+
+// Secret code: typing "movie" anywhere puts the Movie in the bag for free (one per bag).
+// When Stripe is connected, have your server re-check this so it can't be faked.
+function giveFreeMovie(){
+  const m = product("movie");
+  if (cart.some(l => l.free)) return toast("Your free Movie is already in your bag");
+  if (available(m, side) <= 0) return toast("The Movie is sold out");
+  cart.push({ key:"movie:free", id:"movie", side:"both", qty:1, free:true });
+  saveCart(); renderGrid(); renderCart(); openCart();
+  toast("Secret code! The Movie is in your bag for free");
+}
+
+function openCart(){ $("#checkoutNotice").hidden = true; $("#drawer").hidden = false; $("#scrim").hidden = false; }
+function closeAll(){ $("#drawer").hidden = true; $("#admin").hidden = true; $("#scrim").hidden = true; }
+$("#openCart").addEventListener("click", openCart);
+$("#closeCart").addEventListener("click", closeAll);
+$("#scrim").addEventListener("click", closeAll);
+
+/* ---------- admin ---------- */
+let adminOpen = false;
+function openAdmin(){
+  $("#admin").hidden = false; $("#scrim").hidden = false;
+  $("#pinErr").hidden = true;
+  $("#storeNote").textContent = Store.firebaseReady()
+    ? "Connected to Firebase: saves go live for every shopper."
+    : "Firebase isn't connected yet, so stock saves in this browser only.";
+  if (!adminOpen) setTimeout(()=>$("#pinInput").focus(), 30);
+}
+$("#openAdmin").addEventListener("click", openAdmin);
+$("#closeAdmin").addEventListener("click", closeAll);
+
+$("#pinForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  if (await Store.isAdmin($("#pinInput").value)){
+    adminOpen = true; $("#pinForm").hidden = true; $("#pinErr").hidden = true; $("#adminBody").hidden = false; renderStockRows();
+  } else { $("#pinErr").hidden = false; }
+});
+
+function renderStockRows(){
+  const inp = (key, label) => `<input type="number" min="0" step="1" id="stock-${key.replace(":","-")}" data-stock="${key}" value="${stock[key] ?? 0}" aria-label="${label}">`;
+  $("#stockRows").innerHTML = PRODUCTS.filter(p => !p.bundle && !p.digital && !p.inPerson).map(p => p.shared
+    ? `<tr><td><b>${p.name}</b></td><td colspan="2">${inp(p.id, p.name + " stock")}<span class="shared">shared by both sides</span></td></tr>`
+    : `<tr><td><b>${p.name}</b></td><td>${inp(p.id+":pretty", p.name+" pretty stock")}</td><td>${inp(p.id+":killer", p.name+" killer stock")}</td></tr>`
+  ).join("") + `<tr><td><b>Finn's Choice</b></td><td colspan="2"><span class="shared" style="margin:0">No stock of its own: each one sold uses 1 of each item inside it (${product("finnschoice").bundle.map(id => product(id).name).join(", ")}), from that side where there are two versions.</span></td></tr>`
+    + `<tr><td><b>Digital Album</b></td><td colspan="2"><span class="shared" style="margin:0">Digital download, so no stock limit.</span></td></tr>`
+    + `<tr><td><b>UV Tee &amp; Glow Tee</b></td><td colspan="2"><span class="shared" style="margin:0">Sold in person at the merch stand only, so there is no online stock.</span></td></tr>`;
+}
+$("#saveStock").addEventListener("click", async () => {
+  document.querySelectorAll("[data-stock]").forEach(i => { stock[i.dataset.stock] = Math.max(0, parseInt(i.value,10) || 0); });
+  await Store.saveStock(stock); renderGrid(); renderCart(); toast("Stock saved");
+});
+$("#resetStock").addEventListener("click", async () => {
+  stock = { ...DEFAULT_STOCK }; await Store.saveStock(stock); renderStockRows(); renderGrid(); toast("Stock reset to test amounts");
+});
+
+/* ---------- test keys: type "am" / "pm" / "auto" ---------- */
+let typed = "";
+document.addEventListener("keydown", e => {
+  if (e.target.closest("input, textarea") || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (e.key === "Escape") return closeAll();
+  if (e.key.length !== 1) return;
+  typed = (typed + e.key.toLowerCase()).slice(-5);
+  const set = (v) => { override = v; try { v ? sessionStorage.setItem("pk-side-override", v) : sessionStorage.removeItem("pk-side-override"); } catch(err){} };
+  if (typed.endsWith("am")){ set("pretty"); typed=""; setSide("pretty", true); }
+  else if (typed.endsWith("pm")){ set("killer"); typed=""; setSide("killer", true); }
+  else if (typed.endsWith("movie")){ typed=""; giveFreeMovie(); }
+  else if (typed.endsWith("auto")){ set(null); typed=""; setSide(clockSide(), false); toast("Following the clock again"); }
+});
+
+/* ---------- helpers + boot ---------- */
+function $(s){ return document.querySelector(s); }
+let toastTimer;
+function toast(msg){
+  const t = $("#toast"); t.textContent = msg; t.hidden = false;
+  clearTimeout(toastTimer); toastTimer = setTimeout(()=>t.hidden = true, 2200);
+}
+function untilSwitch(){
+  const now = new Date(), next = new Date(now);
+  next.setHours(now.getHours() < 12 ? 12 : 24, 0, 0, 0);
+  const mins = Math.max(1, Math.round((next - now) / 60000)), h = Math.floor(mins / 60), m = mins % 60;
+  return h ? `${h}h ${m}m` : `${m}m`;
+}
+function renderNext(){
+  $("#heroNext").textContent = SIDES[side].next + (override ? " · test override on" : ` · in ${untilSwitch()}`);
+}
+function tickClock(){
+  renderNext();
+  $("#sideClock").textContent = new Date().toLocaleTimeString([], { hour:"numeric", minute:"2-digit" });
+  if (!override && clockSide() !== side) setSide(clockSide(), true);
+}
+
+(async function boot(){
+  stock = await Store.loadStock();
+  setSide(override || clockSide(), false);
+  tickClock(); setInterval(tickClock, 30000);
+  if (location.hash === "#admin") openAdmin();
+})();
+</script>
+</body>
+</html>

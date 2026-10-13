@@ -1,0 +1,166 @@
+<title>Good Morning Tee</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Bodoni+Moda:wght@700;900&family=Special+Elite&family=Rubik+Mono+One&family=Karla:wght@400;600;800&family=Yellowtail&display=swap">
+<style>
+:root{
+  --ground:#f8d2e1; --paper:#fffafc; --ink:#161015; --muted:#8e5a73;
+  --hot:#f25fc4; --soft:#f7b8d4; --line:#e9b1c9;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font:16px/1.55 "Karla",system-ui,sans-serif;padding-inline:16px}
+.wrap{max-width:1080px;margin-inline:auto;padding-block:40px 64px}
+.eyebrow{display:inline-block;background:var(--ink);color:var(--hot);font:14px/1 "Special Elite","Courier New",monospace;padding:7px 10px}
+h1{margin:14px 0 6px;font:900 clamp(40px,7vw,72px)/1 "Bodoni Moda",Georgia,serif;text-wrap:balance}
+.lede{margin:0;max-width:58ch;color:var(--muted)}
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:22px}
+.controls span{font:13px/1 "Special Elite",monospace;color:var(--muted);margin-right:4px}
+.controls button{font:800 14px/1 "Karla",sans-serif;border:1.5px solid var(--ink);background:transparent;color:var(--ink);padding:9px 14px;border-radius:3px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.controls button i{width:14px;height:14px;border-radius:50%;border:1px solid var(--ink);display:block}
+.controls button[aria-pressed="true"]{background:var(--ink);color:#fff}
+.controls button:focus-visible{outline:3px solid var(--hot);outline-offset:2px}
+.views{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;margin-top:22px}
+figure{margin:0;background:var(--paper);padding:18px 18px 14px;box-shadow:0 18px 28px -14px rgba(120,30,75,.45);position:relative}
+figure:nth-child(1){transform:rotate(-.6deg)}
+figure:nth-child(2){transform:rotate(.6deg)}
+figure::before{content:"";position:absolute;top:-10px;left:50%;width:90px;height:22px;transform:translateX(-50%) rotate(-3deg);background:rgba(255,255,255,.65);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+figure svg{width:100%;height:auto;display:block;background:#f6c6d9;background-image:linear-gradient(#fbe0ea 2px,transparent 2px),linear-gradient(90deg,#fbe0ea 2px,transparent 2px);background-size:24px 24px}
+figcaption{font:13px/1.3 "Special Elite",monospace;margin-top:10px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+figcaption b{font-weight:400;color:var(--hot)}
+.specs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin-top:36px}
+.spec{background:var(--paper);padding:18px}
+.spec h2{margin:0 0 10px;font:900 20px/1.1 "Bodoni Moda",serif}
+.spec p,.spec li{font-size:14px;margin:0}
+.spec ul{margin:0;padding-left:18px;display:grid;gap:4px}
+.swatches{display:grid;gap:8px}
+.sw{display:flex;align-items:center;gap:10px;font-size:14px}
+.sw i{width:26px;height:26px;border:1px solid var(--line);display:block;flex:none}
+.sw code{font:12px "Special Elite",monospace;color:var(--muted);margin-left:auto}
+@media (max-width:760px){
+  .views,.specs{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <span class="eyebrow">Morning set · Pretty side · Merch design</span>
+  <h1>Good Morning Tee</h1>
+  <p class="lede">The Pretty side's morning show shirt, in the cover's style: cutout "pretty" letters on a pink collage tile, "good morning" in script, and a little knife underline so it's still a bit killer.</p>
+
+  <div class="controls" role="group" aria-label="Shirt color">
+    <span>Shirt color:</span>
+    <button type="button" id="c-white" data-shirt="white" aria-pressed="true"><i style="background:#ffffff"></i>White</button>
+    <button type="button" id="c-pink" data-shirt="pink" aria-pressed="false"><i style="background:#fbd9e6"></i>Baby pink</button>
+    <button type="button" id="c-cream" data-shirt="cream" aria-pressed="false"><i style="background:#fff3e8"></i>Cream</button>
+  </div>
+
+  <div class="views">
+    <figure><div id="front"></div><figcaption><span>FRONT</span><b>center chest · about 10" wide</b></figcaption></figure>
+    <figure><div id="back"></div><figcaption><span>BACK</span><b>upper back · about 11" wide</b></figcaption></figure>
+  </div>
+
+  <div class="specs">
+    <section class="spec">
+      <h2>Print colors</h2>
+      <div class="swatches">
+        <div class="sw"><i style="background:#f25fc4"></i>Hot pink<code>#F25FC4</code></div>
+        <div class="sw"><i style="background:#161015"></i>Black<code>#161015</code></div>
+        <div class="sw"><i style="background:#f7b8d4"></i>Soft pink<code>#F7B8D4</code></div>
+        <div class="sw"><i style="background:#ffffff"></i>White<code>#FFFFFF</code></div>
+      </div>
+    </section>
+    <section class="spec">
+      <h2>The shirt</h2>
+      <ul>
+        <li>Heavyweight cotton tee, relaxed fit</li>
+        <li>Hot pink ringer trim on the collar and sleeves</li>
+        <li>Four ink colors, so it works as a normal screen print</li>
+        <li>Inside neck print: "pretty side ♡"</li>
+      </ul>
+    </section>
+    <section class="spec">
+      <h2>For the printer</h2>
+      <ul>
+        <li>Fonts: Bodoni Moda, Anton, Special Elite, Rubik Mono One, Yellowtail (all free on Google Fonts)</li>
+        <li>Ask for the text to be converted to outlines before printing</li>
+        <li>The pink grid behind the shirt is only the page background, not part of the print</li>
+      </ul>
+    </section>
+  </div>
+</div>
+
+<script>
+const HOT = "#f25fc4", INK = "#161015", SOFT = "#f7b8d4", WHITE = "#ffffff";
+const SHIRTS = {
+  white: { fill:"#ffffff", shade:"#f1e6eb" },
+  pink:  { fill:"#fbd9e6", shade:"#f0c3d5" },
+  cream: { fill:"#fff3e8", shade:"#f1e2d4" }
+};
+// cutout letter styles, like "PRETTY" and "Shapiro" on the cover
+const CUT = [
+  { f:"'Bodoni Moda',serif", w:900, c:HOT, b:INK },
+  { f:"'Special Elite',monospace", c:INK, b:WHITE, bd:INK },
+  { f:"'Anton',sans-serif", c:WHITE, b:HOT },
+  { f:"'Bodoni Moda',serif", w:900, c:HOT, b:WHITE, bd:HOT },
+  { f:"'Rubik Mono One',sans-serif", c:INK, b:SOFT },
+  { f:"'Bodoni Moda',serif", w:900, c:WHITE, b:INK }
+];
+function cutout(word, cx, y, sz, off = 0){
+  const w = sz * .8, step = w + 4, x0 = cx - (word.length * step - 4) / 2;
+  return [...word].map((ch, i) => {
+    const s = CUT[(i + off) % CUT.length], x = x0 + i * step, r = [-6,4,-3,5,-4,3][i % 6];
+    return `<g transform="rotate(${r} ${x + w/2} ${y})">
+      <rect x="${x}" y="${y - sz*.84}" width="${w}" height="${sz*1.08}" fill="${s.b}" ${s.bd ? `stroke="${s.bd}" stroke-width="2"` : ""}/>
+      <text x="${x + w/2}" y="${y}" text-anchor="middle" style="font:${s.w||400} ${sz*.82}px ${s.f}" fill="${s.c}">${ch}</text></g>`;
+  }).join("");
+}
+function tiles(x, y, w, h){
+  const c = ["#f7c4d6","#ee9fbf","#fde1ea","#f4a9c6"];
+  return `<rect x="${x}" y="${y}" width="${w/2}" height="${h/2}" fill="${c[0]}"/><rect x="${x+w/2}" y="${y}" width="${w/2}" height="${h/2}" fill="${c[1]}"/>
+    <rect x="${x}" y="${y+h/2}" width="${w/2}" height="${h/2}" fill="${c[2]}"/><rect x="${x+w/2}" y="${y+h/2}" width="${w/2}" height="${h/2}" fill="${c[3]}"/>`;
+}
+const heart = (x, y, s, fill) => `<path transform="translate(${x} ${y}) scale(${s})" d="M0 -4 C-6 -12 -16 -2 0 10 C16 -2 6 -12 0 -4Z" fill="${fill}"/>`;
+function tee(shirt, print, back){
+  const s = SHIRTS[shirt];
+  const collar = back ? "M198 34 Q250 52 302 34" : "M198 34 Q250 84 302 34";
+  return `<svg viewBox="0 0 500 540" role="img" aria-label="Good Morning Tee, ${back ? "back" : "front"}">
+    <path d="M170 30 Q250 ${back ? 44 : 70} 330 30 L440 78 L402 170 L356 152 L356 520 L144 520 L144 152 L98 170 L60 78 Z" fill="${s.fill}" stroke="${s.shade}" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M150 170 Q160 340 150 510 M350 170 Q340 340 350 510" fill="none" stroke="${s.shade}" stroke-width="2" opacity=".7"/>
+    <path d="${collar}" fill="none" stroke="${HOT}" stroke-width="10" stroke-linecap="round"/>
+    <line x1="60" y1="78" x2="98" y2="170" stroke="${HOT}" stroke-width="12"/>
+    <line x1="440" y1="78" x2="402" y2="170" stroke="${HOT}" stroke-width="12"/>
+    ${print}</svg>`;
+}
+const FRONT = `
+  ${tiles(160, 132, 180, 118)}
+  ${heart(318, 150, .9, HOT)}
+  ${cutout("pretty", 250, 212, 40)}
+  <text x="250" y="284" text-anchor="middle" style="font:46px 'Yellowtail',cursive" fill="${HOT}">good morning</text>
+  <g transform="rotate(-3 250 302)">
+    <rect x="164" y="295" width="40" height="14" rx="3" fill="${INK}"/>
+    <circle cx="176" cy="302" r="2.2" fill="${WHITE}"/><circle cx="192" cy="302" r="2.2" fill="${WHITE}"/>
+    <path d="M204 294 L338 299 Q322 312 204 310 Z" fill="${WHITE}" stroke="${INK}" stroke-width="2"/>
+  </g>
+  <text x="250" y="338" text-anchor="middle" style="font:10.5px 'Special Elite',monospace;letter-spacing:.16em" fill="${INK}">FINN SHAPIRO · PRETTY KILLER TOUR</text>
+  <rect x="178" y="348" width="144" height="18" fill="${INK}"/>
+  <text x="250" y="361" text-anchor="middle" style="font:10px 'Special Elite',monospace;letter-spacing:.16em" fill="${HOT}">MORNING SET · AM ONLY</text>`;
+const BACK = `
+  <text x="250" y="78" text-anchor="middle" style="font:12px 'Special Elite',monospace;letter-spacing:.12em" fill="${HOT}">pretty side ♡</text>
+  ${tiles(186, 132, 128, 128)}
+  ${cutout("AM", 250, 236, 88, 2)}
+  <text x="250" y="316" text-anchor="middle" style="font:36px 'Yellowtail',cursive" fill="${HOT}">I was there in the morning</text>
+  ${heart(250, 336, 1, HOT)}
+  ${[0,1,2,3,4,5].map(i => `<rect x="${172 + i*26}" y="356" width="24" height="24" fill="${["#f7c4d6","#ee9fbf","#fde1ea","#f4a9c6","#f25fc4","#161015"][i]}"/>`).join("")}
+  <text x="250" y="408" text-anchor="middle" style="font:11px 'Special Elite',monospace;letter-spacing:.18em" fill="${INK}">12:00 AM — 12:00 PM</text>`;
+
+let shirt = "white";
+function render(){
+  document.getElementById("front").innerHTML = tee(shirt, FRONT, false);
+  document.getElementById("back").innerHTML = tee(shirt, BACK, true);
+  document.querySelectorAll("[data-shirt]").forEach(b => b.setAttribute("aria-pressed", b.dataset.shirt === shirt));
+}
+document.querySelectorAll("[data-shirt]").forEach(b => b.addEventListener("click", () => { shirt = b.dataset.shirt; render(); }));
+render();
+if (document.fonts) document.fonts.ready.then(render);
+</script>
