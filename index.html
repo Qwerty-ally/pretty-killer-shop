@@ -700,18 +700,17 @@ function art(p, on){
         : `<text x="97" y="112" text-anchor="middle" style="font:900 26px 'Bodoni Moda',serif" fill="#f2ecf0">KILLER</text><line x1="52" y1="126" x2="140" y2="118" stroke="#ff3fae" stroke-width="2"/>`}
       <text x="97" y="148" text-anchor="middle" style="font:600 8px 'IBM Plex Mono',monospace;letter-spacing:.2em" fill="${side==="pretty"?"#f25fc4":"#8c8390"}">FINN SHAPIRO</text></svg>`;
     case "mtee": {
-      // pink shirt, black text; "good morning" is sun-reactive ink: hidden indoors, turns black in sunlight
-      const shirt = "#f7b8d4";
+      // pink shirt; all the text is sun-reactive (UV color-changing) ink: white indoors, turns purple in sunlight
+      const shirt = "#f290c0", ink = on ? "#7a2fc2" : "#ffffff";
       const body = "M80 20 Q120 40 160 20 L210 45 L192 85 L170 76 L170 204 L70 204 L70 76 L48 85 L30 45 Z";
-      return `<svg viewBox="0 0 240 220" role="img" aria-label="Good Morning Sun Tee${on ? ", in the sun" : ""}">
+      return `<svg viewBox="0 0 240 220" role="img" aria-label="Good Morning Sun Tee${on ? ", in the sun: the text is purple" : ", indoors: the text is white"}">
         ${on ? `<g fill="#ffcf4d"><circle cx="206" cy="30" r="16"/>${[0,45,90,135,180,225,270,315].map(a => `<rect x="204" y="4" width="4" height="9" rx="2" transform="rotate(${a} 206 30)"/>`).join("")}</g>` : ""}
         <path d="${body}" fill="${shirt}" stroke="#161015" stroke-opacity=".35" stroke-width="2"/>
-        <path d="M94 21 Q120 46 146 21" fill="none" stroke="#161015" stroke-width="5"/>
-        <text x="120" y="78" text-anchor="middle" style="font:900 26px 'Bodoni Moda',serif;letter-spacing:.04em" fill="#161015">pretty</text>
-        <text x="120" y="130" text-anchor="middle" style="font:34px 'Yellowtail',cursive" ${on ? `fill="#161015"` : `fill="#fbd0e1" opacity=".6"`}>good morning</text>
-        ${on ? "" : `<text x="120" y="146" text-anchor="middle" style="font:6.5px 'Special Elite',monospace;letter-spacing:.1em" fill="#161015" opacity=".55">( appears in the sun )</text>`}
-        <rect x="80" y="160" width="80" height="13" fill="#161015"/>
-        <text x="120" y="169.5" text-anchor="middle" style="font:7px 'Special Elite',monospace;letter-spacing:.12em" fill="${shirt}">MORNING SET · IN PERSON</text>
+        <path d="M94 21 Q120 46 146 21" fill="none" stroke="#e58fb8" stroke-width="5"/>
+        <text x="120" y="78" text-anchor="middle" style="font:900 26px 'Bodoni Moda',serif;letter-spacing:.04em" fill="${ink}">pretty</text>
+        <text x="120" y="130" text-anchor="middle" style="font:34px 'Yellowtail',cursive" fill="${ink}">good morning</text>
+        ${on ? "" : `<text x="120" y="146" text-anchor="middle" style="font:6.5px 'Special Elite',monospace;letter-spacing:.1em" fill="#161015" opacity=".55">( text turns purple in the sun )</text>`}
+        <text x="120" y="169.5" text-anchor="middle" style="font:7px 'Special Elite',monospace;letter-spacing:.12em" fill="${ink}">MORNING SET · IN PERSON</text>
       </svg>`;
     }
     case "ntee": {
