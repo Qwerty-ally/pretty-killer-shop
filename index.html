@@ -404,9 +404,6 @@ const PRODUCTS = [
   { id:"hat", kind:"hat", name:"Bucket Hat", price:30, variants:{
     pretty:{ label:"Pretty hat" },
     killer:{ label:"Killer hat" } } },
-  { id:"clips", kind:"clips", name:"Hair Clip Set", price:12, variants:{
-    pretty:{ label:"Bow clips" },
-    killer:{ label:"Knife clips" } } },
   { id:"digital", kind:"digital", name:"Digital Album", price:10, digital:true, variants:{
     pretty:{ label:"Pretty ver. · download" },
     killer:{ label:"Killer ver. · download" } } },
@@ -422,7 +419,7 @@ const CATEGORY = {
   finnschoice:"bundles",
   kpopcd:"music", cd:"music", digital:"music", movie:"music",
   mtee:"clothes", ntee:"clothes", hat:"clothes",
-  keychain:"accessories", clips:"accessories",
+  keychain:"accessories",
   book:"collectibles", bookpb:"collectibles", stickers:"collectibles", cards:"collectibles", poster:"collectibles"
 };
 
@@ -687,23 +684,6 @@ function art(p, on){
           <path d="M126 56 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3z" fill="${pretty ? "#ffffff" : "#d9d6dc"}"/>
         </g></svg>`;
     }
-    case "clips": {
-      const bow = (x, y, r, fill, knot) => `<g transform="translate(${x} ${y}) rotate(${r})">
-        <rect x="-44" y="-3" width="88" height="6" rx="3" fill="#d9d6dc"/>
-        <path d="M0 0 C-10 -20 -38 -22 -36 0 C-38 22 -10 20 0 0Z" fill="${fill}" stroke="#e0579b" stroke-width="1.5"/>
-        <path d="M0 0 C10 -20 38 -22 36 0 C38 22 10 20 0 0Z" fill="${fill}" stroke="#e0579b" stroke-width="1.5"/>
-        <path d="M-4 4 L-14 30 L-5 27Z M4 4 L14 30 L5 27Z" fill="#e0579b"/>
-        <rect x="-6" y="-7" width="12" height="14" rx="3" fill="${knot}"/></g>`;
-      const knife = (x, y, r, handle) => `<g transform="translate(${x} ${y}) rotate(${r})">
-        <rect x="-52" y="-3" width="104" height="6" fill="#6e6874"/>
-        <path d="M-8 -9 L56 -2 Q46 10 -8 9 Z" fill="#d9d6dc" stroke="#9a96a0"/>
-        <rect x="-50" y="-10" width="42" height="20" fill="${handle}"/>
-        <circle cx="-38" cy="0" r="2.5" fill="#d9d6dc"/><circle cx="-20" cy="0" r="2.5" fill="#d9d6dc"/></g>`;
-      return `<svg viewBox="0 0 200 200" role="img" aria-label="Hair clip set, ${side === "pretty" ? "bow" : "knife"} clips">
-        ${side === "pretty"
-          ? bow(100, 70, -8, "#f25fc4", "#161015") + bow(100, 140, 6, "#ffffff", "#f25fc4")
-          : knife(96, 72, -10, "#0b0a0c") + knife(104, 136, 8, "#ff3fae")}</svg>`;
-    }
     case "hat": {
       const pretty = side === "pretty";
       const crown = "M62 70 Q100 52 138 70 L148 118 H52 Z";
@@ -749,6 +729,7 @@ const saveCart = () => { try { localStorage.setItem("pk-cart", JSON.stringify(ca
 
 const money = n => "$" + n.toFixed(2);
 const product = id => PRODUCTS.find(p => p.id === id);
+cart = cart.filter(l => product(l.id));   // drop anything no longer sold (e.g. an old bag with Hair Clips)
 const variantLabel = (p, s) => p.shared ? "Same on both sides" : p.variants[s].label + (s==="pretty" ? " · Pretty side" : " · Killer side");
 
 const insideOpen = {};
