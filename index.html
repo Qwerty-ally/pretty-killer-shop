@@ -225,7 +225,6 @@ header.bar{
 .card .buy{margin-top:auto;padding-top:10px;display:flex;align-items:center;justify-content:space-between;gap:10px}
 .price{font:800 20px/1 var(--body);font-variant-numeric:tabular-nums}
 .stock{font-size:12px;color:var(--muted)}
-.stock.low{color:var(--accent);font-weight:600}
 .btn{
   border:0;cursor:pointer;background:var(--accent);color:var(--accent-ink);padding:10px 16px;border-radius:var(--radius-sm);
   font-weight:var(--btn-weight);font-size:14px;text-transform:var(--label-case);letter-spacing:var(--label-track);
@@ -236,7 +235,6 @@ header.bar{
 
 /* ============ FOOTER ============ */
 footer{border-top:1px solid var(--line);padding-block:24px 40px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
-footer button{background:none;border:0;padding:0;color:var(--ink);text-decoration:underline;cursor:pointer;font-size:13px}
 .testhint{font-family:var(--mono)}
 .testhint kbd{border:1px solid var(--line);padding:1px 6px;border-radius:4px;background:var(--surface);color:var(--ink);font-family:inherit}
 
@@ -247,9 +245,9 @@ footer button{background:none;border:0;padding:0;color:var(--ink);text-decoratio
   border-left:1.5px solid var(--line);display:flex;flex-direction:column;
   padding:calc(env(safe-area-inset-top,0px) + 20px) 20px calc(env(safe-area-inset-bottom,0px) + 20px);
 }
-.drawer header,.modal header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
-.drawer h2,.modal h2{margin:0;font:400 28px/1 var(--display)}
-[data-side="killer"] .drawer h2,[data-side="killer"] .modal h2{text-transform:uppercase}
+.drawer header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.drawer h2{margin:0;font:400 28px/1 var(--display)}
+[data-side="killer"] .drawer h2{text-transform:uppercase}
 .x{background:none;border:1.5px solid var(--line);width:36px;height:36px;border-radius:var(--radius-sm);cursor:pointer;font-size:18px;line-height:1}
 .lines{flex:1;overflow:auto;display:flex;flex-direction:column;gap:12px}
 .line{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding-bottom:12px;border-bottom:1px solid var(--line)}
@@ -262,27 +260,6 @@ footer button{background:none;border:0;padding:0;color:var(--ink);text-decoratio
 .totals .row{display:flex;justify-content:space-between;font-weight:800;font-size:18px;font-variant-numeric:tabular-nums}
 .note{font-size:12px;color:var(--muted);margin:0}
 .notice{background:var(--ground-2);border:1.5px dashed var(--accent);border-radius:calc(var(--radius) / 2);padding:12px;font-size:13px}
-
-.modal{
-  position:fixed;z-index:50;left:50%;top:50%;transform:translate(-50%,-50%);
-  width:min(760px,calc(100% - 32px));max-height:calc(100% - 48px);overflow:auto;
-  background:var(--surface);border:1.5px solid var(--line);border-radius:var(--radius);padding:24px;
-}
-.pin{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
-.field{display:flex;flex-direction:column;gap:6px}
-.field input,.stock-table input{
-  background:var(--ground-2);border:1.5px solid var(--line);border-radius:calc(var(--radius) / 2);padding:10px 12px;min-width:0;
-}
-.err{color:#d12a6a;font-size:13px;margin:8px 0 0}
-[data-side="killer"] .err{color:#ff6ab8}
-.table-wrap{overflow-x:auto}
-.stock-table{width:100%;border-collapse:collapse;font-size:14px}
-.stock-table th{text-align:left;padding:8px;border-bottom:1.5px solid var(--line)}
-.stock-table td{padding:8px;border-bottom:1px solid var(--line);vertical-align:middle}
-.stock-table input{width:96px;font-variant-numeric:tabular-nums}
-.stock-table .shared{font-size:12px;color:var(--muted);margin-left:6px}
-.admin-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;align-items:center}
-.admin-actions .note{flex:1 1 220px}
 
 .toast{
   position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);transform:translateX(-50%);z-index:60;
@@ -356,7 +333,6 @@ footer button{background:none;border:0;padding:0;color:var(--ink);text-decoratio
   <footer>
     <span>© 2026 Finn Shapiro · Pretty Killer Tour</span>
     <span class="testhint">Test mode: type <kbd>am</kbd> or <kbd>pm</kbd> to switch sides, <kbd>auto</kbd> to follow the clock</span>
-    <button type="button" id="openAdmin">Admin</button>
   </footer>
 </div>
 
@@ -374,30 +350,6 @@ footer button{background:none;border:0;padding:0;color:var(--ink);text-decoratio
   </div>
 </aside>
 
-<!-- Admin panel -->
-<section class="modal" id="admin" hidden aria-label="Admin panel">
-  <header><h2>Admin · Stock</h2><button class="x" type="button" id="closeAdmin" aria-label="Close admin">×</button></header>
-  <form id="pinForm" class="pin">
-    <div class="field"><label class="label" for="pinInput">Admin PIN</label><input id="pinInput" type="password" inputmode="numeric" autocomplete="off" placeholder="Enter PIN"></div>
-    <button class="btn" type="submit">Unlock</button>
-  </form>
-  <p class="err" id="pinErr" hidden>That PIN didn't match. The test PIN is set in CONFIG.adminPin (default 1234).</p>
-  <div id="adminBody" hidden>
-    <p class="note" style="margin-bottom:12px">Set how many of each item you have. The Tour Books (hardcover and paperback) and Movie each have one stock across both sides; the CDs and stickers have a separate Pretty and Killer version.</p>
-    <div class="table-wrap">
-      <table class="stock-table">
-        <thead><tr><th>Product</th><th>Pretty side (AM)</th><th>Killer side (PM)</th></tr></thead>
-        <tbody id="stockRows"></tbody>
-      </table>
-    </div>
-    <div class="admin-actions">
-      <button class="btn" type="button" id="saveStock">Save stock</button>
-      <button class="btn ghost" type="button" id="resetStock">Reset to test stock</button>
-      <p class="note" id="storeNote"></p>
-    </div>
-  </div>
-</section>
-
 <div class="toast" id="toast" hidden></div>
 
 <script>
@@ -405,37 +357,26 @@ footer button{background:none;border:0;padding:0;color:var(--ink);text-decoratio
    CONFIG — paste your keys here later
    ===================================================================== */
 const CONFIG = {
-  // 1) FIREBASE: Firebase console → Project settings → Your apps → Web app → config
-  firebase: {
-    apiKey: "",
-    authDomain: "",
-    projectId: "",
-    storageBucket: "",
-    messagingSenderId: "",
-    appId: ""
-  },
-  // 2) STRIPE: the pretty-killer-checkout server on Vercel makes the Checkout link (it holds the secret key — NEVER put it here)
+  // STRIPE: the pretty-killer-checkout server on Vercel makes the Checkout link (it holds the secret key — NEVER put it here)
   stripe: {
     checkoutEndpoint: ""           // e.g. "https://pretty-killer-checkout.vercel.app/api/checkout"; empty = test orders
   },
-  // Test-only PIN. Once Firebase is connected, replace with Firebase Auth (see Store.isAdmin below).
-  adminPin: "1234",
   // Placeholder: bag total that unlocks free shipping. Set to 0 to hide the free-shipping bar.
   freeShippingAt: 50
 };
 
 /* =====================================================================
    PRODUCTS — same 5 items on both sides.
-   shared: true  → one version, one stock (Tour Book, Movie)
+   shared: true  → one version for both sides (Tour Books, Movie)
    variants      → a Pretty version (AM) and a Killer version (PM)
    ===================================================================== */
 const PRODUCTS = [
-  // bundle: no stock of its own; it uses one of each item inside it (the CD matches the side you're on).
+  // bundle: one of each item inside it (the CD matches the side you're on).
   // Price = full price of everything inside, except the items in `free`.
   { id:"finnschoice", kind:"bundle", name:"Finn's Choice", price:0, bundle:["kpopcd","book","movie","keychain","cards"], free:["movie"], variants:{
     pretty:{ label:"With the Pretty ver. CD" },
     killer:{ label:"With the Killer ver. CD" } } },
-  // inPerson: shown online on its side only, but sold at the merch stand (no Add to bag, no online stock)
+  // inPerson: shown online on its side only, but sold at the merch stand (no Add to bag)
   { id:"mtee", kind:"mtee", name:"Good Morning Sun Tee", price:20, inPerson:"pretty", showLabel:"Morning show only", reveal:"Step into the sun", unreveal:"Back inside" },
   { id:"ntee", kind:"ntee", name:"Killer Glow Tee", price:20, inPerson:"killer", showLabel:"Night show only", reveal:"Turn the lights off", unreveal:"Turn the lights on" },
   { id:"book", kind:"book", name:"Pretty Killer Tour Book (Hardcover)", price:45, shared:true },
@@ -466,7 +407,6 @@ const PRODUCTS = [
   { id:"clips", kind:"clips", name:"Hair Clip Set", price:12, variants:{
     pretty:{ label:"Bow clips" },
     killer:{ label:"Knife clips" } } },
-  // digital: no stock limit
   { id:"digital", kind:"digital", name:"Digital Album", price:10, digital:true, variants:{
     pretty:{ label:"Pretty ver. · download" },
     killer:{ label:"Killer ver. · download" } } },
@@ -486,48 +426,8 @@ const CATEGORY = {
   book:"collectibles", bookpb:"collectibles", stickers:"collectibles", cards:"collectibles", poster:"collectibles"
 };
 
-const DEFAULT_STOCK = {
-  "book":50, "bookpb":50, "movie":40,
-  "kpopcd:pretty":30, "kpopcd:killer":4,
-  "cd:pretty":100, "cd:killer":100,
-  "stickers:pretty":200, "stickers:killer":200,
-  "hat:pretty":40, "hat:killer":40,
-  "clips:pretty":60, "clips:killer":60,
-  "keychain:pretty":80, "keychain:killer":80,
-  "cards:pretty":150, "cards:killer":150,
-  "poster:pretty":75, "poster:killer":75
-};
-const stockKey = (p, side) => p.shared ? p.id : `${p.id}:${side}`;
-
-/* =====================================================================
-   STORE — stock lives here. Right now it saves in this browser only.
-   When you add Firebase, swap the TODO blocks for Firestore calls so
-   stock is shared by everyone (and your admin edits go live).
-   ===================================================================== */
-const LS_KEY = "pk-shop-stock-v1";
-const Store = {
-  firebaseReady(){ return !!CONFIG.firebase.apiKey; },
-
-  async loadStock(){
-    // TODO(firebase): when connected, read from Firestore instead:
-    //   const snap = await getDoc(doc(db, "shop", "stock"));
-    //   if (snap.exists()) return { ...DEFAULT_STOCK, ...snap.data() };
-    try { const s = JSON.parse(localStorage.getItem(LS_KEY)); if (s) return { ...DEFAULT_STOCK, ...s }; } catch(e){}
-    return { ...DEFAULT_STOCK };
-  },
-
-  async saveStock(stock){
-    // TODO(firebase): await setDoc(doc(db, "shop", "stock"), stock);
-    // Lock this down with Firestore rules so only your admin account can write.
-    try { localStorage.setItem(LS_KEY, JSON.stringify(stock)); } catch(e){}
-  },
-
-  async isAdmin(pin){
-    // TODO(firebase): replace the PIN with Firebase Auth, e.g.
-    //   await signInWithEmailAndPassword(auth, email, password);
-    return pin === CONFIG.adminPin;
-  }
-};
+// Everything online is a pre-order: no stock limits, people get their items after the show.
+const cartKey = (p, side) => p.shared ? p.id : `${p.id}:${side}`;
 
 /* =====================================================================
    CHECKOUT — Stripe goes here.
@@ -843,19 +743,12 @@ function art(p, on){
 }
 
 /* ---------- shop grid ---------- */
-let stock = { ...DEFAULT_STOCK };
 let cart = [];  // { key, id, side, qty }
 try { cart = JSON.parse(localStorage.getItem("pk-cart")) || []; } catch(e){}
 const saveCart = () => { try { localStorage.setItem("pk-cart", JSON.stringify(cart)); } catch(e){} };
 
 const money = n => "$" + n.toFixed(2);
 const product = id => PRODUCTS.find(p => p.id === id);
-// stock keys a product uses up; a bundle uses one of each item inside it
-const keysFor = (p, s) => p.bundle ? p.bundle.map(id => stockKey(product(id), s)) : [stockKey(p, s)];
-const lineKeys = l => keysFor(product(l.id), l.side);
-const inCart = key => cart.reduce((a,l) => a + (lineKeys(l).includes(key) ? l.qty : 0), 0);
-const inStock = (p, s) => p.digital ? Infinity : Math.min(...keysFor(p, s).map(k => stock[k] ?? 0));
-const available = (p, s) => p.digital ? Infinity : Math.min(...keysFor(p, s).map(k => (stock[k] ?? 0) - inCart(k)));
 const variantLabel = (p, s) => p.shared ? "Same on both sides" : p.variants[s].label + (s==="pretty" ? " · Pretty side" : " · Killer side");
 
 const insideOpen = {};
@@ -879,11 +772,9 @@ function renderGrid(){
     return;
   }
   $("#grid").innerHTML = list.map(p => {
-    const total = inStock(p, side);
-    const left = available(p, side);
     const v = (p.shared || !p.variants) ? null : p.variants[side];
-    const stockText = p.digital ? "Instant download" : total <= 0 ? "Sold out" : left <= 0 ? "All in your bag" : left <= 10 ? `Only ${left} left` : `${left} in stock`;
-    const addBtn = `<button class="btn" type="button" data-add="${p.id}" ${left<=0?"disabled":""}>${total<=0 ? "Sold out" : "Add to bag"}</button>`;
+    const stockText = p.digital ? "Pre-order · download after the show" : "Pre-order · yours after the show";
+    const addBtn = `<button class="btn" type="button" data-add="${p.id}">Pre-order</button>`;
     if (p.inPerson){
       const on = !!revealed[p.id];
       return `<article class="card in-person">
@@ -909,7 +800,7 @@ function renderGrid(){
         <h3>${p.name}</h3>
         <ul class="inside">${items.map(c=>`<li>${c.name}${c.shared ? "" : " (" + c.variants[side].label + ")"}${(p.free||[]).includes(c.id) ? " · FREE" : ""}</li>`).join("")}</ul>
         <div class="buy">
-          <div><div class="price">${money(p.price)} <s class="was">${money(full)}</s> <span class="save">${(p.free||[]).map(id => product(id).name.replace("Pretty Killer: ", "")).join(" + ")} free</span></div><div class="stock ${left<=10?"low":""}">${stockText}</div></div>
+          <div><div class="price">${money(p.price)} <s class="was">${money(full)}</s> <span class="save">${(p.free||[]).map(id => product(id).name.replace("Pretty Killer: ", "")).join(" + ")} free</span></div><div class="stock">${stockText}</div></div>
           ${addBtn}
         </div>
       </div>
@@ -924,7 +815,7 @@ function renderGrid(){
         <span class="ver">${v ? v.label : "Pretty + Killer"}</span>
         <h3>${p.name}</h3>${inside}
         <div class="buy">
-          <div><div class="price">${money(p.price)}</div><div class="stock ${left<=10?"low":""}">${stockText}</div></div>
+          <div><div class="price">${money(p.price)}</div><div class="stock">${stockText}</div></div>
           ${addBtn}
         </div>
       </div>
@@ -947,8 +838,7 @@ document.addEventListener("click", e => {
   if (ins){ insideOpen[ins.dataset.inside] = !insideOpen[ins.dataset.inside]; renderGrid(); return; }
   const add = e.target.closest("[data-add]");
   if (add){
-    const p = product(add.dataset.add), key = stockKey(p, side);
-    if (available(p, side) <= 0) return;
+    const p = product(add.dataset.add), key = cartKey(p, side);
     const line = cart.find(l => l.key === key);
     line ? line.qty++ : cart.push({ key, id:p.id, side: p.shared ? "both" : side, qty:1 });
     saveCart(); renderGrid(); renderCart();
@@ -959,7 +849,6 @@ document.addEventListener("click", e => {
     const line = cart.find(l => l.key === q.dataset.key);
     if (!line) return;
     const d = +q.dataset.qty;
-    if (d > 0 && available(product(line.id), line.side) <= 0) return toast("That's all we have left");
     line.qty += d;
     if (line.qty <= 0) cart = cart.filter(l => l !== line);
     saveCart(); renderGrid(); renderCart();
@@ -994,7 +883,7 @@ function renderCart(){
   const live = !!CONFIG.stripe.checkoutEndpoint;
   $("#checkout").textContent = live ? "Checkout" : "Place test order";
   $("#checkout").disabled = !cart.length;
-  $("#checkoutNote").textContent = live ? "You'll finish paying on Stripe's secure checkout." : "Stripe isn't connected yet, so this places a test order: no payment, but stock goes down so you can see it work.";
+  $("#checkoutNote").textContent = live ? "You'll finish paying on Stripe's secure checkout." : "Stripe isn't connected yet, so this places a test order: no payment is taken.";
 }
 
 $("#checkout").addEventListener("click", async () => {
@@ -1010,12 +899,10 @@ $("#checkout").addEventListener("click", async () => {
     return;
   }
   if (r.test){
-    cart.filter(l => !product(l.id).digital).forEach(l => lineKeys(l).forEach(k => { stock[k] = Math.max(0, (stock[k] ?? 0) - l.qty); }));
-    await Store.saveStock(stock);
     const n = cart.reduce((a,l)=>a+l.qty,0);
     cart = []; saveCart(); renderGrid(); renderCart();
     const note = $("#checkoutNotice");
-    note.textContent = `Test order placed: ${n} item${n>1?"s":""}. Stock updated. Add your Stripe keys in CONFIG to take real payments.`;
+    note.textContent = `Test order placed: ${n} item${n>1?"s":""}. No payment was taken.`;
     note.hidden = false;
   }
 });
@@ -1042,54 +929,16 @@ $("#sort").addEventListener("change", e => { view.sort = e.target.value; renderG
 function giveFreeMovie(){
   const m = product("movie");
   if (cart.some(l => l.free)) return toast("Your free Movie is already in your bag");
-  if (available(m, side) <= 0) return toast("The Movie is sold out");
   cart.push({ key:"movie:free", id:"movie", side:"both", qty:1, free:true });
   saveCart(); renderGrid(); renderCart(); openCart();
   toast("Secret code! The Movie is in your bag for free");
 }
 
 function openCart(){ $("#checkoutNotice").hidden = true; $("#drawer").hidden = false; $("#scrim").hidden = false; }
-function closeAll(){ $("#drawer").hidden = true; $("#admin").hidden = true; $("#scrim").hidden = true; }
+function closeAll(){ $("#drawer").hidden = true; $("#scrim").hidden = true; }
 $("#openCart").addEventListener("click", openCart);
 $("#closeCart").addEventListener("click", closeAll);
 $("#scrim").addEventListener("click", closeAll);
-
-/* ---------- admin ---------- */
-let adminOpen = false;
-function openAdmin(){
-  $("#admin").hidden = false; $("#scrim").hidden = false;
-  $("#pinErr").hidden = true;
-  $("#storeNote").textContent = Store.firebaseReady()
-    ? "Connected to Firebase: saves go live for every shopper."
-    : "Firebase isn't connected yet, so stock saves in this browser only.";
-  if (!adminOpen) setTimeout(()=>$("#pinInput").focus(), 30);
-}
-$("#openAdmin").addEventListener("click", openAdmin);
-$("#closeAdmin").addEventListener("click", closeAll);
-
-$("#pinForm").addEventListener("submit", async e => {
-  e.preventDefault();
-  if (await Store.isAdmin($("#pinInput").value)){
-    adminOpen = true; $("#pinForm").hidden = true; $("#pinErr").hidden = true; $("#adminBody").hidden = false; renderStockRows();
-  } else { $("#pinErr").hidden = false; }
-});
-
-function renderStockRows(){
-  const inp = (key, label) => `<input type="number" min="0" step="1" id="stock-${key.replace(":","-")}" data-stock="${key}" value="${stock[key] ?? 0}" aria-label="${label}">`;
-  $("#stockRows").innerHTML = PRODUCTS.filter(p => !p.bundle && !p.digital && !p.inPerson).map(p => p.shared
-    ? `<tr><td><b>${p.name}</b></td><td colspan="2">${inp(p.id, p.name + " stock")}<span class="shared">shared by both sides</span></td></tr>`
-    : `<tr><td><b>${p.name}</b></td><td>${inp(p.id+":pretty", p.name+" pretty stock")}</td><td>${inp(p.id+":killer", p.name+" killer stock")}</td></tr>`
-  ).join("") + `<tr><td><b>Finn's Choice</b></td><td colspan="2"><span class="shared" style="margin:0">No stock of its own: each one sold uses 1 of each item inside it (${product("finnschoice").bundle.map(id => product(id).name).join(", ")}), from that side where there are two versions.</span></td></tr>`
-    + `<tr><td><b>Digital Album</b></td><td colspan="2"><span class="shared" style="margin:0">Digital download, so no stock limit.</span></td></tr>`
-    + `<tr><td><b>UV Tee &amp; Glow Tee</b></td><td colspan="2"><span class="shared" style="margin:0">Sold in person at the merch stand only, so there is no online stock.</span></td></tr>`;
-}
-$("#saveStock").addEventListener("click", async () => {
-  document.querySelectorAll("[data-stock]").forEach(i => { stock[i.dataset.stock] = Math.max(0, parseInt(i.value,10) || 0); });
-  await Store.saveStock(stock); renderGrid(); renderCart(); toast("Stock saved");
-});
-$("#resetStock").addEventListener("click", async () => {
-  stock = { ...DEFAULT_STOCK }; await Store.saveStock(stock); renderStockRows(); renderGrid(); toast("Stock reset to test amounts");
-});
 
 /* ---------- test keys: type "am" / "pm" / "auto" ---------- */
 let typed = "";
@@ -1127,11 +976,9 @@ function tickClock(){
   if (!override && clockSide() !== side) setSide(clockSide(), true);
 }
 
-(async function boot(){
-  stock = await Store.loadStock();
+(function boot(){
   setSide(override || clockSide(), false);
   tickClock(); setInterval(tickClock, 30000);
-  if (location.hash === "#admin") openAdmin();
   handleStripeReturn();
 })();
 </script>
