@@ -359,7 +359,7 @@ footer{border-top:1px solid var(--line);padding-block:24px 40px;display:flex;jus
 const CONFIG = {
   // STRIPE: the pretty-killer-checkout server on Vercel makes the Checkout link (it holds the secret key — NEVER put it here)
   stripe: {
-    checkoutEndpoint: ""           // e.g. "https://pretty-killer-checkout.vercel.app/api/checkout"; empty = test orders
+    checkoutEndpoint: "https://pretty-killer-checkout.vercel.app/api/checkout"   // empty = test orders
   },
   // Placeholder: bag total that unlocks free shipping. Set to 0 to hide the free-shipping bar.
   freeShippingAt: 50
