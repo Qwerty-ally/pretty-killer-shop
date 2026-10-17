@@ -383,7 +383,7 @@ footer button{background:none;border:0;padding:0;color:var(--ink);text-decoratio
   </form>
   <p class="err" id="pinErr" hidden>That PIN didn't match. The test PIN is set in CONFIG.adminPin (default 1234).</p>
   <div id="adminBody" hidden>
-    <p class="note" style="margin-bottom:12px">Set how many of each item you have. The Tour Book and Movie share one stock across both sides; the CDs and stickers have a separate Pretty and Killer version.</p>
+    <p class="note" style="margin-bottom:12px">Set how many of each item you have. The Tour Books (hardcover and paperback) and Movie each have one stock across both sides; the CDs and stickers have a separate Pretty and Killer version.</p>
     <div class="table-wrap">
       <table class="stock-table">
         <thead><tr><th>Product</th><th>Pretty side (AM)</th><th>Killer side (PM)</th></tr></thead>
@@ -439,13 +439,14 @@ const PRODUCTS = [
   // inPerson: shown online on its side only, but sold at the merch stand (no Add to bag, no online stock)
   { id:"mtee", kind:"mtee", name:"Good Morning Sun Tee", price:35, inPerson:"pretty", showLabel:"Morning show only", reveal:"Step into the sun", unreveal:"Back inside" },
   { id:"ntee", kind:"ntee", name:"Killer Glow Tee", price:35, inPerson:"killer", showLabel:"Night show only", reveal:"Turn the lights off", unreveal:"Turn the lights on" },
-  { id:"book", kind:"book", name:"Pretty Killer Tour Book", price:40, shared:true },
-  { id:"kpopcd", kind:"kpop", name:"K-pop Style CD", price:28,
+  { id:"book", kind:"book", name:"Pretty Killer Tour Book (Hardcover)", price:45, shared:true },
+  { id:"bookpb", kind:"book", name:"Pretty Killer Tour Book (Paperback)", price:37, shared:true },
+  { id:"kpopcd", kind:"kpop", name:"K-pop Style CD", price:35,
     inside:["Lenticular card","Charm","Photocard","Stickers","Pokémon-style card","Scratch-off"],
     variants:{
     pretty:{ label:"Pretty ver." },
     killer:{ label:"Killer ver." } } },
-  { id:"cd", kind:"cd", name:"Standard CD", price:15, variants:{
+  { id:"cd", kind:"cd", name:"Standard CD", price:22, variants:{
     pretty:{ label:"Pretty cover" },
     killer:{ label:"Killer cover" } } },
   { id:"keychain", kind:"keychain", name:"Mini CD Keychain", price:15, variants:{
@@ -457,9 +458,9 @@ const PRODUCTS = [
   { id:"cards", kind:"cards", name:"Mystery Trading Cards", price:6, variants:{
     pretty:{ label:"Pretty pack · 5 random cards" },
     killer:{ label:"Killer pack · 5 random cards" } } },
-  { id:"poster", kind:"poster", name:"Tour Poster", price:20, variants:{
-    pretty:{ label:"Pretty poster · 18×24 in" },
-    killer:{ label:"Killer poster · 18×24 in" } } },
+  { id:"poster", kind:"poster", name:"Tour Poster", price:5, variants:{
+    pretty:{ label:"Pretty poster · 8.5×11 in" },
+    killer:{ label:"Killer poster · 8.5×11 in" } } },
   { id:"hat", kind:"hat", name:"Bucket Hat", price:30, variants:{
     pretty:{ label:"Pretty hat" },
     killer:{ label:"Killer hat" } } },
@@ -470,7 +471,7 @@ const PRODUCTS = [
   { id:"digital", kind:"digital", name:"Digital Album", price:10, digital:true, variants:{
     pretty:{ label:"Pretty ver. · download" },
     killer:{ label:"Killer ver. · download" } } },
-  { id:"movie", kind:"movie", name:"Pretty Killer: The Movie", price:25, shared:true }
+  { id:"movie", kind:"movie", name:"Pretty Killer: The Movie", price:15, shared:true }
 ];
 
 PRODUCTS.filter(p => p.bundle).forEach(b => {
@@ -483,11 +484,11 @@ const CATEGORY = {
   kpopcd:"music", cd:"music", digital:"music", movie:"music",
   mtee:"clothes", ntee:"clothes", hat:"clothes",
   keychain:"accessories", clips:"accessories",
-  book:"collectibles", stickers:"collectibles", cards:"collectibles", poster:"collectibles"
+  book:"collectibles", bookpb:"collectibles", stickers:"collectibles", cards:"collectibles", poster:"collectibles"
 };
 
 const DEFAULT_STOCK = {
-  "book":50, "movie":40,
+  "book":50, "bookpb":50, "movie":40,
   "kpopcd:pretty":30, "kpopcd:killer":4,
   "cd:pretty":100, "cd:killer":100,
   "stickers:pretty":200, "stickers:killer":200,
