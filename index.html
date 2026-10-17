@@ -380,7 +380,6 @@ const PRODUCTS = [
   { id:"mtee", kind:"mtee", name:"Good Morning Sun Tee", price:20, inPerson:"pretty", showLabel:"Morning show only", reveal:"Step into the sun", unreveal:"Back inside" },
   { id:"ntee", kind:"ntee", name:"Killer Glow Tee", price:20, inPerson:"killer", showLabel:"Night show only", reveal:"Turn the lights off", unreveal:"Turn the lights on" },
   { id:"book", kind:"book", name:"Pretty Killer Tour Book (Hardcover)", price:45, shared:true },
-  { id:"bookpb", kind:"book", name:"Pretty Killer Tour Book (Paperback)", price:37, shared:true },
   { id:"kpopcd", kind:"kpop", name:"K-pop Style CD", price:35,
     inside:["Lenticular card","Charm","Photocard","Stickers","Pokémon-style card","Scratch-off"],
     variants:{
@@ -401,9 +400,8 @@ const PRODUCTS = [
   { id:"poster", kind:"poster", name:"Tour Poster", price:5, variants:{
     pretty:{ label:"Pretty poster · 8.5×11 in" },
     killer:{ label:"Killer poster · 8.5×11 in" } } },
-  { id:"hat", kind:"hat", name:"Bucket Hat", price:30, variants:{
-    pretty:{ label:"Pretty hat" },
-    killer:{ label:"Killer hat" } } },
+  // reversible: one hat, Killer on the outside, Pretty on the reverse side
+  { id:"hat", kind:"hat", name:"Reversible Bucket Hat", price:30, shared:true, note:"Killer outside · flip it for Pretty" },
   { id:"digital", kind:"digital", name:"Digital Album", price:10, digital:true, variants:{
     pretty:{ label:"Pretty ver. · download" },
     killer:{ label:"Killer ver. · download" } } },
@@ -422,7 +420,7 @@ const CATEGORY = {
   kpopcd:"music", cd:"music", digital:"music", movie:"music",
   mtee:"clothes", ntee:"clothes", hat:"clothes",
   keychain:"accessories",
-  book:"collectibles", bookpb:"collectibles", stickers:"collectibles", cards:"collectibles", poster:"collectibles"
+  book:"collectibles", stickers:"collectibles", cards:"collectibles", poster:"collectibles"
 };
 
 // Everything online is a pre-order: no stock limits, people get their items after the show.
@@ -690,20 +688,25 @@ function art(p, on){
         </g></svg>`;
     }
     case "hat": {
-      const pretty = side === "pretty";
+      // reversible hat: the Killer side in front, the Pretty reverse side behind it
+      const one = pretty => {
       const crown = "M62 70 Q100 52 138 70 L148 118 H52 Z";
       const brim = "M28 122 Q100 100 172 122 Q178 142 150 148 Q100 136 50 148 Q22 142 28 122 Z";
       const stitch = pretty
         ? `<path d="M100 84c-6-8-20-2-12 9l12 10 12-10c8-11-6-17-12-9z" fill="#f25fc4" stroke="#fff" stroke-width="1.5" stroke-dasharray="2 2"/>`
         : `<g transform="rotate(-24 100 90)"><path d="M100 84 L140 86 Q132 96 100 94 Z" fill="#d9d6dc"/><rect x="72" y="84" width="28" height="10" rx="2" fill="#ff3fae"/></g>`;
-      return `<svg viewBox="0 0 200 200" role="img" aria-label="Bucket hat, ${pretty ? "pretty" : "killer"} version">
-        ${pretty ? `<defs><pattern id="ging" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="12" height="12" fill="#fde9f0"/><rect width="6" height="12" fill="#f25fc4" opacity=".3"/><rect width="12" height="6" fill="#f25fc4" opacity=".3"/></pattern></defs>` : ""}
-        <ellipse cx="100" cy="160" rx="70" ry="8" fill="#000" opacity=".12"/>
+      return `<ellipse cx="100" cy="160" rx="70" ry="8" fill="#000" opacity=".12"/>
         <path d="${brim}" fill="${pretty ? "url(#ging)" : "#141216"}" stroke="${pretty ? "#e0579b" : "#3a353e"}" stroke-width="2"/>
         <path d="${crown}" fill="${pretty ? "#f7b8d4" : "#0b0a0c"}" stroke="${pretty ? "#e0579b" : "#3a353e"}" stroke-width="2"/>
         <path d="M52 108 H148 L150 120 H50 Z" fill="${pretty ? "#161015" : "#ff3fae"}"/>
         <text x="100" y="117.5" text-anchor="middle" style="font:${pretty ? "8px 'Special Elite',monospace" : "8px 'IBM Plex Mono',monospace"};letter-spacing:.2em" fill="${pretty ? "#f25fc4" : "#0a0a0a"}">${pretty ? "PRETTY KILLER" : "KILLER"}</text>
-        ${stitch}</svg>`;
+        ${stitch}`;
+      };
+      return `<svg viewBox="0 0 200 200" role="img" aria-label="Reversible bucket hat: Killer on the outside, Pretty on the reverse side">
+        <defs><pattern id="ging" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="12" height="12" fill="#fde9f0"/><rect width="6" height="12" fill="#f25fc4" opacity=".3"/><rect width="12" height="6" fill="#f25fc4" opacity=".3"/></pattern></defs>
+        <g transform="translate(72 4) scale(.68)">${one(true)}</g>
+        <g transform="translate(-10 58) scale(.72)">${one(false)}</g>
+        <path d="M96 104 q14 -16 30 -6" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/><path d="M122 92 l5 6 -8 2" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
     }
     case "stickers": {
       const sheet = side==="pretty" ? "#fff" : "#1d1a20";
@@ -735,7 +738,7 @@ const saveCart = () => { try { localStorage.setItem("pk-cart", JSON.stringify(ca
 const money = n => "$" + n.toFixed(2);
 const product = id => PRODUCTS.find(p => p.id === id);
 cart = cart.filter(l => product(l.id));   // drop anything no longer sold (e.g. an old bag with Hair Clips)
-const variantLabel = (p, s) => p.shared ? "Same on both sides" : p.variants[s].label + (s==="pretty" ? " · Pretty side" : " · Killer side");
+const variantLabel = (p, s) => p.shared ? p.note || "Same on both sides" : p.variants[s].label + (s==="pretty" ? " · Pretty side" : " · Killer side");
 
 const insideOpen = {};
 const view = { q:"", cat:"all", sort:"featured" };
@@ -799,7 +802,7 @@ function renderGrid(){
     return `<article class="card ${p.feature ? "feature" : ""}">
       <div class="art${p.inside ? " clickable" : ""}" ${p.inside ? `data-inside="${p.id}"` : ""}>${p.shared ? `<span class="tag both">Both sides</span>` : `<span class="tag">${side==="pretty"?"Pretty only":"Killer only"}</span>`}${art(p)}</div>
       <div class="body">
-        <span class="ver">${v ? v.label : "Pretty + Killer"}</span>
+        <span class="ver">${v ? v.label : p.note || "Pretty + Killer"}</span>
         <h3>${p.name}</h3>${inside}
         <div class="buy">
           <div><div class="price">${money(p.price)}</div><div class="stock">${stockText}</div></div>
@@ -852,7 +855,7 @@ function renderCart(){
     $("#lines").innerHTML = cart.map(l => {
       const p = product(l.id);
       return `<div class="line">
-        <div><div class="n">${p.name}</div><div class="v">${l.free ? "Secret code · free" : p.shared ? "Same on both sides" : variantLabel(p, l.side)}</div></div>
+        <div><div class="n">${p.name}</div><div class="v">${l.free ? "Secret code · free" : variantLabel(p, l.side)}</div></div>
         <div class="price" style="font-size:16px">${l.free ? `<span class="free">FREE</span>` : money(p.price*l.qty)}</div>
         <div class="qty">${l.free ? "" : `<button type="button" data-qty="-1" data-key="${l.key}" aria-label="One less">−</button><span>${l.qty}</span><button type="button" data-qty="1" data-key="${l.key}" aria-label="One more">+</button>`}<button type="button" class="linkish" data-remove="${l.key}">Remove</button></div>
       </div>`;
