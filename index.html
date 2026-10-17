@@ -414,10 +414,9 @@ const CONFIG = {
     messagingSenderId: "",
     appId: ""
   },
-  // 2) STRIPE: Dashboard → Developers → API keys (publishable key only — NEVER put the secret key here)
+  // 2) STRIPE: the pretty-killer-checkout server on Vercel makes the Checkout link (it holds the secret key — NEVER put it here)
   stripe: {
-    publishableKey: "",            // "pk_test_..."
-    checkoutEndpoint: ""           // your server / Firebase Function that creates a Checkout Session, e.g. "/api/create-checkout-session"
+    checkoutEndpoint: ""           // e.g. "https://pretty-killer-checkout.vercel.app/api/checkout"; empty = test orders
   },
   // Test-only PIN. Once Firebase is connected, replace with Firebase Auth (see Store.isAdmin below).
   adminPin: "1234",
@@ -534,18 +533,22 @@ const Store = {
    CHECKOUT — Stripe goes here.
    ===================================================================== */
 async function startCheckout(cartLines){
-  if (!CONFIG.stripe.publishableKey || !CONFIG.stripe.checkoutEndpoint){
+  if (!CONFIG.stripe.checkoutEndpoint){
     return { test:true };   // not connected yet → run a test order
   }
-  // TODO(stripe): your server creates a Checkout Session and returns its URL.
-  //   const res = await fetch(CONFIG.stripe.checkoutEndpoint, {
-  //     method:"POST", headers:{ "Content-Type":"application/json" },
-  //     body: JSON.stringify({ items: cartLines.map(l => ({ id:l.key, qty:l.qty })) })
-  //   });
-  //   const { url } = await res.json();
-  //   window.location.href = url;
-  //   (Then decrement stock in a Stripe webhook on the server, not here.)
-  return { test:false };
+  // The server looks up the real prices and returns a Stripe Checkout link for the whole bag.
+  try {
+    const res = await fetch(CONFIG.stripe.checkoutEndpoint, {
+      method:"POST", headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify({ items: cartLines.map(l => ({ id:l.id, side:l.side, qty:l.qty, free:!!l.free })) })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.url) return { error: data.error || "Checkout didn't start. Try again." };
+    window.location.href = data.url;
+    return { redirecting:true };
+  } catch(e){
+    return { error: "Couldn't reach checkout. Check your connection and try again." };
+  }
 }
 
 /* =====================================================================
@@ -988,7 +991,7 @@ function renderCart(){
     const pct = Math.min(100, subtotal / goal * 100);
     ship.innerHTML = `<span>${subtotal >= goal ? "You've got free shipping ♡" : `You're ${money(goal - subtotal)} away from free shipping`}</span><i><b style="width:${pct}%"></b></i>`;
   }
-  const live = CONFIG.stripe.publishableKey && CONFIG.stripe.checkoutEndpoint;
+  const live = !!CONFIG.stripe.checkoutEndpoint;
   $("#checkout").textContent = live ? "Checkout" : "Place test order";
   $("#checkout").disabled = !cart.length;
   $("#checkoutNote").textContent = live ? "You'll finish paying on Stripe's secure checkout." : "Stripe isn't connected yet, so this places a test order: no payment, but stock goes down so you can see it work.";
@@ -996,7 +999,16 @@ function renderCart(){
 
 $("#checkout").addEventListener("click", async () => {
   if (!cart.length) return;
+  const btn = $("#checkout"), label = btn.textContent;
+  btn.disabled = true; btn.textContent = "Going to checkout…";
   const r = await startCheckout(cart);
+  if (r.redirecting) return;
+  btn.disabled = !cart.length; btn.textContent = label;
+  if (r.error){
+    const note = $("#checkoutNotice");
+    note.textContent = r.error; note.hidden = false;
+    return;
+  }
   if (r.test){
     cart.filter(l => !product(l.id).digital).forEach(l => lineKeys(l).forEach(k => { stock[k] = Math.max(0, (stock[k] ?? 0) - l.qty); }));
     await Store.saveStock(stock);
@@ -1007,6 +1019,19 @@ $("#checkout").addEventListener("click", async () => {
     note.hidden = false;
   }
 });
+
+// Coming back from Stripe: ?paid=1 (order paid) or ?canceled=1 (went back without paying)
+function handleStripeReturn(){
+  const q = new URLSearchParams(location.search);
+  if (!q.has("paid") && !q.has("canceled")) return;
+  history.replaceState(null, "", location.pathname + location.hash);
+  if (q.has("paid")){
+    cart = []; saveCart(); renderGrid(); renderCart(); openCart();
+    const note = $("#checkoutNotice");
+    note.textContent = "Thank you! Your order is paid.";
+    note.hidden = false;
+  } else toast("Checkout canceled. Your bag is still here.");
+}
 
 $("#clearBag").addEventListener("click", () => { cart = []; saveCart(); renderGrid(); renderCart(); toast("Bag emptied"); });
 $("#search").addEventListener("input", e => { view.q = e.target.value; renderGrid(); });
@@ -1107,6 +1132,7 @@ function tickClock(){
   setSide(override || clockSide(), false);
   tickClock(); setInterval(tickClock, 30000);
   if (location.hash === "#admin") openAdmin();
+  handleStripeReturn();
 })();
 </script>
 </body>
