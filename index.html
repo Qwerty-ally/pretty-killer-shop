@@ -407,7 +407,9 @@ const PRODUCTS = [
   { id:"digital", kind:"digital", name:"Digital Album", price:10, digital:true, variants:{
     pretty:{ label:"Pretty ver. · download" },
     killer:{ label:"Killer ver. · download" } } },
-  { id:"movie", kind:"movie", name:"Pretty Killer: The Movie", price:15, shared:true }
+  { id:"movie", kind:"movie", name:"Pretty Killer: The Movie", price:15, shared:true },
+  // hidden: only shows after typing "test" — a $1 item for trying real checkout
+  { id:"test", kind:"test", name:"Test Item", price:1, shared:true, digital:true, hidden:true }
 ];
 
 PRODUCTS.filter(p => p.bundle).forEach(b => {
@@ -569,6 +571,9 @@ function art(p, on){
       <rect x="62" y="30" width="126" height="182" fill="var(--art-3)" opacity=".5" transform="rotate(6 125 121)"/>
       <g transform="rotate(-4 120 120)">${split(52,26,130,184,"","TOUR BOOK 2026")}
       <rect x="52" y="26" width="8" height="184" fill="#000" opacity=".25"/></g></svg>`;
+    case "test": return `<svg viewBox="0 0 200 200" role="img" aria-label="Test item">
+      <rect x="40" y="56" width="120" height="88" rx="8" fill="none" stroke="var(--accent)" stroke-width="3" stroke-dasharray="8 6"/>
+      <text x="100" y="112" text-anchor="middle" style="font:400 40px 'Anton',sans-serif;letter-spacing:.06em" fill="var(--accent)">$1 TEST</text></svg>`;
     case "movie": return `<svg viewBox="0 0 200 200" role="img" aria-label="Movie DVD">
       <g transform="rotate(3 100 100)">
       <rect x="44" y="18" width="112" height="164" rx="6" fill="var(--art-2)" opacity=".4"/>
@@ -739,10 +744,11 @@ const searchText = p => [p.name, p.showLabel, CATEGORY[p.id], ...(p.inside || []
   ...(p.variants ? Object.values(p.variants).map(v => v.label) : []),
   ...(p.bundle || []).map(id => product(id).name)].filter(Boolean).join(" ").toLowerCase();
 const revealed = {};   // UV / lights-off preview on the in-person tees
+let showTest = false;  // typing "test" shows the hidden $1 Test Item
 function renderGrid(){
   const q = view.q.trim().toLowerCase();
   const filtering = !!q || view.cat !== "all" || view.sort !== "featured";
-  let list = PRODUCTS.filter(p => !p.inPerson || p.inPerson === side)
+  let list = PRODUCTS.filter(p => (!p.inPerson || p.inPerson === side) && (!p.hidden || showTest))
     .filter(p => view.cat === "all" || CATEGORY[p.id] === view.cat)
     .filter(p => !q || searchText(p).includes(q));
   if (view.sort === "low") list = [...list].sort((a,b) => a.price - b.price);
@@ -754,7 +760,7 @@ function renderGrid(){
   }
   $("#grid").innerHTML = list.map(p => {
     const v = (p.shared || !p.variants) ? null : p.variants[side];
-    const stockText = p.digital ? "Pre-order · download after the show" : "Pre-order · yours after the show";
+    const stockText = p.hidden ? "Hidden test item · real $1 charge" : p.digital ? "Pre-order · download after the show" : "Pre-order · yours after the show";
     const addBtn = `<button class="btn" type="button" data-add="${p.id}">Pre-order</button>`;
     if (p.inPerson){
       const on = !!revealed[p.id];
@@ -932,6 +938,7 @@ document.addEventListener("keydown", e => {
   if (typed.endsWith("am")){ set("pretty"); typed=""; setSide("pretty", true); }
   else if (typed.endsWith("pm")){ set("killer"); typed=""; setSide("killer", true); }
   else if (typed.endsWith("movie")){ typed=""; giveFreeMovie(); }
+  else if (typed.endsWith("test")){ typed=""; showTest = !showTest; renderGrid(); toast(showTest ? "$1 Test Item is showing (only for you)" : "Test Item hidden"); }
   else if (typed.endsWith("auto")){ set(null); typed=""; setSide(clockSide(), false); toast("Following the clock again"); }
 });
 
