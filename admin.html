@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Shop Orders</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ground:#09080a; --surface:#141216; --surface-2:#1d1a20; --ink:#f2ecf0; --muted:#8c8390; --line:#2c272f;
+  --accent:#ff3fae; --ok:#5fd39a;
+  --display:"Anton",Impact,sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font:15px/1.5 var(--mono);padding:24px 16px 48px}
+.wrap{max-width:980px;margin:0 auto}
+h1{margin:0;font:400 clamp(32px,7vw,52px)/1 var(--display);text-transform:uppercase;letter-spacing:.02em}
+h1 span{color:var(--accent)}
+.label{font:600 11px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.14em;color:var(--muted)}
+.top{display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+.status{font-size:12px;color:var(--muted)}
+input,button{font:inherit;color:inherit}
+input{background:var(--surface);border:1.5px solid var(--line);padding:10px 12px;min-width:0}
+input:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn{background:var(--accent);color:#0a0a0a;border:0;padding:11px 16px;font-weight:600;cursor:pointer;text-transform:uppercase;letter-spacing:.08em;font-size:13px}
+.btn.ghost{background:none;color:var(--ink);border:1.5px solid var(--line)}
+.login{max-width:420px;background:var(--surface);border:1.5px solid var(--line);padding:20px;display:flex;flex-direction:column;gap:10px}
+.err{color:var(--accent);font-size:13px;margin:0}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px}
+.stat{background:var(--surface);border:1.5px solid var(--line);padding:12px 14px}
+.stat b{display:block;font:400 30px/1.1 var(--display);font-variant-numeric:tabular-nums}
+.tools{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+.tools input{flex:1 1 220px}
+.tools label{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--muted);cursor:pointer}
+.orders{display:flex;flex-direction:column;gap:10px}
+.order{background:var(--surface);border:1.5px solid var(--line);border-left:4px solid var(--accent);padding:14px 16px;display:grid;grid-template-columns:auto 1fr auto;gap:6px 18px;align-items:start}
+.order.new{animation:flash 1.6s ease-out 2}
+@keyframes flash{50%{background:#2a1424}}
+.order.done{border-left-color:var(--ok);opacity:.55}
+.num{font:400 30px/1 var(--display);color:var(--accent);letter-spacing:.03em}
+.order.done .num{color:var(--ok)}
+.who b{font-size:17px}
+.who .label{display:block;margin-top:2px}
+.items{grid-column:2 / 3;margin:4px 0 0;padding:0;list-style:none;font-size:14px}
+.items li::before{content:"· ";color:var(--accent)}
+.right{text-align:right;display:flex;flex-direction:column;gap:8px;align-items:end}
+.total{font-weight:600;font-variant-numeric:tabular-nums}
+.pick{display:flex;gap:6px;align-items:center;font-size:13px;cursor:pointer;white-space:nowrap}
+.pick input{width:18px;height:18px;accent-color:var(--ok)}
+.empty{color:var(--muted);padding:30px 0;text-align:center}
+@media (max-width:600px){
+  .order{grid-template-columns:1fr auto}
+  .who{grid-column:1 / -1;grid-row:2}
+  .items{grid-column:1 / -1}
+  .right{grid-column:2;grid-row:1}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div><div class="label">Pretty Killer Shop · Admin</div><h1>Orders <span id="count"></span></h1></div>
+    <div class="status" id="status"></div>
+  </div>
+
+  <form class="login" id="login">
+    <label class="label" for="pw">Admin password</label>
+    <input id="pw" type="password" autocomplete="current-password" required>
+    <button class="btn" type="submit">Open orders</button>
+    <p class="err" id="loginErr" hidden></p>
+  </form>
+
+  <div id="board" hidden>
+    <div class="stats">
+      <div class="stat"><span class="label">Orders</span><b id="sOrders">0</b></div>
+      <div class="stat"><span class="label">To pick up</span><b id="sWaiting">0</b></div>
+      <div class="stat"><span class="label">Sales</span><b id="sSales">$0</b></div>
+    </div>
+    <div class="tools">
+      <input id="search" type="search" placeholder="Search name or order number" aria-label="Search orders">
+      <label><input type="checkbox" id="hideDone"> Hide picked up</label>
+      <button class="btn ghost" type="button" id="refresh">Refresh</button>
+      <button class="btn ghost" type="button" id="logout">Log out</button>
+    </div>
+    <div class="orders" id="orders"></div>
+  </div>
+</div>
+
+<script>
+const ORDERS_URL = "https://pretty-killer-checkout.vercel.app/api/orders";
+const $ = s => document.querySelector(s);
+const esc = t => String(t).replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" })[c]);
+const money = c => "$" + (c / 100).toFixed(2);
+const store = {
+  get(k, d){ try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch(e){ return d; } },
+  set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
+};
+
+let pw = store.get("pk-admin-pw", ""), orders = [], seen = new Set(store.get("pk-admin-seen", [])), firstLoad = true;
+// "picked up" is saved on this device only
+const done = new Set(store.get("pk-admin-done", []));
+let timer;
+
+async function load(){
+  $("#status").textContent = "Loading…";
+  try {
+    const r = await fetch(ORDERS_URL, { headers: { "X-Admin-Key": pw }, cache: "no-store" });
+    const data = await r.json().catch(() => ({}));
+    if (r.status === 401){ return logout("Wrong password."); }
+    if (!r.ok) throw new Error(data.error || "Couldn't load orders.");
+    orders = data.orders || [];
+    $("#login").hidden = true; $("#board").hidden = false;
+    render();
+    $("#status").textContent = "Updated " + new Date().toLocaleTimeString([], { hour:"numeric", minute:"2-digit", second:"2-digit" }) + " · checks every 15 seconds";
+  } catch(e){
+    $("#status").textContent = e.message + " Trying again soon.";
+  }
+}
+
+function render(){
+  const q = $("#search").value.trim().toLowerCase(), hide = $("#hideDone").checked;
+  const fresh = firstLoad ? new Set() : new Set(orders.map(o => o.order).filter(n => !seen.has(n)));
+  orders.forEach(o => seen.add(o.order)); store.set("pk-admin-seen", [...seen].slice(-1000));
+  if (fresh.size && !firstLoad) document.title = `(${fresh.size} new) Shop Orders`;
+  firstLoad = false;
+
+  $("#count").textContent = orders.length ? `· ${orders.length}` : "";
+  $("#sOrders").textContent = orders.length;
+  $("#sWaiting").textContent = orders.filter(o => !done.has(o.order)).length;
+  $("#sSales").textContent = money(orders.reduce((a, o) => a + o.total, 0));
+
+  const list = orders.filter(o => (!hide || !done.has(o.order)) && (!q || `${o.name} ${o.order}`.toLowerCase().includes(q)));
+  $("#orders").innerHTML = list.length ? list.map(o => {
+    const isDone = done.has(o.order), when = new Date(o.created);
+    return `<article class="order ${isDone ? "done" : ""} ${fresh.has(o.order) ? "new" : ""}">
+      <div class="num">${esc(o.order || "—")}</div>
+      <div class="who"><b>${esc(o.name || "(no name)")}</b><span class="label">${when.toLocaleDateString([], { month:"short", day:"numeric" })} · ${when.toLocaleTimeString([], { hour:"numeric", minute:"2-digit" })}${o.email ? " · " + esc(o.email) : ""}</span></div>
+      <div class="right"><span class="total">${money(o.total)}</span>
+        <label class="pick"><input type="checkbox" data-done="${esc(o.order)}" ${isDone ? "checked" : ""}> Picked up</label></div>
+      <ul class="items">${o.items.map(i => `<li>${i.qty} × ${esc(i.name)}</li>`).join("")}${o.freeMovie ? "<li>1 × Pretty Killer: The Movie (secret code, free)</li>" : ""}</ul>
+    </article>`;
+  }).join("") : `<p class="empty">${orders.length ? "No orders match." : "No orders yet."}</p>`;
+}
+
+function logout(msg){
+  clearInterval(timer); pw = ""; store.set("pk-admin-pw", "");
+  $("#board").hidden = true; $("#login").hidden = false;
+  $("#loginErr").textContent = msg || ""; $("#loginErr").hidden = !msg;
+  $("#status").textContent = "";
+}
+function start(){ load(); clearInterval(timer); timer = setInterval(load, 15000); }
+
+$("#login").addEventListener("submit", e => { e.preventDefault(); pw = $("#pw").value.trim(); store.set("pk-admin-pw", pw); $("#loginErr").hidden = true; start(); });
+$("#logout").addEventListener("click", () => logout());
+$("#refresh").addEventListener("click", load);
+$("#search").addEventListener("input", render);
+$("#hideDone").addEventListener("change", render);
+$("#orders").addEventListener("change", e => {
+  const box = e.target.closest("[data-done]"); if (!box) return;
+  box.checked ? done.add(box.dataset.done) : done.delete(box.dataset.done);
+  store.set("pk-admin-done", [...done]); render();
+});
+document.addEventListener("visibilitychange", () => { if (!document.hidden) document.title = "Shop Orders"; });
+if (pw) start();
+</script>
+</body>
+</html>

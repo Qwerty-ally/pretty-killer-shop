@@ -260,6 +260,25 @@ footer{border-top:1px solid var(--line);padding-block:24px 40px;display:flex;jus
 .totals .row{display:flex;justify-content:space-between;font-weight:800;font-size:18px;font-variant-numeric:tabular-nums}
 .note{font-size:12px;color:var(--muted);margin:0}
 .notice{background:var(--ground-2);border:1.5px dashed var(--accent);border-radius:calc(var(--radius) / 2);padding:12px;font-size:13px}
+.buyer{display:flex;flex-direction:column;gap:6px}
+.buyer input{background:var(--ground-2);border:1.5px solid var(--line);border-radius:var(--radius-sm);padding:10px 12px;color:var(--ink);font:inherit;min-width:0}
+.buyer input:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+
+/* order confirmation (after paying) */
+.confirm{position:fixed;inset:0;z-index:70;background:var(--ground);overflow:auto;display:grid;place-items:center;padding:24px 16px}
+.confirm[hidden]{display:none}
+.cf-box{width:min(520px,100%);background:var(--surface);border:1.5px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:clamp(20px,5vw,32px);display:flex;flex-direction:column;gap:18px;text-align:center}
+.cf-box h2{margin:0;font:400 clamp(30px,7vw,44px)/1.05 var(--display)}
+[data-side="killer"] .cf-box h2{text-transform:uppercase}
+.cf-num b{display:block;margin-top:6px;font:400 clamp(44px,12vw,72px)/1 var(--display);color:var(--accent);letter-spacing:.04em;font-variant-numeric:tabular-nums}
+.cf-timer{border-block:1.5px dashed var(--line);padding:16px 0}
+.cf-timer b{display:block;margin:6px 0 10px;font:800 40px/1 var(--body);font-variant-numeric:tabular-nums}
+.cf-timer i{display:block;height:8px;background:var(--ground-2);border:1px solid var(--line);border-radius:99px;overflow:hidden}
+.cf-timer i b{display:block;height:100%;margin:0;width:0;background:var(--accent);transition:width .25s linear}
+.cf-timer.ready b{color:var(--accent)}
+.cf-pick{margin:0;font-weight:800;font-size:18px}
+.cf-items{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;text-align:left;font-size:14px}
+.cf-items li{display:flex;justify-content:space-between;gap:12px;padding:8px 10px;background:var(--ground-2);border-radius:var(--radius-sm)}
 
 .toast{
   position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);transform:translateX(-50%);z-index:60;
@@ -344,11 +363,25 @@ footer{border-top:1px solid var(--line);padding-block:24px 40px;display:flex;jus
   <div class="totals">
     <div class="ship" id="ship" hidden></div>
     <div class="row"><span>Subtotal</span><span id="subtotal">$0.00</span></div>
+    <div class="buyer"><label class="label" for="buyerName">Your name (for pickup)</label><input id="buyerName" type="text" maxlength="60" autocomplete="name" placeholder="First and last name"></div>
     <div class="notice" id="checkoutNotice" hidden></div>
     <button class="btn" type="button" id="checkout">Checkout</button>
     <p class="note" id="checkoutNote"></p>
   </div>
 </aside>
+
+<!-- Order confirmation, shown after paying on Stripe -->
+<section class="confirm" id="confirm" hidden role="dialog" aria-modal="true" aria-labelledby="cfTitle">
+  <div class="cf-box">
+    <div class="label">Order confirmed ✓</div>
+    <h2 id="cfTitle">Thank you!</h2>
+    <div class="cf-num"><span class="label">Order number</span><b id="cfOrder">…</b></div>
+    <div class="cf-timer" id="cfTimer"><span class="label" id="cfTimerLabel">Ready in</span><b id="cfClock">2:00</b><i><b id="cfBar"></b></i></div>
+    <p class="cf-pick" id="cfPick">Pick it up from the stand.</p>
+    <ul class="cf-items" id="cfItems"></ul>
+    <button class="btn" type="button" id="cfDone">Back to the shop</button>
+  </div>
+</section>
 
 <div class="toast" id="toast" hidden></div>
 
@@ -359,10 +392,13 @@ footer{border-top:1px solid var(--line);padding-block:24px 40px;display:flex;jus
 const CONFIG = {
   // STRIPE: the pretty-killer-checkout server on Vercel makes the Checkout link (it holds the secret key — NEVER put it here)
   stripe: {
-    checkoutEndpoint: "https://pretty-killer-checkout.vercel.app/api/checkout"   // empty = test orders
+    checkoutEndpoint: "https://pretty-killer-checkout.vercel.app/api/checkout",  // empty = test orders
+    orderEndpoint: "https://pretty-killer-checkout.vercel.app/api/order"         // looks up the order for the confirmation screen
   },
-  // Placeholder: bag total that unlocks free shipping. Set to 0 to hide the free-shipping bar.
-  freeShippingAt: 50
+  // Bag total that unlocks free shipping. 0 hides the bar (orders are picked up at the stand).
+  freeShippingAt: 0,
+  // The confirmation screen counts down this long before saying the order is ready.
+  readyAfterMs: 2 * 60 * 1000
 };
 
 /* =====================================================================
@@ -429,7 +465,7 @@ const cartKey = (p, side) => p.shared ? p.id : `${p.id}:${side}`;
 /* =====================================================================
    CHECKOUT — Stripe goes here.
    ===================================================================== */
-async function startCheckout(cartLines){
+async function startCheckout(cartLines, name){
   if (!CONFIG.stripe.checkoutEndpoint){
     return { test:true };   // not connected yet → run a test order
   }
@@ -437,7 +473,7 @@ async function startCheckout(cartLines){
   try {
     const res = await fetch(CONFIG.stripe.checkoutEndpoint, {
       method:"POST", headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify({ items: cartLines.map(l => ({ id:l.id, side:l.side, qty:l.qty, free:!!l.free })) })
+      body: JSON.stringify({ name, items: cartLines.map(l => ({ id:l.id, side:l.side, qty:l.qty, free:!!l.free })) })
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok || !data.url) return { error: data.error || "Checkout didn't start. Try again." };
@@ -873,14 +909,25 @@ function renderCart(){
   const live = !!CONFIG.stripe.checkoutEndpoint;
   $("#checkout").textContent = live ? "Checkout" : "Place test order";
   $("#checkout").disabled = !cart.length;
-  $("#checkoutNote").textContent = live ? "You'll finish paying on Stripe's secure checkout." : "Stripe isn't connected yet, so this places a test order: no payment is taken.";
+  $("#checkoutNote").textContent = live ? "You'll pay on Stripe's secure checkout, then pick up your order at the merch stand." : "Stripe isn't connected yet, so this places a test order: no payment is taken.";
 }
+
+// the buyer's name goes with the order (remembered on this device for next time)
+try { $("#buyerName").value = localStorage.getItem("pk-name") || ""; } catch(e){}
+$("#buyerName").addEventListener("input", () => { $("#checkoutNotice").hidden = true; try { localStorage.setItem("pk-name", $("#buyerName").value.trim()); } catch(e){} });
 
 $("#checkout").addEventListener("click", async () => {
   if (!cart.length) return;
+  const name = $("#buyerName").value.replace(/\s+/g, " ").trim();
+  if (!name){
+    const note = $("#checkoutNotice");
+    note.textContent = "Type your name first so we know whose order it is.";
+    note.hidden = false; $("#buyerName").focus();
+    return;
+  }
   const btn = $("#checkout"), label = btn.textContent;
   btn.disabled = true; btn.textContent = "Going to checkout…";
-  const r = await startCheckout(cart);
+  const r = await startCheckout(cart, name);
   if (r.redirecting) return;
   btn.disabled = !cart.length; btn.textContent = label;
   if (r.error){
@@ -897,18 +944,60 @@ $("#checkout").addEventListener("click", async () => {
   }
 });
 
-// Coming back from Stripe: ?paid=1 (order paid) or ?canceled=1 (went back without paying)
-function handleStripeReturn(){
+// Coming back from Stripe: ?paid=1&session_id=… (order paid) or ?canceled=1 (went back without paying).
+// The session id stays in the address while the confirmation is open, so a reload shows it again.
+async function handleStripeReturn(){
   const q = new URLSearchParams(location.search);
-  if (!q.has("paid") && !q.has("canceled")) return;
-  history.replaceState(null, "", location.pathname + location.hash);
-  if (q.has("paid")){
-    cart = []; saveCart(); renderGrid(); renderCart(); openCart();
-    const note = $("#checkoutNotice");
-    note.textContent = "Thank you! Your order is paid.";
-    note.hidden = false;
-  } else toast("Checkout canceled. Your bag is still here.");
+  if (q.has("canceled")){
+    history.replaceState(null, "", location.pathname + location.hash);
+    return toast("Checkout canceled. Your bag is still here.");
+  }
+  if (!q.has("paid")) return;
+  cart = []; saveCart(); renderGrid(); renderCart();
+  const sid = q.get("session_id") || "";
+  showConfirm(null, sid);
+  let order = null;
+  if (/^cs_(test|live)_/.test(sid) && CONFIG.stripe.orderEndpoint){
+    try {
+      const r = await fetch(`${CONFIG.stripe.orderEndpoint}?session_id=${encodeURIComponent(sid)}`);
+      if (r.ok) order = await r.json();
+    } catch(e){}
+  }
+  showConfirm(order || false, sid);   // false = paid, but the order details couldn't be loaded
 }
+
+let cfTimer;
+function showConfirm(o, sid){
+  // when the order is ready: saved per order, so reloading doesn't restart the timer
+  const key = "pk-ready-" + (sid || "order");
+  let readyAt = 0;
+  try { readyAt = +localStorage.getItem(key) || 0; } catch(e){}
+  if (!readyAt){ readyAt = Date.now() + CONFIG.readyAfterMs; try { localStorage.setItem(key, String(readyAt)); } catch(e){} }
+
+  $("#cfTitle").textContent = o && o.name ? `Thank you, ${o.name}!` : "Thank you!";
+  $("#cfOrder").textContent = o && o.order ? o.order : o === null ? "…" : "Paid ✓";
+  $("#cfItems").innerHTML = o && o.items ? o.items.map(i => `<li><span>${esc(i.name)}</span><b>×${i.qty}</b></li>`).join("")
+    + (o.freeMovie ? `<li><span>Pretty Killer: The Movie (secret code)</span><b>FREE</b></li>` : "") : "";
+  $("#confirm").hidden = false;
+
+  clearInterval(cfTimer);
+  const tick = () => {
+    const left = Math.max(0, readyAt - Date.now()), s = Math.ceil(left / 1000);
+    const ready = left === 0;
+    $("#cfClock").textContent = ready ? "Ready!" : `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+    $("#cfTimerLabel").textContent = ready ? "Your order is" : "Your order will be ready in";
+    $("#cfBar").style.width = `${100 - left / CONFIG.readyAfterMs * 100}%`;
+    $("#cfTimer").classList.toggle("ready", ready);
+    $("#cfPick").textContent = ready ? "Pick it up from the stand now! Show this screen and say your order number."
+                                     : "Then pick it up from the stand. Keep this screen open.";
+    if (ready) clearInterval(cfTimer);
+  };
+  tick(); cfTimer = setInterval(tick, 250);
+}
+$("#cfDone").addEventListener("click", () => {
+  clearInterval(cfTimer); $("#confirm").hidden = true;
+  history.replaceState(null, "", location.pathname + location.hash);
+});
 
 $("#clearBag").addEventListener("click", () => { cart = []; saveCart(); renderGrid(); renderCart(); toast("Bag emptied"); });
 $("#search").addEventListener("input", e => { view.q = e.target.value; renderGrid(); });
