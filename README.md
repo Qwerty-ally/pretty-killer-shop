@@ -21,6 +21,6 @@ Finn's Choice bundle ($115: K-pop Style CD, hardcover Tour Book, Mini CD Keychai
 
 **Prices are in two places:** `PRODUCTS` here (what people see) and `CATALOG` in the checkout server (what people pay). Change both.
 
-**Photos:** put product photos in `photos/` and list them in `PHOTOS` in `index.html` (the item, then Finn with it, which shows on hover). Items without photos keep their drawn art; the Tour Book shows the book open on hover.
+**Photos:** put product photos in `photos/` and list them in `PHOTOS` in `index.html` (the item, then Finn with it, which shows on hover). Items without photos keep their drawn art.
 
 `good-morning-tee.html` is the design sheet for the morning show shirt.

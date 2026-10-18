@@ -457,7 +457,7 @@ const PRODUCTS = [
 
 // Product photos. Put the files in photos/ and list them here: [the item, Finn with it (shows on hover)].
 // Items with a Pretty and a Killer version can have a pair per side: { pretty:[…], killer:[…] }.
-// Items not listed keep their drawn art. The Tour Book's hover shows the book open.
+// Items not listed keep their drawn art.
 const PHOTOS = {
   // cd: { pretty:["photos/cd-pretty.jpg", "photos/cd-pretty-finn.jpg"], killer:["photos/cd-killer.jpg", "photos/cd-killer-finn.jpg"] },
   // hat: ["photos/hat.jpg", "photos/hat-finn.jpg"],
@@ -467,10 +467,9 @@ const pics = p => { const x = PHOTOS[p.id]; return Array.isArray(x) ? x : x && x
 function artInner(p, on){
   const ph = pics(p);
   if (ph && !on) return `<img class="pov-a" src="${ph[0]}" alt="${esc(p.name)}" loading="lazy"><img class="pov-b" src="${ph[1]}" alt="Finn with the ${esc(p.name)}" loading="lazy"><span class="pov-hint">↻ Finn with it</span>`;
-  if (p.kind === "book") return `${art(p)}<span class="pov-b">${art({ kind:"bookOpen" })}</span><span class="pov-hint">↻ Peek inside</span>`;
   return p.bundle ? p.bundle.map(id => art(product(id))).join("") : art(p, on);
 }
-const hasPov = (p, on) => !!(pics(p) && !on) || p.kind === "book";
+const hasPov = (p, on) => !!(pics(p) && !on);
 
 PRODUCTS.filter(p => p.bundle).forEach(b => {
   b.price = b.bundle.filter(id => !(b.free || []).includes(id)).reduce((a, id) => a + PRODUCTS.find(p => p.id === id).price, 0);
@@ -631,20 +630,6 @@ function art(p, on){
       <rect x="62" y="30" width="126" height="182" fill="var(--art-3)" opacity=".5" transform="rotate(6 125 121)"/>
       <g transform="rotate(-4 120 120)">${split(52,26,130,184,"","TOUR BOOK 2026")}
       <rect x="52" y="26" width="8" height="184" fill="#000" opacity=".25"/></g></svg>`;
-    // hover view for the tour book (no photo of it yet): the book open
-    case "bookOpen": return `<svg viewBox="0 0 240 240" role="img" aria-label="Inside the tour book">
-      <g transform="rotate(-3 120 120)">
-      <path d="M120 58 Q78 44 22 52 V192 Q78 184 120 198 Z" fill="#fffaf6" stroke="#111" stroke-opacity=".3"/>
-      <path d="M120 58 Q162 44 218 52 V192 Q162 184 120 198 Z" fill="#fffaf6" stroke="#111" stroke-opacity=".3"/>
-      <rect x="116" y="56" width="8" height="142" fill="#000" opacity=".12"/>
-      <rect x="34" y="66" width="74" height="58" fill="#f7b8d4"/>
-      <text x="71" y="101" text-anchor="middle" style="font:800 17px 'Sniglet',sans-serif" fill="#ff5fc0">pretty</text>
-      ${[0,1,2,3].map(i=>`<rect x="34" y="${136+i*12}" width="${[74,66,72,48][i]}" height="4" fill="#111" opacity=".25"/>`).join("")}
-      <text x="170" y="80" text-anchor="middle" style="font:900 12px 'Bodoni Moda',serif" fill="#111">TOUR DIARY</text>
-      ${[0,1,2].map(i=>`<rect x="132" y="${92+i*11}" width="${[74,64,70][i]}" height="4" fill="#111" opacity=".25"/>`).join("")}
-      <rect x="132" y="128" width="74" height="54" fill="#111"/>
-      <text x="169" y="161" text-anchor="middle" style="font:900 15px 'Bodoni Moda',serif" fill="#ff5fc0">KILLER</text>
-      </g></svg>`;
     case "test": return `<svg viewBox="0 0 200 200" role="img" aria-label="Test item">
       <rect x="40" y="56" width="120" height="88" rx="8" fill="none" stroke="var(--accent)" stroke-width="3" stroke-dasharray="8 6"/>
       <text x="100" y="112" text-anchor="middle" style="font:400 40px 'Anton',sans-serif;letter-spacing:.06em" fill="var(--accent)">$1 TEST</text></svg>`;
