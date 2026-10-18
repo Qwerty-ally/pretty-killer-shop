@@ -181,6 +181,15 @@ header.bar{
 .card .ver{font:600 12px/1 var(--mono);color:var(--accent);text-transform:var(--label-case);letter-spacing:var(--label-track)}
 .card p{margin:0;font-size:14px;color:var(--muted)}
 .card .art.clickable{cursor:pointer}
+/* two views: the item, then Finn with it (hover, or tap on phones) */
+.card .art.pov{overflow:hidden;cursor:pointer}
+.card .art.pov img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.card .art .pov-b{position:absolute;inset:0;display:grid;place-items:center;background:inherit;opacity:0;transition:opacity .35s ease}
+.card .art.pov:hover .pov-b,.card .art.pov.flipped .pov-b{opacity:1}
+.card .art .tag,.pov-hint{z-index:2}
+.pov-hint{position:absolute;right:10px;bottom:10px;padding:4px 9px;border-radius:var(--radius-sm);background:rgba(0,0,0,.6);color:#fff;font:600 11px/1.3 var(--mono);text-transform:var(--label-case);letter-spacing:var(--label-track);pointer-events:none;transition:opacity .25s}
+.card .art.pov:hover .pov-hint,.card .art.pov.flipped .pov-hint{opacity:0}
+@media (prefers-reduced-motion:reduce){.card .art .pov-b{transition:none}}
 .shop-tools{display:flex;flex-wrap:wrap;gap:12px 16px;align-items:end;padding-bottom:20px}
 .shop-tools .search,.shop-tools .sort{display:flex;flex-direction:column;gap:6px}
 .shop-tools .search{flex:1 1 220px}
@@ -446,6 +455,23 @@ const PRODUCTS = [
   { id:"test", kind:"test", name:"Test Item", price:1, shared:true, digital:true, hidden:true }
 ];
 
+// Product photos. Put the files in photos/ and list them here: [the item, Finn with it (shows on hover)].
+// Items with a Pretty and a Killer version can have a pair per side: { pretty:[…], killer:[…] }.
+// Items not listed keep their drawn art. The Tour Book's hover shows the book open.
+const PHOTOS = {
+  // cd: { pretty:["photos/cd-pretty.jpg", "photos/cd-pretty-finn.jpg"], killer:["photos/cd-killer.jpg", "photos/cd-killer-finn.jpg"] },
+  // hat: ["photos/hat.jpg", "photos/hat-finn.jpg"],
+};
+const pics = p => { const x = PHOTOS[p.id]; return Array.isArray(x) ? x : x && x[side] || null; };
+// the art box: two views that swap on hover (tap on phones), or plain drawn art
+function artInner(p, on){
+  const ph = pics(p);
+  if (ph && !on) return `<img class="pov-a" src="${ph[0]}" alt="${esc(p.name)}" loading="lazy"><img class="pov-b" src="${ph[1]}" alt="Finn with the ${esc(p.name)}" loading="lazy"><span class="pov-hint">↻ Finn with it</span>`;
+  if (p.kind === "book") return `${art(p)}<span class="pov-b">${art({ kind:"bookOpen" })}</span><span class="pov-hint">↻ Peek inside</span>`;
+  return p.bundle ? p.bundle.map(id => art(product(id))).join("") : art(p, on);
+}
+const hasPov = (p, on) => !!(pics(p) && !on) || p.kind === "book";
+
 PRODUCTS.filter(p => p.bundle).forEach(b => {
   b.price = b.bundle.filter(id => !(b.free || []).includes(id)).reduce((a, id) => a + PRODUCTS.find(p => p.id === id).price, 0);
 });
@@ -605,6 +631,20 @@ function art(p, on){
       <rect x="62" y="30" width="126" height="182" fill="var(--art-3)" opacity=".5" transform="rotate(6 125 121)"/>
       <g transform="rotate(-4 120 120)">${split(52,26,130,184,"","TOUR BOOK 2026")}
       <rect x="52" y="26" width="8" height="184" fill="#000" opacity=".25"/></g></svg>`;
+    // hover view for the tour book (no photo of it yet): the book open
+    case "bookOpen": return `<svg viewBox="0 0 240 240" role="img" aria-label="Inside the tour book">
+      <g transform="rotate(-3 120 120)">
+      <path d="M120 58 Q78 44 22 52 V192 Q78 184 120 198 Z" fill="#fffaf6" stroke="#111" stroke-opacity=".3"/>
+      <path d="M120 58 Q162 44 218 52 V192 Q162 184 120 198 Z" fill="#fffaf6" stroke="#111" stroke-opacity=".3"/>
+      <rect x="116" y="56" width="8" height="142" fill="#000" opacity=".12"/>
+      <rect x="34" y="66" width="74" height="58" fill="#f7b8d4"/>
+      <text x="71" y="101" text-anchor="middle" style="font:800 17px 'Sniglet',sans-serif" fill="#ff5fc0">pretty</text>
+      ${[0,1,2,3].map(i=>`<rect x="34" y="${136+i*12}" width="${[74,66,72,48][i]}" height="4" fill="#111" opacity=".25"/>`).join("")}
+      <text x="170" y="80" text-anchor="middle" style="font:900 12px 'Bodoni Moda',serif" fill="#111">TOUR DIARY</text>
+      ${[0,1,2].map(i=>`<rect x="132" y="${92+i*11}" width="${[74,64,70][i]}" height="4" fill="#111" opacity=".25"/>`).join("")}
+      <rect x="132" y="128" width="74" height="54" fill="#111"/>
+      <text x="169" y="161" text-anchor="middle" style="font:900 15px 'Bodoni Moda',serif" fill="#ff5fc0">KILLER</text>
+      </g></svg>`;
     case "test": return `<svg viewBox="0 0 200 200" role="img" aria-label="Test item">
       <rect x="40" y="56" width="120" height="88" rx="8" fill="none" stroke="var(--accent)" stroke-width="3" stroke-dasharray="8 6"/>
       <text x="100" y="112" text-anchor="middle" style="font:400 40px 'Anton',sans-serif;letter-spacing:.06em" fill="var(--accent)">$1 TEST</text></svg>`;
@@ -804,7 +844,7 @@ function renderGrid(){
     if (p.inPerson){
       const on = !!revealed[p.id];
       return `<article class="card in-person">
-      <div class="art clickable ${on ? "revealed" : ""}" data-reveal="${p.id}"><span class="tag">${p.showLabel}</span>${art(p, on)}</div>
+      <div class="art clickable ${on ? "revealed" : ""}${hasPov(p, on) ? " pov" : ""}" ${hasPov(p, on) ? "" : `data-reveal="${p.id}"`}><span class="tag">${p.showLabel}</span>${artInner(p, on)}</div>
       <div class="body">
         <span class="ver">${p.showLabel} · In person</span>
         <h3>${p.name}</h3>
@@ -820,7 +860,7 @@ function renderGrid(){
       const items = p.bundle.map(product);
       const full = items.reduce((a,c)=>a+c.price,0);
       return `<article class="card full">
-      <div class="art bundle-art"><span class="tag">Finn's pick</span>${items.map(art).join("")}</div>
+      <div class="art${hasPov(p) ? " pov" : " bundle-art"}"><span class="tag">Finn's pick</span>${artInner(p)}</div>
       <div class="body">
         <span class="ver">${v.label}</span>
         <h3>${p.name}</h3>
@@ -836,7 +876,7 @@ function renderGrid(){
         <button class="inside-btn" type="button" data-inside="${p.id}" aria-expanded="${insideOpen[p.id]?"true":"false"}" aria-controls="inside-${p.id}">What's inside <span aria-hidden="true">${insideOpen[p.id]?"−":"+"}</span></button>
         <ul class="inside" id="inside-${p.id}" ${insideOpen[p.id]?"":"hidden"}>${p.inside.map(i=>`<li>${i}</li>`).join("")}</ul>` : "";
     return `<article class="card ${p.feature ? "feature" : ""}">
-      <div class="art${p.inside ? " clickable" : ""}" ${p.inside ? `data-inside="${p.id}"` : ""}>${p.shared ? `<span class="tag both">Both sides</span>` : `<span class="tag">${side==="pretty"?"Pretty only":"Killer only"}</span>`}${art(p)}</div>
+      <div class="art${hasPov(p) ? " pov" : p.inside ? " clickable" : ""}" ${p.inside && !hasPov(p) ? `data-inside="${p.id}"` : ""}>${p.shared ? `<span class="tag both">Both sides</span>` : `<span class="tag">${side==="pretty"?"Pretty only":"Killer only"}</span>`}${artInner(p)}</div>
       <div class="body">
         <span class="ver">${v ? v.label : p.note || "Pretty + Killer"}</span>
         <h3>${p.name}</h3>${inside}
@@ -858,6 +898,9 @@ document.addEventListener("click", e => {
   }
   const rm = e.target.closest("[data-remove]");
   if (rm){ cart = cart.filter(l => l.key !== rm.dataset.remove); saveCart(); renderGrid(); renderCart(); return; }
+  // phones can't hover: a tap swaps the photo
+  const pov = e.target.closest(".art.pov");
+  if (pov){ pov.classList.toggle("flipped"); return; }
   const rev = e.target.closest("[data-reveal]");
   if (rev){ revealed[rev.dataset.reveal] = !revealed[rev.dataset.reveal]; renderGrid(); return; }
   const ins = e.target.closest("[data-inside]");
