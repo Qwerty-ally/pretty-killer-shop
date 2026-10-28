@@ -17,7 +17,7 @@ Finn's Choice bundle ($115: K-pop Style CD, hardcover Tour Book, Mini CD Keychai
 
 - Buyers type their **name** in the bag before checking out. Orders are **picked up at the merch stand** (no shipping address).
 - After paying they get a **confirmation screen** with their order number (like `PK-4821`), a 2-minute "ready in" timer (`CONFIG.readyAfterMs`) and "Pick it up from the stand".
-- **Admin:** `admin.html` lists every paid order with the name, items and total, refreshes every 15 seconds, and has a **Picked up** checkbox (saved on that device). Its password is the `ADMIN_KEY` setting on Vercel, not in this repo.
+- **Admin:** `admin.html` lists every paid order with the name, items and total, refreshes every 15 seconds, and has a **Picked up** checkbox (saved on that device). Open it with your private link, `admin.html#<ADMIN_KEY>` (the `ADMIN_KEY` setting on Vercel, not in this repo), and it opens with no password to type. The password box is still there as a backup.
 
 **Prices are in two places:** `PRODUCTS` here (what people see) and `CATALOG` in the checkout server (what people pay). Change both.
 

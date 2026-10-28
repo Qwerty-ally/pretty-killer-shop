@@ -99,6 +99,9 @@ const store = {
   set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
 };
 
+// the private admin link (admin.html#<ADMIN_KEY>) opens the orders with no password to type
+const linkKey = decodeURIComponent(location.hash.slice(1)).trim();
+if (linkKey) store.set("pk-admin-pw", linkKey);
 let pw = store.get("pk-admin-pw", ""), orders = [], seen = new Set(store.get("pk-admin-seen", [])), firstLoad = true;
 // "picked up" is saved on this device only
 const done = new Set(store.get("pk-admin-done", []));
