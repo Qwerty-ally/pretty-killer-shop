@@ -9,7 +9,7 @@ Official merch shop for Finn Shapiro's Pretty Killer Tour.
 
 ## Products
 
-Finn's Choice bundle ($115: K-pop Style CD, hardcover Tour Book, Mini CD Keychain and Mystery Trading Cards, with the Movie free), Tour Book (hardcover, $45), K-pop Style CD, Standard CD, Mini CD Keychain, Sticker Pack, Mystery Trading Cards, Tour Poster, Reversible Bucket Hat (Killer outside, Pretty on the reverse), Digital Album and the Movie. The in-person Good Morning Sun Tee (morning show) and Killer Glow Tee (night show) are shown online but sold only at the merch stand.
+Finn's Choice bundle ($115: K-pop Style CD, hardcover Tour Book, Mini CD Keychain and Mystery Trading Cards, with the Movie free), Tour Book (hardcover, $45), K-pop Style CD, Standard CD, Mini CD Keychain, Sticker Pack, Mystery Trading Cards, Tour Poster, Reversible Bucket Hat (Killer outside, Pretty on the reverse), Digital Album, Video Pack ($5, music videos and more, with a different Pretty and Killer version) and the Movie. The in-person Good Morning Sun Tee (morning show) and Killer Glow Tee (night show) are shown online but sold only at the merch stand.
 
 ## Checkout (Stripe)
 

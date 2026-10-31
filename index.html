@@ -450,6 +450,11 @@ const PRODUCTS = [
   { id:"digital", kind:"digital", name:"Digital Album", price:10, digital:true, variants:{
     pretty:{ label:"Pretty ver. · download" },
     killer:{ label:"Killer ver. · download" } } },
+  { id:"videopack", kind:"videopack", name:"Video Pack", price:5, digital:true,
+    inside:["Music videos","And more"],
+    variants:{
+    pretty:{ label:"Pretty ver. · download" },
+    killer:{ label:"Killer ver. · download" } } },
   { id:"movie", kind:"movie", name:"Pretty Killer: The Movie", price:15, shared:true },
   // hidden: only shows after typing "test" — a $1 item for trying real checkout
   { id:"test", kind:"test", name:"Test Item", price:1, shared:true, digital:true, hidden:true }
@@ -478,7 +483,7 @@ PRODUCTS.filter(p => p.bundle).forEach(b => {
 // shop filter categories
 const CATEGORY = {
   finnschoice:"bundles",
-  kpopcd:"music", cd:"music", digital:"music", movie:"music",
+  kpopcd:"music", cd:"music", digital:"music", videopack:"music", movie:"music",
   mtee:"clothes", ntee:"clothes", hat:"clothes",
   keychain:"accessories",
   book:"collectibles", stickers:"collectibles", cards:"collectibles", poster:"collectibles"
@@ -699,6 +704,19 @@ function art(p, on){
         <rect x="72" y="124" width="56" height="3" fill="${pretty ? "#f7b8d4" : "#2c272f"}"/><rect x="72" y="124" width="22" height="3" fill="${pretty ? "#f25fc4" : "#ff3fae"}"/>
         <circle cx="100" cy="148" r="11" fill="${pretty ? "#f25fc4" : "#ff3fae"}"/><path d="M96 142 L106 148 L96 154 Z" fill="${pretty ? "#fff" : "#0a0a0a"}"/>
         <path d="M78 144 L78 152 L72 148 Z M122 144 L122 152 L128 148 Z" fill="${pretty ? "#161015" : "#8c8390"}"/>
+      </svg>`;
+    }
+    case "videopack": {
+      const pretty = side === "pretty", ink = pretty ? "#161015" : "#f2ecf0", hot = pretty ? "#f25fc4" : "#ff3fae";
+      // a stack of three video clips with a play button on the top one
+      return `<svg viewBox="0 0 200 200" role="img" aria-label="Video pack, ${pretty ? "pretty" : "killer"} version">
+        <rect x="46" y="34" width="112" height="70" rx="6" fill="${pretty ? "#f7b8d4" : "#2c272f"}" transform="rotate(-8 102 69)"/>
+        <rect x="42" y="50" width="116" height="72" rx="6" fill="${pretty ? "#f4a9c6" : "#1d1a20"}" transform="rotate(5 100 86)"/>
+        <rect x="36" y="70" width="128" height="80" rx="6" fill="${pretty ? "#fffafc" : "#0b0a0c"}" stroke="${pretty ? "#e9b1c9" : "#3a353e"}" stroke-width="2"/>
+        ${pretty ? tiles(42, 76, 116, 52) : `<text x="100" y="108" text-anchor="middle" style="font:26px 'Anton',sans-serif;letter-spacing:.04em" fill="${hot}">KILLER</text>`}
+        <circle cx="100" cy="102" r="15" fill="${hot}"/><path d="M95 94 L108 102 L95 110 Z" fill="${pretty ? "#fff" : "#0a0a0a"}"/>
+        <rect x="44" y="136" width="112" height="3" fill="${pretty ? "#f7b8d4" : "#2c272f"}"/><rect x="44" y="136" width="40" height="3" fill="${hot}"/>
+        <text x="100" y="176" text-anchor="middle" style="font:8px ${pretty ? "'Special Elite'" : "'IBM Plex Mono'"},monospace;letter-spacing:.12em" fill="${ink}">${pretty ? "PRETTY" : "KILLER"} VIDEO PACK</text>
       </svg>`;
     }
     case "poster": {
