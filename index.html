@@ -80,7 +80,7 @@ header.bar{
 /* ============ HERO ============ */
 .hero{padding-block:48px 28px;position:relative}
 .hero .label{margin-bottom:10px}
-.title{margin:0;line-height:.9;display:flex;flex-wrap:wrap;gap:.04em;font-size:clamp(76px,17vw,200px)}
+.title{margin:0;line-height:.9;display:flex;flex-wrap:wrap;gap:.04em;font-size:clamp(48px,14vw,200px)}
 .title .ch{display:inline-block}
 /* both sides: ransom-note cutout letters, like the cover */
 .title .ch{
@@ -223,7 +223,7 @@ header.bar{
 .was{font-size:14px;font-weight:400;color:var(--muted)}
 .save{display:inline-block;vertical-align:middle;font:600 11px/1.3 var(--mono);text-transform:var(--label-case);letter-spacing:var(--label-track);background:var(--accent);color:var(--accent-ink);padding:3px 8px;border-radius:var(--radius-sm)}
 [data-side="pretty"] .card.full .art{margin:10px}
-.inside-btn{align-self:flex-start;background:none;border:1.5px solid var(--line);border-radius:var(--radius-sm);padding:5px 10px;cursor:pointer;font:600 12px/1 var(--mono);text-transform:var(--label-case);letter-spacing:var(--label-track);color:var(--ink)}
+.inside-btn{align-self:flex-start;background:none;border:1.5px solid var(--line);border-radius:var(--radius-sm);padding:9px 12px;min-height:36px;cursor:pointer;font:600 12px/1 var(--mono);text-transform:var(--label-case);letter-spacing:var(--label-track);color:var(--ink)}
 .inside-btn span{color:var(--accent);margin-left:4px}
 .inside{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
 .inside li{font-size:13px;padding:4px 10px;border-radius:var(--radius-sm);background:var(--ground-2);border:1px solid var(--line)}
@@ -300,6 +300,10 @@ footer{border-top:1px solid var(--line);padding-block:24px 40px;display:flex;jus
   .card.feature{grid-column:span 2}
   .card.feature ~ .card.feature{grid-column:auto}
 }
+@media (max-width:480px){
+  /* phones: the page colors already show the side, so the AM/PM pill makes room for the bag */
+  header.bar .side-pill{display:none}
+}
 @media (max-width:560px){
   .grid{grid-template-columns:1fr}
   .card.feature{grid-column:auto}
@@ -310,6 +314,7 @@ footer{border-top:1px solid var(--line);padding-block:24px 40px;display:flex;jus
   .card.feature .art svg{height:200px}
   .side-pill em{display:none}
   .brand span{display:none}
+  .brand b{white-space:nowrap}
   .collage{grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(6,1fr)}
   .collage > div:nth-child(n+19){display:none}
 }
