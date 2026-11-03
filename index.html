@@ -300,6 +300,7 @@ footer{border-top:1px solid var(--line);padding-block:24px 40px;display:flex;jus
   .card.feature{grid-column:span 2}
   .card.feature ~ .card.feature{grid-column:auto}
 }
+.card.linked{outline:4px solid var(--accent);outline-offset:4px;transition:outline-color .4s}
 @media (max-width:480px){
   /* phones: the page colors already show the side, so the AM/PM pill makes room for the bag */
   header.bar .side-pill{display:none}
@@ -559,7 +560,7 @@ const SIDES = {
 };
 
 let side = "pretty";
-let override = null;
+let override = null, linkSide = false;   // linkSide: a product link picked the side for this visit
 try { override = sessionStorage.getItem("pk-side-override"); } catch(e){}
 
 function clockSide(){ return new Date().getHours() < 12 ? "pretty" : "killer"; }
@@ -851,7 +852,7 @@ function renderGrid(){
     const addBtn = `<button class="btn" type="button" data-add="${p.id}">Pre-order</button>`;
     if (p.inPerson){
       const on = !!revealed[p.id];
-      return `<article class="card in-person">
+      return `<article class="card in-person" id="p-${p.id}">
       <div class="art clickable ${on ? "revealed" : ""}${hasPov(p, on) ? " pov" : ""}" ${hasPov(p, on) ? "" : `data-reveal="${p.id}"`}><span class="tag">${p.showLabel}</span>${artInner(p, on)}</div>
       <div class="body">
         <span class="ver">${p.showLabel} · In person</span>
@@ -867,7 +868,7 @@ function renderGrid(){
     if (p.bundle){
       const items = p.bundle.map(product);
       const full = items.reduce((a,c)=>a+c.price,0);
-      return `<article class="card full">
+      return `<article class="card full" id="p-${p.id}">
       <div class="art${hasPov(p) ? " pov" : " bundle-art"}"><span class="tag">Finn's pick</span>${artInner(p)}</div>
       <div class="body">
         <span class="ver">${v.label}</span>
@@ -883,7 +884,7 @@ function renderGrid(){
     const inside = p.inside ? `
         <button class="inside-btn" type="button" data-inside="${p.id}" aria-expanded="${insideOpen[p.id]?"true":"false"}" aria-controls="inside-${p.id}">What's inside <span aria-hidden="true">${insideOpen[p.id]?"−":"+"}</span></button>
         <ul class="inside" id="inside-${p.id}" ${insideOpen[p.id]?"":"hidden"}>${p.inside.map(i=>`<li>${i}</li>`).join("")}</ul>` : "";
-    return `<article class="card ${p.feature ? "feature" : ""}">
+    return `<article class="card ${p.feature ? "feature" : ""}" id="p-${p.id}">
       <div class="art${hasPov(p) ? " pov" : p.inside ? " clickable" : ""}" ${p.inside && !hasPov(p) ? `data-inside="${p.id}"` : ""}>${p.shared ? `<span class="tag both">Both sides</span>` : `<span class="tag">${side==="pretty"?"Pretty only":"Killer only"}</span>`}${artInner(p)}</div>
       <div class="body">
         <span class="ver">${v ? v.label : p.note || "Pretty + Killer"}</span>
@@ -1099,7 +1100,7 @@ function untilSwitch(){
   return h ? `${h}h ${m}m` : `${m}m`;
 }
 function renderNext(){
-  $("#heroNext").textContent = SIDES[side].next + (override ? " · test override on" : ` · in ${untilSwitch()}`);
+  $("#heroNext").textContent = SIDES[side].next + (override && !linkSide ? " · test override on" : override ? "" : ` · in ${untilSwitch()}`);
 }
 function tickClock(){
   renderNext();
@@ -1107,10 +1108,24 @@ function tickClock(){
   if (!override && clockSide() !== side) setSide(clockSide(), true);
 }
 
+// product links: #p-<id> scrolls to that item; #p-<id>-pretty / -killer also shows that side's version
+// (for this visit only). In-person tees switch to the side they're sold on.
+function openProductLink(){
+  const m = location.hash.match(/^#p-([a-z]+)(?:-(pretty|killer))?$/);
+  const p = m && PRODUCTS.find(x => x.id === m[1] && !x.hidden);
+  if (!p) return;
+  const want = m[2] || p.inPerson;
+  if (want && want !== side){ override = want; linkSide = true; setSide(want, false); }
+  const card = document.getElementById("p-" + p.id); if (!card) return;
+  card.scrollIntoView({ block:"center" });
+  card.classList.add("linked"); setTimeout(() => card.classList.remove("linked"), 4000);
+}
+
 (function boot(){
   setSide(override || clockSide(), false);
   tickClock(); setInterval(tickClock, 30000);
   handleStripeReturn();
+  openProductLink();
 })();
 </script>
 </body>

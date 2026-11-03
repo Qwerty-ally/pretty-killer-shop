@@ -81,6 +81,21 @@ h2{margin:40px 0 6px;font:900 34px/1.1 var(--display)}
 .song .pg{font:600 12px var(--mono);color:var(--accent)}
 .song.done .nm{text-decoration:line-through;opacity:.55}
 .song.tba .nm{font-style:italic;opacity:.5;font-weight:400}
+.pgrid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px;max-width:520px;margin:0 0 10px}
+.pgrid span{aspect-ratio:3/4;display:grid;place-items:center;text-align:center;background:var(--surface);border:1.5px solid var(--line);border-radius:var(--radius);font:600 10px/1.15 var(--mono);padding:2px;overflow-wrap:anywhere}
+.pgrid span.sym{font-size:22px;color:var(--accent)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin:0 0 16px;font:600 13px var(--mono);color:var(--muted)}
+.legend b{color:var(--accent);font-size:16px}
+.links{display:flex;flex-direction:column;gap:10px}
+.link{display:grid;grid-template-columns:1fr auto;gap:8px 12px;align-items:center;background:var(--surface);padding:14px 16px;border-radius:var(--radius);box-shadow:var(--shadow)}
+.link h3{margin:0;font:900 20px/1.15 var(--display)}
+[data-side="killer"] .link h3{font-weight:400;text-transform:uppercase;letter-spacing:.03em}
+.link .sub{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap}
+.link a,.link button{display:inline-flex;align-items:center;min-height:40px;padding:8px 12px;font:600 13px var(--mono);text-transform:uppercase;letter-spacing:.06em;text-decoration:none;border-radius:var(--radius);cursor:pointer}
+.link a{background:var(--accent);color:var(--accent-ink)}
+.link a.k{background:#0b0a0c;color:#ff3fae;border:1.5px solid #2c272f}
+.link a.p{background:#fffafc;color:#161015;border:1.5px solid #e9b1c9}
+.link button{background:none;border:1.5px solid var(--line);color:var(--muted)}
 .part{grid-column:1/-1;margin:14px 0 2px;font:600 13px var(--mono);text-transform:uppercase;letter-spacing:.12em;color:var(--accent)}
 .song.extra .nm{font-weight:800}
 </style>
@@ -101,7 +116,11 @@ h2{margin:40px 0 6px;font:900 34px/1.1 var(--display)}
     <div class="pages" id="pbPages"></div>
     <div class="songs" id="pbSongs"></div>
   </section>
-  <p class="foot">Ticking an item marks it ready. The ticks are saved on this device only.</p>
+  <section id="linksView" hidden>
+    <p class="pb-sum">Each link opens the shop scrolled to that item. Pretty / Killer links show that version.</p>
+    <div class="links" id="linkList"></div>
+  </section>
+  <p class="foot" id="foot">Ticking an item marks it ready. The ticks are saved on this device only.</p>
 </div>
 
 <script>
@@ -121,7 +140,7 @@ const PRODUCTS = [
     photobook: true,
     items: [
       { side:"both", name:"CD", note:"The album" },
-      { side:"both", name:"Photobook", note:"Start page, then 3 parts: an outfit page and 5 songs (23 pages each) per part (see below)" },
+      { side:"both", name:"Photobook", note:"349 pages: a start page, then 3 parts, each an outfit page and 5 songs at 23 pages per song (see below)" },
       { side:"both", name:"Lenticular card" },
       { side:"both", name:"Charm" },
       { side:"both", name:"Photocards", qty:"2" },
@@ -133,22 +152,50 @@ const PRODUCTS = [
   {
     id: "book",
     name: "Pretty Killer Tour Book",
-    meta: ["$45", "Hardcover", "One version", "Pre-order · after the show"],
+    meta: ["$45", "Hardcover", "480 pages", "One version", "Pre-order · after the show"],
     versions: [ { key:"both", label:"Tour Book" } ],
     items: [
       { side:"both", name:"Hardcover", note:"The cover" },
+      { side:"both", name:"480 pages" },
       { side:"both", tba:true },
       { side:"both", tba:true },
       { side:"both", tba:true }
     ]
-  }
+  },
+  { id: "links", name: "Shop links", links: true }
+];
+
+/* SHOP LINKS: every item in the shop. variants: true = separate Pretty and Killer links. */
+const SHOP = "https://qwerty-ally.github.io/pretty-killer-shop/";
+const SHOP_ITEMS = [
+  { id:"finnschoice", name:"Finn's Choice", price:"$115", variants:true },
+  { id:"mtee", name:"Good Morning Sun Tee", price:"$20", note:"Morning show only · merch stand" },
+  { id:"ntee", name:"Killer Glow Tee", price:"$20", note:"Night show only · merch stand" },
+  { id:"book", name:"Pretty Killer Tour Book", price:"$45" },
+  { id:"kpopcd", name:"K-pop Style CD", price:"$45", variants:true },
+  { id:"cd", name:"Standard CD", price:"$22", variants:true },
+  { id:"keychain", name:"Mini CD Keychain", price:"$15", variants:true },
+  { id:"stickers", name:"Sticker Pack", price:"$8", variants:true },
+  { id:"cards", name:"Mystery Trading Cards", price:"$10", variants:true },
+  { id:"poster", name:"Tour Poster", price:"$5", variants:true },
+  { id:"hat", name:"Reversible Bucket Hat", price:"$30" },
+  { id:"digital", name:"Digital Album", price:"$10", variants:true },
+  { id:"videopack", name:"Video Pack", price:"$5", variants:true },
+  { id:"movie", name:"Pretty Killer: The Movie", price:"$15" }
 ];
 
 /* PHOTOBOOK (from "CD K-pop Final"): a start page, then 3 parts. Each part is an outfit page
    and 5 songs, 23 pages per song. That's the 15 songs on that version's side of the tracklist
    (part 1 = songs 1-5, part 2 = 6-10, part 3 = 11-15). Song names come from the tracklist. */
+// the 23 pages of every song, in order, from the "CD K-pop Final" grid:
+// ○ = random, □ = related to the song, ♡ = something with the name
+const SONG_PAGES = ["Cover explanation", "Lyrics", "♡", "○", "○", "○",
+                    "□", "□", "□", "□", "□", "□",
+                    "♡", "○", "○", "○", "□", "○",
+                    "□", "○", "□", "Finale", "?"];
 const PHOTOBOOK = {
-  perSong: [ { n:18, what:"photos" }, { n:2, what:"behind the scenes" }, { n:1, what:"lyrics page" }, { n:1, what:"backstory page" }, { n:1, what:"poster" } ],
+  perSong: [ { n:9, what:"□ related to the song" }, { n:8, what:"○ random" }, { n:2, what:"♡ something with the name" },
+             { n:1, what:"cover explanation" }, { n:1, what:"lyrics" }, { n:1, what:"finale" }, { n:1, what:"? last box (to check)" } ],
   start: 1,          // start page
   parts: 3,
   songsPerPart: 5,
@@ -165,16 +212,34 @@ $("#ptabs").innerHTML = PRODUCTS.map(p => `<button class="ptab" type="button" ro
 function openProduct(id){
   PRODUCT = PRODUCTS.find(p => p.id === id) || PRODUCTS[0];
   done = {}; try { done = JSON.parse(localStorage.getItem(KEY())) || {}; } catch(e){}
-  v = PRODUCT.versions[0].key;
+  const versions = PRODUCT.versions || [];
+  v = versions.length ? versions[0].key : "both";
   history.replaceState(null, "", "#" + PRODUCT.id);
   document.querySelectorAll("[data-p]").forEach(b => b.setAttribute("aria-selected", b.dataset.p === PRODUCT.id));
   $("#name").textContent = PRODUCT.name;
   $("#eyebrow").textContent = "Contents · Pretty Killer Tour";
-  $("#meta").innerHTML = PRODUCT.meta.map(m => `<span>${esc(m)}</span>`).join("");
-  $("#tabs").hidden = PRODUCT.versions.length < 2;
-  $("#tabs").innerHTML = PRODUCT.versions.map(x => `<button class="tab" type="button" data-v="${x.key}">${esc(x.label)}</button>`).join("");
+  $("#meta").innerHTML = (PRODUCT.meta || []).map(m => `<span>${esc(m)}</span>`).join("");
+  $("#tabs").hidden = versions.length < 2;
+  $("#tabs").innerHTML = versions.map(x => `<button class="tab" type="button" data-v="${x.key}">${esc(x.label)}</button>`).join("");
   $("#pb").hidden = !PRODUCT.photobook;
+  const isLinks = !!PRODUCT.links;
+  ["#eyebrow", "#meta", ".progress", "#list", "#foot"].forEach(sel => $(sel).hidden = isLinks);
+  $("#linksView").hidden = !isLinks;
+  if (isLinks){
+    $("#tabs").hidden = true; $("#eyebrow").textContent = "";
+    $("#meta").innerHTML = "";
+    document.documentElement.dataset.side = new Date().getHours() < 12 ? "pretty" : "killer";
+    renderLinks(); return;
+  }
   render();
+}
+function renderLinks(){
+  const url = (id, side) => `${SHOP}#p-${id}${side ? "-" + side : ""}`;
+  const a = (href, label, cls = "") => `<a class="${cls}" href="${href}" target="_blank" rel="noopener">${label}</a><button type="button" data-copy="${href}">Copy</button>`;
+  $("#linkList").innerHTML = `<div class="link"><h3>Whole shop</h3><span></span><div class="sub">${a(SHOP, "Open the shop")}</div></div>`
+    + SHOP_ITEMS.map(it => `<div class="link"><h3>${esc(it.name)}</h3><span class="qty">${esc(it.price)}</span>
+      ${it.note ? `<p style="grid-column:1/-1;margin:0;color:var(--muted);font-size:14px">${esc(it.note)}</p>` : ""}
+      <div class="sub">${it.variants ? a(url(it.id, "pretty"), "Pretty ver.", "p") + a(url(it.id, "killer"), "Killer ver.", "k") : a(url(it.id), "Open")}</div></div>`).join("");
 }
 
 function render(){
@@ -197,7 +262,9 @@ function renderPhotobook(){
   const P = PHOTOBOOK, per = P.perSong.reduce((a, x) => a + x.n, 0);
   const songs = P.parts * P.songsPerPart, total = P.start + P.parts * (P.outfitPerPart + P.songsPerPart * per);
   $("#pbSum").textContent = `${v === "killer" ? "Killer" : "Pretty"} ver.: ${P.start} start page + ${P.parts} parts × (${P.outfitPerPart} outfit page + ${P.songsPerPart} songs × ${per} pages) = ${total} pages.`;
-  $("#pbPages").innerHTML = P.perSong.map(x => `<span><b>${x.n}</b> ${esc(x.what)}</span>`).join("") + `<span>= ${per} pages per song</span>`;
+  $("#pbPages").innerHTML = P.perSong.map(x => `<span><b>${x.n}</b> ${esc(x.what)}</span>`).join("") + `<span>= ${per} pages per song</span>`
+    + `<div style="flex-basis:100%"></div><div class="pgrid" aria-label="The 23 pages of a song, in order">${SONG_PAGES.map(t => `<span class="${t.length === 1 ? "sym" : ""}">${esc(t)}</span>`).join("")}</div>`
+    + `<div class="legend" style="flex-basis:100%"><span><b>○</b> random</span><span><b>□</b> related to the song</span><span><b>♡</b> something with the name</span></div>`;
   const row = (k, no, name, pages, cls = "") => `<label class="song${cls}${done[k] ? " done" : ""}"><input type="checkbox" data-k="${k}" ${done[k] ? "checked" : ""}>
       <span class="no">${no}</span><span class="nm">${name}</span><span class="pg">${pages} page${pages === 1 ? "" : "s"}</span></label>`;
   let html = row(`pb:${v}:start`, "★", "Start page", P.start, " extra");
@@ -218,6 +285,8 @@ fetch("https://firestore.googleapis.com/v1/projects/finn-pretty-killer-tix/datab
   }).catch(() => {});
 document.addEventListener("click", e => {
   const p = e.target.closest("[data-p]"); if (p) return openProduct(p.dataset.p);
+  const c = e.target.closest("[data-copy]");
+  if (c){ navigator.clipboard.writeText(c.dataset.copy).then(() => { c.textContent = "Copied"; setTimeout(() => c.textContent = "Copy", 1500); }).catch(() => {}); return; }
   const b = e.target.closest("[data-v]"); if (b){ v = b.dataset.v; render(); }
 });
 document.addEventListener("change", e => { const c = e.target.closest("[data-k]"); if (!c) return; c.checked ? done[c.dataset.k] = true : delete done[c.dataset.k]; save(); render(); });
