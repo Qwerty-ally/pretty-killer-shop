@@ -24,3 +24,12 @@ Finn's Choice bundle ($115: K-pop Style CD, hardcover Tour Book, Mini CD Keychai
 **Photos:** put product photos in `photos/` and list them in `PHOTOS` in `index.html` (the item, then Finn with it, which shows on hover). Items without photos keep their drawn art.
 
 `good-morning-tee.html` is the design sheet for the morning show shirt.
+
+## Contents sheets (just for Finn)
+
+Two hidden pages (not linked anywhere) that list what comes inside an item, with a checklist to tick off what's ready (the ticks are saved on that device):
+
+- `kpop-cd-357458f0.html`: the K-pop Style CD, with Pretty ver. and Killer ver. tabs.
+- `tour-book-dceeeafc.html`: the Tour Book (one version).
+
+Edit `PRODUCT.items` at the top of each page's script. Each item has a name, an optional note and qty, and a side (`pretty`, `killer` or `both`); `tba: true` shows "To be announced".
