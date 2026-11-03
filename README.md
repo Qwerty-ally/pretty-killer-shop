@@ -32,4 +32,6 @@ Two hidden pages (not linked anywhere) that list what comes inside an item, with
 - `kpop-cd-357458f0.html`: the K-pop Style CD, with Pretty ver. and Killer ver. tabs.
 - `tour-book-dceeeafc.html`: the Tour Book (one version).
 
+The K-pop CD page also has a **Photobook** section: 23 pages for each of the 15 songs on that version's side (18 photos, 2 behind the scenes, 1 lyrics page, 1 backstory page, 1 poster) plus 3 outfit photos once, so 348 pages per version. The song names come from the tracklist, and each song can be ticked off. Change the page counts in `PHOTOBOOK`.
+
 Edit `PRODUCT.items` at the top of each page's script. Each item has a name, an optional note and qty, and a side (`pretty`, `killer` or `both`); `tba: true` shows "To be announced".
