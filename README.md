@@ -25,13 +25,10 @@ Finn's Choice bundle ($115: K-pop Style CD, hardcover Tour Book, Mini CD Keychai
 
 `good-morning-tee.html` is the design sheet for the morning show shirt.
 
-## Contents sheets (just for Finn)
+## Finn Planning (just for Finn)
 
-Two hidden pages (not linked anywhere) that list what comes inside an item, with a checklist to tick off what's ready (the ticks are saved on that device):
+`finn-planning-d8b7d0ad.html` is a hidden page (not linked anywhere) with a tab for each item: **K-pop Style CD** (Pretty ver. and Killer ver.) and **Pretty Killer Tour Book**. Each tab lists what comes inside, with a checklist to tick off what's ready (the ticks are saved on that device).
 
-- `kpop-cd-357458f0.html`: the K-pop Style CD, with Pretty ver. and Killer ver. tabs.
-- `tour-book-dceeeafc.html`: the Tour Book (one version).
-
-The K-pop CD page also has a **Photobook** section: 23 pages for each of the 15 songs on that version's side (18 photos, 2 behind the scenes, 1 lyrics page, 1 backstory page, 1 poster) plus 3 outfit photos once, so 348 pages per version. The song names come from the tracklist, and each song can be ticked off. Change the page counts in `PHOTOBOOK`.
-
-Edit `PRODUCT.items` at the top of each page's script. Each item has a name, an optional note and qty, and a side (`pretty`, `killer` or `both`); `tba: true` shows "To be announced".
+- The K-pop CD tab has a **Photobook** section, from "CD K-pop Final": a start page, then 3 parts, each with an outfit page and 5 songs at 23 pages per song (18 photos, 2 behind the scenes, 1 lyrics page, 1 backstory page, 1 poster). That's 349 pages per version. The 15 song names come from that side of the tracklist.
+- Edit `PRODUCTS` (and `PHOTOBOOK`) at the top of its script.
+- The old `kpop-cd-357458f0.html` and `tour-book-dceeeafc.html` links forward to the right tab.
