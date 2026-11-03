@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Bodoni+Moda:wght@700;900&family=Special+Elite&family=IBM+Plex+Mono:wght@400;600&family=Karla:wght@400;600;800&display=swap">
 <style>
-/* Pretty Killer digital item page. Pretty = pink, Killer = black (the version tab picks it). */
+/* Pretty Killer digital item page. Pretty = pink, Killer = black (follows the clock). */
 :root{
   --ground:#f8d2e1; --surface:#fffafc; --ink:#161015; --muted:#8e5a73;
   --accent:#f25fc4; --accent-ink:#161015; --line:#e9b1c9;
@@ -74,7 +74,7 @@ h1{margin:8px 0 6px;font:900 clamp(40px,10vw,84px)/.95 var(--display)}
   <header class="bar"><b>Finn Shapiro</b><span>Pretty Killer Tour</span></header>
   <span class="eyebrow">Your digital item</span>
   <h1>Pretty Killer: The Movie</h1>
-  <p class="sub">Watch it here or download it to keep. It's the same on both sides.</p>
+  <p class="sub" id="sub">Watch it here or download it to keep. It's the same on both sides.</p>
   <div class="card">
     <div class="media" id="media"></div>
     <div class="body"><div><h2>The Movie</h2><p id="len"></p></div><span id="act"></span></div>
@@ -82,8 +82,9 @@ h1{margin:8px 0 6px;font:900 clamp(40px,10vw,84px)/.95 var(--display)}
   <p class="foot">Thank you for supporting the Pretty Killer Tour. ♡ Finn</p>
 </div>
 <script>
-/* THE MOVIE: the video file. Until it's there, the page says "Coming soon". */
-const MOVIE = { file:"https://qwerty-ally.github.io/pretty-killer-tickets/media/pretty-killer/movie.mp4", name:"Pretty Killer - The Movie.mp4" };
+/* THE MOVIE: it comes out after the concert. Until then file is "" and the page says so.
+   When it's out, put the video in media/ and set file (for example "media/movie-896dba76/the-movie.mp4"). */
+const MOVIE = { file:"", name:"Pretty Killer - The Movie.mp4" };
 
 const $ = s => document.querySelector(s);
 const esc = t => String(t ?? "").replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" })[c]);
@@ -101,7 +102,8 @@ document.addEventListener("click", e => { const b = e.target.closest("[data-v]")
 
 function render(){
   setTabs();
-  check(MOVIE.file).then(ok => {
+  (MOVIE.file ? check(MOVIE.file) : Promise.resolve(false)).then(ok => {
+    if (!ok) $("#sub").textContent = "Coming soon. Keep this page: the movie will be right here to watch and download.";
     $("#media").innerHTML = ok ? `<video src="${esc(MOVIE.file)}" controls playsinline preload="metadata"></video>` : "Coming soon";
     $("#act").innerHTML = ok ? `<a class="dl" href="${esc(MOVIE.file)}" download="${esc(MOVIE.name)}">⬇ Download</a>` : `<span class="soon">Coming soon</span>`;
     const vid = $("#media video");
