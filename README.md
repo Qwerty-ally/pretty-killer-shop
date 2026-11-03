@@ -33,7 +33,7 @@ Finn's Choice bundle ($115: K-pop Style CD, hardcover Tour Book, Mini CD Keychai
 - Each song's 23 pages follow the grid in `SONG_PAGES`: cover explanation, lyrics, finale, backstory, and photos marked ○ random, □ related to the song, ♡ something with the name.
 - **Where to make it:** links to where each part gets made (`make` on each item). The Tour Book and the K-pop CD photobook are made on Barnes & Noble Press.
 - The Tour Book is 480 pages (the rest of its contents are still to come).
-- The **Shop links** tab has a link to every shop item (Pretty and Killer links for items with two versions) with a Copy button.
+- The **Shop links** tab lists every shop item with where Finn buys or makes it (`buy` in `SHOP_ITEMS`), with a Copy button. Items without a link say "No link yet".
 - Edit `PRODUCTS` (and `PHOTOBOOK`) at the top of its script.
 - The old `kpop-cd-357458f0.html` and `tour-book-dceeeafc.html` links forward to the right tab.
 

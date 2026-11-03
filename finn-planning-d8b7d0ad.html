@@ -128,7 +128,7 @@ h2{margin:40px 0 6px;font:900 34px/1.1 var(--display)}
     <div class="songs" id="pbSongs"></div>
   </section>
   <section id="linksView" hidden>
-    <p class="pb-sum">Each link opens the shop scrolled to that item. Pretty / Killer links show that version.</p>
+    <p class="pb-sum">Where to buy or make each shop item.</p>
     <div class="links" id="linkList"></div>
   </section>
   <p class="foot" id="foot">Ticking an item marks it ready. The ticks are saved on this device only.</p>
@@ -143,6 +143,7 @@ h2{margin:40px 0 6px;font:900 34px/1.1 var(--display)}
    photobook: true adds the Photobook section (23 pages per song, see PHOTOBOOK).
    make: where each part gets made (what, where, url), shown under "Where to make it".
    ===================================================================== */
+const BN_PRESS = "https://press.barnesandnoble.com/build-a-book/choose-book-type";   // Barnes & Noble Press: build a book
 const PRODUCTS = [
   {
     id: "kpopcd",
@@ -150,7 +151,7 @@ const PRODUCTS = [
     meta: ["$45", "Pretty ver. + Killer ver.", "Pre-order · after the show"],
     versions: [ { key:"pretty", label:"Pretty ver." }, { key:"killer", label:"Killer ver." } ],
     photobook: true,
-    make: [ { what:"Photobook", where:"Barnes & Noble Press · build a book", url:"https://press.barnesandnoble.com/build-a-book/choose-book-type" } ],
+    make: [ { what:"Photobook", where:"Barnes & Noble Press · build a book", url:BN_PRESS } ],
     items: [
       { side:"both", name:"CD", note:"The album" },
       { side:"both", name:"Photobook", note:"349 pages: a start page, then 3 parts, each an outfit page and 5 songs at 23 pages per song (see below)" },
@@ -167,7 +168,7 @@ const PRODUCTS = [
     name: "Pretty Killer Tour Book",
     meta: ["$45", "Hardcover", "480 pages", "One version", "Pre-order · after the show"],
     versions: [ { key:"both", label:"Tour Book" } ],
-    make: [ { what:"Tour Book", where:"Barnes & Noble Press · build a book", url:"https://press.barnesandnoble.com/build-a-book/choose-book-type" } ],
+    make: [ { what:"Tour Book", where:"Barnes & Noble Press · build a book", url:BN_PRESS } ],
     items: [
       { side:"both", name:"Hardcover", note:"The cover" },
       { side:"both", name:"480 pages" },
@@ -179,22 +180,23 @@ const PRODUCTS = [
   { id: "links", name: "Shop links", links: true }
 ];
 
-/* SHOP LINKS: every item in the shop. variants: true = separate Pretty and Killer links. */
-const SHOP = "https://qwerty-ally.github.io/pretty-killer-shop/";
+/* SHOP LINKS: where Finn buys (or makes) each shop item. buy: [{ what, url }].
+   An item with no links says "No link yet". The Tour Book and K-pop CD links also show
+   under "Where to make it" on their own tabs. */
 const SHOP_ITEMS = [
-  { id:"finnschoice", name:"Finn's Choice", price:"$115", variants:true },
-  { id:"mtee", name:"Good Morning Sun Tee", price:"$20", note:"Morning show only · merch stand" },
-  { id:"ntee", name:"Killer Glow Tee", price:"$20", note:"Night show only · merch stand" },
-  { id:"book", name:"Pretty Killer Tour Book", price:"$45" },
-  { id:"kpopcd", name:"K-pop Style CD", price:"$45", variants:true },
-  { id:"cd", name:"Standard CD", price:"$22", variants:true },
-  { id:"keychain", name:"Mini CD Keychain", price:"$15", variants:true },
-  { id:"stickers", name:"Sticker Pack", price:"$8", variants:true },
-  { id:"cards", name:"Mystery Trading Cards", price:"$10", variants:true },
-  { id:"poster", name:"Tour Poster", price:"$5", variants:true },
+  { id:"finnschoice", name:"Finn's Choice", price:"$115", note:"Bundle of the K-pop CD, Tour Book, Keychain and Trading Cards (see each item)" },
+  { id:"mtee", name:"Good Morning Sun Tee", price:"$20" },
+  { id:"ntee", name:"Killer Glow Tee", price:"$20" },
+  { id:"book", name:"Pretty Killer Tour Book", price:"$45", buy:[ { what:"Tour Book", url:BN_PRESS } ] },
+  { id:"kpopcd", name:"K-pop Style CD", price:"$45", buy:[ { what:"Photobook", url:BN_PRESS } ], note:"More links to come" },
+  { id:"cd", name:"Standard CD", price:"$22" },
+  { id:"keychain", name:"Mini CD Keychain", price:"$15" },
+  { id:"stickers", name:"Sticker Pack", price:"$8" },
+  { id:"cards", name:"Mystery Trading Cards", price:"$10" },
+  { id:"poster", name:"Tour Poster", price:"$5" },
   { id:"hat", name:"Reversible Bucket Hat", price:"$30" },
-  { id:"digital", name:"Digital Album", price:"$10", variants:true },
-  { id:"videopack", name:"Video Pack", price:"$5", variants:true },
+  { id:"digital", name:"Digital Album", price:"$10" },
+  { id:"videopack", name:"Video Pack", price:"$5" },
   { id:"movie", name:"Pretty Killer: The Movie", price:"$15" }
 ];
 
@@ -250,12 +252,12 @@ function openProduct(id){
   render();
 }
 function renderLinks(){
-  const url = (id, side) => `${SHOP}#p-${id}${side ? "-" + side : ""}`;
-  const a = (href, label, cls = "") => `<a class="${cls}" href="${href}" target="_blank" rel="noopener">${label}</a><button type="button" data-copy="${href}">Copy</button>`;
-  $("#linkList").innerHTML = `<div class="link"><h3>Whole shop</h3><span></span><div class="sub">${a(SHOP, "Open the shop")}</div></div>`
-    + SHOP_ITEMS.map(it => `<div class="link"><h3>${esc(it.name)}</h3><span class="qty">${esc(it.price)}</span>
+  const host = u => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch(e){ return ""; } };
+  $("#linkList").innerHTML = SHOP_ITEMS.map(it => `<div class="link"><h3>${esc(it.name)}</h3><span class="qty">${esc(it.price)}</span>
       ${it.note ? `<p style="grid-column:1/-1;margin:0;color:var(--muted);font-size:14px">${esc(it.note)}</p>` : ""}
-      <div class="sub">${it.variants ? a(url(it.id, "pretty"), "Pretty ver.", "p") + a(url(it.id, "killer"), "Killer ver.", "k") : a(url(it.id), "Open")}</div></div>`).join("");
+      <div class="sub">${(it.buy || []).length
+        ? it.buy.map(b => `<a href="${esc(b.url)}" target="_blank" rel="noopener">${esc(b.what)} · ${esc(host(b.url))} ↗</a><button type="button" data-copy="${esc(b.url)}">Copy</button>`).join("")
+        : `<span style="color:var(--muted);font:600 13px var(--mono)">No link yet</span>`}</div></div>`).join("");
 }
 
 function render(){
