@@ -96,6 +96,13 @@ h2{margin:40px 0 6px;font:900 34px/1.1 var(--display)}
 .link a.k{background:#0b0a0c;color:#ff3fae;border:1.5px solid #2c272f}
 .link a.p{background:#fffafc;color:#161015;border:1.5px solid #e9b1c9}
 .link button{background:none;border:1.5px solid var(--line);color:var(--muted)}
+#make{margin:0 0 18px}
+.label-make{display:block;margin-bottom:8px;font:600 12px var(--mono);text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+.make{display:flex;flex-direction:column;gap:8px}
+.make a{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:48px;padding:12px 16px;background:var(--surface);color:var(--ink);text-decoration:none;border-radius:var(--radius);box-shadow:var(--shadow);border-left:4px solid var(--accent)}
+.make a b{font:900 18px/1.15 var(--display)}
+[data-side="killer"] .make a b{font-weight:400;text-transform:uppercase;letter-spacing:.03em}
+.make a span{font:600 12px var(--mono);color:var(--muted);text-align:right}
 .part{grid-column:1/-1;margin:14px 0 2px;font:600 13px var(--mono);text-transform:uppercase;letter-spacing:.12em;color:var(--accent)}
 .song.extra .nm{font-weight:800}
 </style>
@@ -108,6 +115,10 @@ h2{margin:40px 0 6px;font:900 34px/1.1 var(--display)}
   <h1 id="name"></h1>
   <div class="meta" id="meta"></div>
   <div class="tabs" id="tabs" role="group" aria-label="Version"></div>
+  <section id="make" hidden>
+    <span class="label-make">Where to make it</span>
+    <div class="make" id="makeList"></div>
+  </section>
   <div class="progress"><span id="count"></span><span class="track"><i id="fill"></i></span></div>
   <div class="list" id="list"></div>
   <section id="pb">
@@ -130,6 +141,7 @@ h2{margin:40px 0 6px;font:900 34px/1.1 var(--display)}
    Each item: name, note (optional), qty (optional), side ("pretty" / "killer" / "both").
    An item with tba: true shows as "To be announced".
    photobook: true adds the Photobook section (23 pages per song, see PHOTOBOOK).
+   make: where each part gets made (what, where, url), shown under "Where to make it".
    ===================================================================== */
 const PRODUCTS = [
   {
@@ -138,6 +150,7 @@ const PRODUCTS = [
     meta: ["$45", "Pretty ver. + Killer ver.", "Pre-order · after the show"],
     versions: [ { key:"pretty", label:"Pretty ver." }, { key:"killer", label:"Killer ver." } ],
     photobook: true,
+    make: [ { what:"Photobook", where:"Barnes & Noble Press · build a book", url:"https://press.barnesandnoble.com/build-a-book/choose-book-type" } ],
     items: [
       { side:"both", name:"CD", note:"The album" },
       { side:"both", name:"Photobook", note:"349 pages: a start page, then 3 parts, each an outfit page and 5 songs at 23 pages per song (see below)" },
@@ -154,6 +167,7 @@ const PRODUCTS = [
     name: "Pretty Killer Tour Book",
     meta: ["$45", "Hardcover", "480 pages", "One version", "Pre-order · after the show"],
     versions: [ { key:"both", label:"Tour Book" } ],
+    make: [ { what:"Tour Book", where:"Barnes & Noble Press · build a book", url:"https://press.barnesandnoble.com/build-a-book/choose-book-type" } ],
     items: [
       { side:"both", name:"Hardcover", note:"The cover" },
       { side:"both", name:"480 pages" },
@@ -222,6 +236,8 @@ function openProduct(id){
   $("#tabs").hidden = versions.length < 2;
   $("#tabs").innerHTML = versions.map(x => `<button class="tab" type="button" data-v="${x.key}">${esc(x.label)}</button>`).join("");
   $("#pb").hidden = !PRODUCT.photobook;
+  $("#make").hidden = !(PRODUCT.make || []).length;
+  $("#makeList").innerHTML = (PRODUCT.make || []).map(m => `<a href="${esc(m.url)}" target="_blank" rel="noopener"><b>${esc(m.what)}</b><span>${esc(m.where)} ↗</span></a>`).join("");
   const isLinks = !!PRODUCT.links;
   ["#eyebrow", "#meta", ".progress", "#list", "#foot"].forEach(sel => $(sel).hidden = isLinks);
   $("#linksView").hidden = !isLinks;
