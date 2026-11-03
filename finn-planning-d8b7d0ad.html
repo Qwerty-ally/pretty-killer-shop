@@ -181,6 +181,7 @@ const PRODUCTS = [
 ];
 
 /* SHOP LINKS: where Finn buys (or makes) each shop item. buy: [{ what, url }].
+   page: the item's own page (the digital items: where buyers watch, listen and download).
    An item with no links says "No link yet". The Tour Book and K-pop CD links also show
    under "Where to make it" on their own tabs. */
 const SHOP_ITEMS = [
@@ -195,9 +196,9 @@ const SHOP_ITEMS = [
   { id:"cards", name:"Mystery Trading Cards", price:"$10" },
   { id:"poster", name:"Tour Poster", price:"$5" },
   { id:"hat", name:"Reversible Bucket Hat", price:"$30" },
-  { id:"digital", name:"Digital Album", price:"$10" },
-  { id:"videopack", name:"Video Pack", price:"$5" },
-  { id:"movie", name:"Pretty Killer: The Movie", price:"$15" }
+  { id:"digital", name:"Digital Album", price:"$10", page:"digital-album-3a242862.html" },
+  { id:"videopack", name:"Video Pack", price:"$5", page:"video-pack-798d0979.html" },
+  { id:"movie", name:"Pretty Killer: The Movie", price:"$15", page:"movie-896dba76.html" }
 ];
 
 /* PHOTOBOOK (from "CD K-pop Final"): a start page, then 3 parts. Each part is an outfit page
@@ -255,9 +256,9 @@ function renderLinks(){
   const host = u => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch(e){ return ""; } };
   $("#linkList").innerHTML = SHOP_ITEMS.map(it => `<div class="link"><h3>${esc(it.name)}</h3><span class="qty">${esc(it.price)}</span>
       ${it.note ? `<p style="grid-column:1/-1;margin:0;color:var(--muted);font-size:14px">${esc(it.note)}</p>` : ""}
-      <div class="sub">${(it.buy || []).length
+      <div class="sub">${it.page ? `<a class="p" href="${esc(it.page)}" target="_blank" rel="noopener">Open its page ↗</a><button type="button" data-copy="${esc(new URL(it.page, location.href).href)}">Copy</button>` : ""}${(it.buy || []).length
         ? it.buy.map(b => `<a href="${esc(b.url)}" target="_blank" rel="noopener">${esc(b.what)} · ${esc(host(b.url))} ↗</a><button type="button" data-copy="${esc(b.url)}">Copy</button>`).join("")
-        : `<span style="color:var(--muted);font:600 13px var(--mono)">No link yet</span>`}</div></div>`).join("");
+        : it.page ? "" : `<span style="color:var(--muted);font:600 13px var(--mono)">No link yet</span>`}</div></div>`).join("");
 }
 
 function render(){

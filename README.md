@@ -40,3 +40,11 @@ Finn's Choice bundle ($115: K-pop Style CD, hardcover Tour Book, Mini CD Keychai
 ## Product links
 
 `index.html#p-<id>` opens the shop scrolled to that item (for example `#p-hat`), with a pink outline for a few seconds. `#p-<id>-pretty` or `#p-<id>-killer` also shows that side's version for that visit, and the in-person tees switch to the side they're sold on.
+
+## Digital item pages
+
+Three separate hidden pages (not linked from the shop) where the digital items are watched, listened to and downloaded. They're listed under **Shop links** on Finn Planning.
+
+- `movie-896dba76.html`: **Pretty Killer: The Movie**. The video is `MOVIE.file` at the top of its script (right now the 1:12 movie the tickets site uses as the tracklist intro).
+- `video-pack-798d0979.html`: **Video Pack**, Pretty ver. (Worked) and Killer ver. (PK), each with the music video, dance practice and music video behind the scenes. Put the files in `media/video-pack-798d0979/pretty/` and `/killer/` as `music-video.mp4`, `dance-practice.mp4` and `behind-the-scenes.mp4`. Missing ones say "Coming soon".
+- `digital-album-3a242862.html`: **Digital Album**, Pretty ver. and Killer ver., with every song on that side of the tracklist. Songs play and download from the tickets site's `media/pretty-killer/songs/` (the same files the show uses). Songs without a file say "Coming soon".
