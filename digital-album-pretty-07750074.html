@@ -56,7 +56,14 @@ h1{margin:8px 0 6px;font:900 clamp(40px,10vw,84px)/.95 var(--display)}
 .dl{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:10px 16px;background:var(--accent);color:var(--accent-ink);text-decoration:none;font:600 13px var(--mono);text-transform:uppercase;letter-spacing:.08em;border-radius:var(--radius)}
 .soon{font:600 13px var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
 .tracks{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);padding:6px 0}
-.trk{display:grid;grid-template-columns:32px 1fr auto;gap:12px;align-items:center;padding:12px 18px;border-bottom:1px solid var(--line)}
+.cover{width:min(360px,100%);aspect-ratio:1;margin:0 0 20px;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);background:var(--surface)}
+.cover img{display:block;width:100%;height:100%;object-fit:cover}
+.ph{display:grid;place-items:center;text-align:center;border:2px dashed var(--line);color:var(--muted);font:600 12px var(--mono);text-transform:uppercase;letter-spacing:.1em;padding:8px}
+.cover.ph{box-shadow:none;font-size:14px}
+.thumb{width:44px;height:44px;border-radius:var(--radius);overflow:hidden;flex:none}
+.thumb img{display:block;width:100%;height:100%;object-fit:cover}
+.thumb.ph{padding:2px;font-size:7px;letter-spacing:.04em;border-width:1.5px}
+.trk{display:grid;grid-template-columns:32px 44px 1fr auto;gap:12px;align-items:center;padding:12px 18px;border-bottom:1px solid var(--line)}
 .trk:last-child{border-bottom:0}
 .trk .no{font:600 12px var(--mono);color:var(--muted)}
 .trk .nm{font-weight:800;min-width:0;overflow-wrap:anywhere}
@@ -66,7 +73,7 @@ h1{margin:8px 0 6px;font:900 clamp(40px,10vw,84px)/.95 var(--display)}
 .play.on{background:var(--accent);color:var(--accent-ink)}
 .trk .dl{min-height:40px;padding:8px 12px}
 .foot{margin-top:24px;font:12px var(--mono);color:var(--muted)}
-@media (max-width:560px){ .trk{grid-template-columns:26px 1fr} .trk .act{grid-column:1/-1;justify-content:flex-end} }
+@media (max-width:560px){ .trk{grid-template-columns:26px 44px 1fr} .trk .act{grid-column:1/-1;justify-content:flex-end} }
 </style>
 </head>
 <body>
@@ -76,6 +83,7 @@ h1{margin:8px 0 6px;font:900 clamp(40px,10vw,84px)/.95 var(--display)}
   <h1>Digital Album</h1>
   <span class="eyebrow">Pretty ver.</span>
   <p class="sub">Listen here or download each song.</p>
+  <div class="cover ph" id="cover">Cover coming soon</div>
   <div class="tracks" id="tracks"></div>
   <p class="foot">Thank you for supporting the Pretty Killer Tour. ♡ Finn</p>
 </div>
@@ -85,6 +93,10 @@ h1{margin:8px 0 6px;font:900 clamp(40px,10vw,84px)/.95 var(--display)}
    Each song's audio is the same file the show uses: <song-name>.mp3 in the tickets site's
    media/pretty-killer/songs/ (lowercase with dashes, like anne.mp3). Songs without one say "Coming soon". */
 const SONGS = "https://qwerty-ally.github.io/pretty-killer-tickets/media/pretty-killer/songs/";
+/* COVERS: the album cover is media/album-covers/<pretty or killer>/cover.jpg, and each song's cover
+   is media/album-covers/<pretty or killer>/<song-name>.jpg (lowercase with dashes, like anne.jpg).
+   A song without its own cover uses the album cover. Missing covers show "Cover coming soon". */
+const COVERS = "media/album-covers/";
 let tracks = { pretty:[], killer:[] };
 
 const $ = s => document.querySelector(s);
@@ -113,12 +125,19 @@ function render(){
   setTabs(); stop();
   const names = (tracks[v] || []).map(n => (n || "").trim());
   const files = names.map(n => n ? SONGS + slug(n) + ".mp3" : "");
-  Promise.all(files.map(f => f ? check(f) : false)).then(oks => {
+  const albumCover = `${COVERS}${v}/cover.jpg`, songCovers = names.map(n => n ? `${COVERS}${v}/${slug(n)}.jpg` : "");
+  Promise.all([check(albumCover), ...songCovers.map(c => c ? check(c) : false), ...files.map(f => f ? check(f) : false)]).then(all => {
+    const hasAlbum = all[0], hasSong = all.slice(1, 1 + names.length), oks = all.slice(1 + names.length);
+    const c = $("#cover"); c.className = hasAlbum ? "cover" : "cover ph";
+    c.innerHTML = hasAlbum ? `<img src="${albumCover}" alt="${v === "killer" ? "Killer" : "Pretty"} ver. album cover">` : "Cover coming soon";
+    const thumb = i => hasSong[i] ? `<span class="thumb"><img src="${esc(songCovers[i])}" alt="" loading="lazy"></span>`
+      : hasAlbum ? `<span class="thumb"><img src="${albumCover}" alt="" loading="lazy"></span>` : `<span class="thumb ph">Cover soon</span>`;
     $("#tracks").innerHTML = names.length ? names.map((n, i) => `<div class="trk">
       <span class="no">${String(i + 1).padStart(2, "0")}</span>
+      ${thumb(i)}
       <span class="nm${n ? "" : " tba"}">${n ? esc(n) : "To be announced"}</span>
       <span class="act">${oks[i] ? `<button class="play" type="button" data-play="${esc(files[i])}" aria-label="Play ${esc(n)}">▶</button><a class="dl" href="${esc(files[i])}" download="Finn Shapiro - ${esc(n)}.mp3">⬇</a>` : n ? `<span class="soon">Coming soon</span>` : ""}</span>
-    </div>`).join("") : `<div class="trk"><span></span><span class="nm tba">Loading the songs…</span></div>`;
+    </div>`).join("") : `<div class="trk"><span></span><span></span><span class="nm tba">Loading the songs…</span></div>`;
   });
 }
 fetch("https://firestore.googleapis.com/v1/projects/finn-pretty-killer-tix/databases/(default)/documents/tracklist/prettykiller")
