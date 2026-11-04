@@ -63,13 +63,16 @@ input:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline
 .sale label.f{display:flex;flex-direction:column;gap:4px}
 select{background:var(--surface-2);border:1.5px solid var(--line);color:var(--ink);padding:10px 12px;font:inherit;min-width:0}
 .lines{display:flex;flex-direction:column;gap:8px}
-.line{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) 70px 80px auto;gap:8px;align-items:center;background:var(--surface-2);padding:8px}
+.line{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) 60px 112px 80px auto;gap:8px;align-items:center;background:var(--surface-2);padding:8px}
 .line input,.line select{width:100%}
 .line .amt{text-align:right;font-variant-numeric:tabular-nums}
+.line .each{display:flex;align-items:center;gap:2px}
+.line .each input.off{border-color:#ffd166;color:#ffd166}
+.line .was{grid-column:1 / -1;font-size:12px;color:#ffd166;margin:-2px 0 0}
 .line .x{background:none;border:1.5px solid var(--line);color:var(--muted);width:36px;height:36px;cursor:pointer}
 .sale .sum{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
 .sale .sum b{font:400 28px/1 var(--display)}
-@media (max-width:600px){ .line{grid-template-columns:1fr 1fr} .line .amt{text-align:left} }
+@media (max-width:600px){ .line{grid-template-columns:1fr 1fr 1fr} .line > select:first-child{grid-column:1 / -1} .line .amt{text-align:left} }
 @media (max-width:600px){
   .order{grid-template-columns:1fr auto}
   .who{grid-column:1 / -1;grid-row:2}
@@ -213,7 +216,8 @@ async function openSale(){
   renderLines(); $("#sale").hidden = false; $("#saleName").focus();
 }
 const itemOf = l => catalog.find(c => c.id === l.id);
-const linePrice = l => l.id === "custom" ? Math.round((parseFloat(l.price) || 0) * 100) : itemOf(l).price;
+// l.price is what you typed (dollars); empty means the normal price for list items
+const linePrice = l => l.price !== undefined && l.price !== "" ? Math.round((parseFloat(l.price) || 0) * 100) : l.id === "custom" ? 0 : itemOf(l).price;
 function renderLines(){
   $("#saleLines").innerHTML = saleLines.map((l, i) => {
     const it = l.id === "custom" ? null : itemOf(l);
@@ -223,8 +227,10 @@ function renderLines(){
         ? `<input data-f="name" data-i="${i}" placeholder="What" value="${esc(l.name || "")}" aria-label="What was sold">`
         : it.variants ? `<select data-f="side" data-i="${i}" aria-label="Version">${Object.entries(it.variants).map(([k, v]) => `<option value="${k}" ${k === l.side ? "selected" : ""}>${esc(v)}</option>`).join("")}</select>` : `<span class="label">One version</span>`}
       <input data-f="qty" data-i="${i}" type="number" min="1" max="50" value="${l.qty}" aria-label="How many">
-      ${l.id === "custom" ? `<input data-f="price" data-i="${i}" type="number" min="0" step="0.01" placeholder="$ each" value="${esc(l.price || "")}" aria-label="Price each">` : `<span class="amt">${money(linePrice(l) * l.qty)}</span>`}
+      <span class="each">$<input data-f="price" data-i="${i}" type="number" min="0" step="0.01" placeholder="${it ? (it.price / 100).toFixed(2) : "each"}" value="${esc(l.price ?? (it ? (it.price / 100).toFixed(2) : ""))}" aria-label="Price each" class="${it && linePrice(l) !== it.price ? "off" : ""}"></span>
+      <span class="amt" data-amt="${i}">${money(linePrice(l) * l.qty)}</span>
       <button class="x" type="button" data-x="${i}" aria-label="Remove item" ${saleLines.length < 2 ? "disabled" : ""}>×</button>
+      <p class="was" data-was="${i}" ${it && linePrice(l) !== it.price ? "" : "hidden"}>${it ? `Discount: normally ${money(it.price)} each` : ""}</p>
     </div>`; }).join("");
   $("#saleTotal").textContent = money(saleLines.reduce((a, l) => a + linePrice(l) * (l.qty || 0), 0));
 }
@@ -233,8 +239,15 @@ $("#saleLines").addEventListener("input", e => {
   const l = saleLines[+el.dataset.i], f = el.dataset.f;
   if (f === "qty") l.qty = Math.max(1, Math.min(50, Math.floor(+el.value) || 1));
   else l[f] = el.value;
-  if (f === "id" || f === "side"){ if (f === "id"){ const it = l.id === "custom" ? null : itemOf(l); l.side = it && it.variants ? Object.keys(it.variants)[0] : ""; } renderLines(); }
-  else $("#saleTotal").textContent = money(saleLines.reduce((a, x) => a + linePrice(x) * (x.qty || 0), 0));
+  if (f === "id" || f === "side"){ if (f === "id"){ const it = l.id === "custom" ? null : itemOf(l); l.side = it && it.variants ? Object.keys(it.variants)[0] : ""; delete l.price; } renderLines(); }
+  else {
+    // update this line's amount and discount note without redrawing (keeps typing smooth)
+    const i = +el.dataset.i, it = l.id === "custom" ? null : itemOf(l), off = !!it && linePrice(l) !== it.price;
+    document.querySelector(`[data-amt="${i}"]`).textContent = money(linePrice(l) * l.qty);
+    const was = document.querySelector(`[data-was="${i}"]`); if (was) was.hidden = !off;
+    const pin = document.querySelector(`[data-f="price"][data-i="${i}"]`); if (pin) pin.classList.toggle("off", off);
+    $("#saleTotal").textContent = money(saleLines.reduce((a, x) => a + linePrice(x) * (x.qty || 0), 0));
+  }
 });
 $("#saleLines").addEventListener("click", e => { const x = e.target.closest("[data-x]"); if (x){ saleLines.splice(+x.dataset.x, 1); renderLines(); } });
 $("#addLine").addEventListener("click", () => { saleLines.push({ id: catalog[0].id, side: "pretty", qty: 1 }); renderLines(); });
@@ -242,7 +255,7 @@ $("#addSale").addEventListener("click", openSale);
 $("#cancelSale").addEventListener("click", () => { $("#sale").hidden = true; });
 $("#sale").addEventListener("submit", async e => {
   e.preventDefault();
-  const items = saleLines.map(l => l.id === "custom" ? { custom: true, name: (l.name || "").trim(), price: linePrice(l), qty: l.qty } : { id: l.id, side: l.side, qty: l.qty });
+  const items = saleLines.map(l => l.id === "custom" ? { custom: true, name: (l.name || "").trim(), price: linePrice(l), qty: l.qty } : { id: l.id, side: l.side, qty: l.qty, price: linePrice(l) });
   const b = $("#saveSale"); b.disabled = true; b.textContent = "Saving…"; $("#saleErr").hidden = true;
   try {
     const r = await fetch(MANUAL_URL, { method: "POST", headers: { "Content-Type": "application/json", "X-Admin-Key": pw },
