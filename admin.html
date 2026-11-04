@@ -15,6 +15,7 @@
   --display:"Anton",Impact,sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 body{margin:0;background:var(--ground);color:var(--ink);font:15px/1.5 var(--mono);padding:24px 16px 48px}
 .wrap{max-width:980px;margin:0 auto}
 h1{margin:0;font:400 clamp(32px,7vw,52px)/1 var(--display);text-transform:uppercase;letter-spacing:.02em}
@@ -34,7 +35,7 @@ input:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline
 .stat b{display:block;font:400 30px/1.1 var(--display);font-variant-numeric:tabular-nums}
 .tools{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
 .tools input{flex:1 1 220px}
-.tools label{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--muted);cursor:pointer}
+.tools label{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--muted);cursor:pointer;white-space:nowrap}
 .orders{display:flex;flex-direction:column;gap:10px}
 .order{background:var(--surface);border:1.5px solid var(--line);border-left:4px solid var(--accent);padding:14px 16px;display:grid;grid-template-columns:auto 1fr auto;gap:6px 18px;align-items:start}
 .order.new{animation:flash 1.6s ease-out 2}
