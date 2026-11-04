@@ -51,6 +51,24 @@ input:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline
 .pick{display:flex;gap:6px;align-items:center;font-size:13px;cursor:pointer;white-space:nowrap}
 .pick input{width:18px;height:18px;accent-color:var(--ok)}
 .empty{color:var(--muted);padding:30px 0;text-align:center}
+.badge{display:inline-block;margin-left:8px;padding:2px 7px;font:600 10px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.1em;background:#2a2230;color:#ffd166;border:1px solid #4a3d22;vertical-align:middle}
+.note{grid-column:2 / 3;font-size:13px;color:var(--muted);margin:0}
+.rm{background:none;border:0;padding:0;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:12px}
+/* add an in-person sale */
+.sale{background:var(--surface);border:1.5px solid var(--accent);padding:16px;margin-bottom:16px;display:flex;flex-direction:column;gap:12px}
+.sale h2{margin:0;font:400 26px/1 var(--display);text-transform:uppercase;letter-spacing:.02em}
+.sale .row{display:flex;gap:10px;flex-wrap:wrap}
+.sale .row > *{flex:1 1 160px}
+.sale label.f{display:flex;flex-direction:column;gap:4px}
+select{background:var(--surface-2);border:1.5px solid var(--line);color:var(--ink);padding:10px 12px;font:inherit;min-width:0}
+.lines{display:flex;flex-direction:column;gap:8px}
+.line{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) 70px 80px auto;gap:8px;align-items:center;background:var(--surface-2);padding:8px}
+.line input,.line select{width:100%}
+.line .amt{text-align:right;font-variant-numeric:tabular-nums}
+.line .x{background:none;border:1.5px solid var(--line);color:var(--muted);width:36px;height:36px;cursor:pointer}
+.sale .sum{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.sale .sum b{font:400 28px/1 var(--display)}
+@media (max-width:600px){ .line{grid-template-columns:1fr 1fr} .line .amt{text-align:left} }
 @media (max-width:600px){
   .order{grid-template-columns:1fr auto}
   .who{grid-column:1 / -1;grid-row:2}
@@ -78,19 +96,35 @@ input:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline
       <div class="stat"><span class="label">Orders</span><b id="sOrders">0</b></div>
       <div class="stat"><span class="label">To pick up</span><b id="sWaiting">0</b></div>
       <div class="stat"><span class="label">Sales</span><b id="sSales">$0</b></div>
+      <div class="stat"><span class="label">In person</span><b id="sInPerson">$0</b></div>
     </div>
     <div class="tools">
       <input id="search" type="search" placeholder="Search name or order number" aria-label="Search orders">
       <label><input type="checkbox" id="hideDone"> Hide picked up</label>
       <button class="btn ghost" type="button" id="refresh">Refresh</button>
+      <button class="btn" type="button" id="addSale">+ In-person sale</button>
       <button class="btn ghost" type="button" id="logout">Log out</button>
     </div>
+    <form class="sale" id="sale" hidden>
+      <h2>Add an in-person sale</h2>
+      <div class="row">
+        <label class="f"><span class="label">Buyer's name</span><input id="saleName" maxlength="60" placeholder="Name (optional)"></label>
+        <label class="f"><span class="label">Paid with</span><select id="saleMethod"></select></label>
+      </div>
+      <div class="lines" id="saleLines"></div>
+      <div class="row"><button class="btn ghost" type="button" id="addLine" style="flex:0 0 auto">+ Add an item</button></div>
+      <label class="f"><span class="label">Note</span><input id="saleNote" maxlength="200" placeholder="Optional, like 'paid $40, gave $5 back'"></label>
+      <div class="sum"><span class="label">Total</span><b id="saleTotal">$0.00</b></div>
+      <p class="err" id="saleErr" hidden></p>
+      <div class="row"><button class="btn" type="submit" id="saveSale">Save sale</button><button class="btn ghost" type="button" id="cancelSale">Cancel</button></div>
+    </form>
     <div class="orders" id="orders"></div>
   </div>
 </div>
 
 <script>
 const ORDERS_URL = "https://pretty-killer-checkout.vercel.app/api/orders";
+const MANUAL_URL = "https://pretty-killer-checkout.vercel.app/api/manual";   // in-person sales
 const $ = s => document.querySelector(s);
 const esc = t => String(t).replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" })[c]);
 const money = c => "$" + (c / 100).toFixed(2);
@@ -134,16 +168,19 @@ function render(){
   $("#sOrders").textContent = orders.length;
   $("#sWaiting").textContent = orders.filter(o => !done.has(o.order)).length;
   $("#sSales").textContent = money(orders.reduce((a, o) => a + o.total, 0));
+  $("#sInPerson").textContent = money(orders.filter(o => o.manual).reduce((a, o) => a + o.total, 0));
 
   const list = orders.filter(o => (!hide || !done.has(o.order)) && (!q || `${o.name} ${o.order}`.toLowerCase().includes(q)));
   $("#orders").innerHTML = list.length ? list.map(o => {
     const isDone = done.has(o.order), when = new Date(o.created);
     return `<article class="order ${isDone ? "done" : ""} ${fresh.has(o.order) ? "new" : ""}">
       <div class="num">${esc(o.order || "—")}</div>
-      <div class="who"><b>${esc(o.name || "(no name)")}</b><span class="label">${when.toLocaleDateString([], { month:"short", day:"numeric" })} · ${when.toLocaleTimeString([], { hour:"numeric", minute:"2-digit" })}${o.email ? " · " + esc(o.email) : ""}</span></div>
+      <div class="who"><b>${esc(o.name || "(no name)")}</b>${o.manual ? `<span class="badge">In person · ${esc(o.method || "Cash")}</span>` : ""}<span class="label">${when.toLocaleDateString([], { month:"short", day:"numeric" })} · ${when.toLocaleTimeString([], { hour:"numeric", minute:"2-digit" })}${o.email ? " · " + esc(o.email) : ""}</span></div>
       <div class="right"><span class="total">${money(o.total)}</span>
         <label class="pick"><input type="checkbox" data-done="${esc(o.order)}" ${isDone ? "checked" : ""}> Picked up</label></div>
       <ul class="items">${o.items.map(i => `<li>${i.qty} × ${esc(i.name)}</li>`).join("")}${o.freeMovie ? "<li>1 × Pretty Killer: The Movie (secret code, free)</li>" : ""}</ul>
+      ${o.note ? `<p class="note">Note: ${esc(o.note)}</p>` : ""}
+      ${o.manual ? `<p class="note"><button class="rm" type="button" data-rm="${esc(o.id)}">Remove this sale</button></p>` : ""}
     </article>`;
   }).join("") : `<p class="empty">${orders.length ? "No orders match." : "No orders yet."}</p>`;
 }
@@ -155,6 +192,78 @@ function logout(msg){
   $("#status").textContent = "";
 }
 function start(){ load(); clearInterval(timer); timer = setInterval(load, 15000); }
+
+/* ---------- in-person sales ----------
+   Saved by the checkout server as Stripe invoices marked "paid outside of Stripe": nobody is
+   charged or emailed. They show in the list with an "In person" badge and count in Sales. */
+let catalog = null, methods = [], saleLines = [];
+async function openSale(){
+  $("#saleErr").hidden = true;
+  if (!catalog){
+    try {
+      const r = await fetch(MANUAL_URL, { headers: { "X-Admin-Key": pw }, cache: "no-store" });
+      const d = await r.json(); if (!r.ok) throw new Error(d.error || "");
+      catalog = d.items; methods = d.methods;
+    } catch(e){ $("#status").textContent = "The sale form didn't load. Try again."; return; }
+    $("#saleMethod").innerHTML = methods.map(m => `<option>${esc(m)}</option>`).join("");
+  }
+  saleLines = [{ id: catalog[0].id, side: "pretty", qty: 1 }];
+  $("#saleName").value = ""; $("#saleNote").value = "";
+  renderLines(); $("#sale").hidden = false; $("#saleName").focus();
+}
+const itemOf = l => catalog.find(c => c.id === l.id);
+const linePrice = l => l.id === "custom" ? Math.round((parseFloat(l.price) || 0) * 100) : itemOf(l).price;
+function renderLines(){
+  $("#saleLines").innerHTML = saleLines.map((l, i) => {
+    const it = l.id === "custom" ? null : itemOf(l);
+    return `<div class="line">
+      <select data-f="id" data-i="${i}" aria-label="Item">${catalog.map(c => `<option value="${c.id}" ${c.id === l.id ? "selected" : ""}>${esc(c.name)} · ${money(c.price)}</option>`).join("")}<option value="custom" ${l.id === "custom" ? "selected" : ""}>Something else…</option></select>
+      ${l.id === "custom"
+        ? `<input data-f="name" data-i="${i}" placeholder="What" value="${esc(l.name || "")}" aria-label="What was sold">`
+        : it.variants ? `<select data-f="side" data-i="${i}" aria-label="Version">${Object.entries(it.variants).map(([k, v]) => `<option value="${k}" ${k === l.side ? "selected" : ""}>${esc(v)}</option>`).join("")}</select>` : `<span class="label">One version</span>`}
+      <input data-f="qty" data-i="${i}" type="number" min="1" max="50" value="${l.qty}" aria-label="How many">
+      ${l.id === "custom" ? `<input data-f="price" data-i="${i}" type="number" min="0" step="0.01" placeholder="$ each" value="${esc(l.price || "")}" aria-label="Price each">` : `<span class="amt">${money(linePrice(l) * l.qty)}</span>`}
+      <button class="x" type="button" data-x="${i}" aria-label="Remove item" ${saleLines.length < 2 ? "disabled" : ""}>×</button>
+    </div>`; }).join("");
+  $("#saleTotal").textContent = money(saleLines.reduce((a, l) => a + linePrice(l) * (l.qty || 0), 0));
+}
+$("#saleLines").addEventListener("input", e => {
+  const el = e.target.closest("[data-f]"); if (!el) return;
+  const l = saleLines[+el.dataset.i], f = el.dataset.f;
+  if (f === "qty") l.qty = Math.max(1, Math.min(50, Math.floor(+el.value) || 1));
+  else l[f] = el.value;
+  if (f === "id" || f === "side"){ if (f === "id"){ const it = l.id === "custom" ? null : itemOf(l); l.side = it && it.variants ? Object.keys(it.variants)[0] : ""; } renderLines(); }
+  else $("#saleTotal").textContent = money(saleLines.reduce((a, x) => a + linePrice(x) * (x.qty || 0), 0));
+});
+$("#saleLines").addEventListener("click", e => { const x = e.target.closest("[data-x]"); if (x){ saleLines.splice(+x.dataset.x, 1); renderLines(); } });
+$("#addLine").addEventListener("click", () => { saleLines.push({ id: catalog[0].id, side: "pretty", qty: 1 }); renderLines(); });
+$("#addSale").addEventListener("click", openSale);
+$("#cancelSale").addEventListener("click", () => { $("#sale").hidden = true; });
+$("#sale").addEventListener("submit", async e => {
+  e.preventDefault();
+  const items = saleLines.map(l => l.id === "custom" ? { custom: true, name: (l.name || "").trim(), price: linePrice(l), qty: l.qty } : { id: l.id, side: l.side, qty: l.qty });
+  const b = $("#saveSale"); b.disabled = true; b.textContent = "Saving…"; $("#saleErr").hidden = true;
+  try {
+    const r = await fetch(MANUAL_URL, { method: "POST", headers: { "Content-Type": "application/json", "X-Admin-Key": pw },
+      body: JSON.stringify({ name: $("#saleName").value, method: $("#saleMethod").value, note: $("#saleNote").value, items }) });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.error || "The sale didn't save. Try again.");
+    done.add(d.order.order); store.set("pk-admin-done", [...done]);   // sold at the stand, so it's already picked up
+    $("#sale").hidden = true; load();
+  } catch(err){ $("#saleErr").textContent = err.message; $("#saleErr").hidden = false; }
+  finally { b.disabled = false; b.textContent = "Save sale"; }
+});
+// remove a sale (tap twice)
+$("#orders").addEventListener("click", async e => {
+  const b = e.target.closest("[data-rm]"); if (!b) return;
+  if (b.dataset.sure !== "1"){ b.dataset.sure = "1"; b.textContent = "Tap again to remove"; return; }
+  b.disabled = true; b.textContent = "Removing…";
+  try {
+    const r = await fetch(`${MANUAL_URL}?id=${encodeURIComponent(b.dataset.rm)}`, { method: "DELETE", headers: { "X-Admin-Key": pw } });
+    if (!r.ok) throw new Error();
+    orders = orders.filter(o => o.id !== b.dataset.rm); render();
+  } catch(err){ b.disabled = false; b.textContent = "Couldn't remove. Try again"; }
+});
 
 $("#login").addEventListener("submit", e => { e.preventDefault(); pw = $("#pw").value.trim(); store.set("pk-admin-pw", pw); $("#loginErr").hidden = true; start(); });
 $("#logout").addEventListener("click", () => logout());
