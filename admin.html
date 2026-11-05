@@ -98,6 +98,7 @@ select{background:var(--surface-2);border:1.5px solid var(--line);color:var(--in
   <div id="board" hidden>
     <div class="stats">
       <div class="stat"><span class="label">Orders</span><b id="sOrders">0</b></div>
+      <div class="stat"><span class="label">To order</span><b id="sToOrder">0</b></div>
       <div class="stat"><span class="label">To pick up</span><b id="sWaiting">0</b></div>
       <div class="stat"><span class="label">Sales</span><b id="sSales">$0</b></div>
       <div class="stat"><span class="label">In person</span><b id="sInPerson">$0</b></div>
@@ -143,6 +144,8 @@ if (linkKey) store.set("pk-admin-pw", linkKey);
 let pw = store.get("pk-admin-pw", ""), orders = [], seen = new Set(store.get("pk-admin-seen", [])), firstLoad = true;
 // "picked up" is saved on this device only
 const done = new Set(store.get("pk-admin-done", []));
+// "ordered": you've ordered or made what's in it (also saved on this device only)
+const ordered = new Set(store.get("pk-admin-ordered", []));
 let timer;
 
 async function load(){
@@ -171,6 +174,7 @@ function render(){
   $("#count").textContent = orders.length ? `· ${orders.length}` : "";
   $("#sOrders").textContent = orders.length;
   $("#sWaiting").textContent = orders.filter(o => !done.has(o.order)).length;
+  $("#sToOrder").textContent = orders.filter(o => !ordered.has(o.order) && !done.has(o.order)).length;
   $("#sSales").textContent = money(orders.reduce((a, o) => a + o.total, 0));
   $("#sInPerson").textContent = money(orders.filter(o => o.manual).reduce((a, o) => a + o.total, 0));
 
@@ -181,6 +185,7 @@ function render(){
       <div class="num">${esc(o.order || "—")}</div>
       <div class="who"><b>${esc(o.name || "(no name)")}</b>${o.manual ? `<span class="badge">In person · ${esc(o.method || "Cash")}</span>` : ""}<span class="label">${when.toLocaleDateString([], { month:"short", day:"numeric" })} · ${when.toLocaleTimeString([], { hour:"numeric", minute:"2-digit" })}${o.email ? " · " + esc(o.email) : ""}</span></div>
       <div class="right"><span class="total">${money(o.total)}</span>
+        <label class="pick"><input type="checkbox" data-ordered="${esc(o.order)}" ${ordered.has(o.order) || isDone ? "checked" : ""}> Ordered</label>
         <label class="pick"><input type="checkbox" data-done="${esc(o.order)}" ${isDone ? "checked" : ""}> Picked up</label></div>
       <ul class="items">${o.items.map(i => `<li>${i.qty} × ${esc(i.name)}</li>`).join("")}${o.freeMovie ? "<li>1 × Pretty Killer: The Movie (secret code, free)</li>" : ""}</ul>
       ${o.note ? `<p class="note">Note: ${esc(o.note)}</p>` : ""}
@@ -263,6 +268,7 @@ $("#sale").addEventListener("submit", async e => {
     const d = await r.json().catch(() => ({}));
     if (!r.ok) throw new Error(d.error || "The sale didn't save. Try again.");
     done.add(d.order.order); store.set("pk-admin-done", [...done]);   // sold at the stand, so it's already picked up
+    ordered.add(d.order.order); store.set("pk-admin-ordered", [...ordered]);
     $("#sale").hidden = true; load();
   } catch(err){ $("#saleErr").textContent = err.message; $("#saleErr").hidden = false; }
   finally { b.disabled = false; b.textContent = "Save sale"; }
@@ -285,6 +291,8 @@ $("#refresh").addEventListener("click", load);
 $("#search").addEventListener("input", render);
 $("#hideDone").addEventListener("change", render);
 $("#orders").addEventListener("change", e => {
+  const ob = e.target.closest("[data-ordered]");
+  if (ob){ ob.checked ? ordered.add(ob.dataset.ordered) : ordered.delete(ob.dataset.ordered); store.set("pk-admin-ordered", [...ordered]); render(); return; }
   const box = e.target.closest("[data-done]"); if (!box) return;
   box.checked ? done.add(box.dataset.done) : done.delete(box.dataset.done);
   store.set("pk-admin-done", [...done]); render();
