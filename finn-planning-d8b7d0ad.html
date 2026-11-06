@@ -106,19 +106,19 @@ h2{margin:40px 0 6px;font:900 34px/1.1 var(--display)}
 .part{grid-column:1/-1;margin:14px 0 2px;font:600 13px var(--mono);text-transform:uppercase;letter-spacing:.12em;color:var(--accent)}
 .song.extra .nm{font-weight:800}
 /* outfits: 3 mannequins per side, each side in its own colors */
-.o-side{--o-bg:#fffafc;--o-ink:#161015;--o-acc:#f25fc4;--o-line:#e9b1c9;--o-body:#f7b8d4;--o-stand:#161015;margin-bottom:28px}
-.o-side.o-killer{--o-bg:#141216;--o-ink:#f2ecf0;--o-acc:#ff3fae;--o-line:#2c272f;--o-body:#2a2530;--o-stand:#ff3fae}
+.o-side{--o-ink:var(--ink);--o-acc:#f25fc4;--o-body:#f7d6e4;--o-edge:#c98aa8;--o-stand:#161015;margin-bottom:28px}
+.o-side.o-killer{--o-acc:#ff3fae;--o-body:#2a2530;--o-edge:#ff3fae;--o-stand:#ff3fae}
+:root[data-side="killer"] .o-pretty{--o-stand:#f7b8d4}
 .o-side h2{margin:24px 0 12px}
 .o-killer h2{font:400 34px/1.1 "Anton",Impact,sans-serif;text-transform:uppercase;color:#ff3fae}
 .o-pretty h2{font:900 34px/1.1 "Bodoni Moda",Georgia,serif;color:var(--ink)}
 .mannequins{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-.mq{display:flex;flex-direction:column;gap:8px;background:var(--o-bg);color:var(--o-ink);border:1.5px solid var(--o-line);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow)}
-.mq svg{width:100%;max-width:150px;height:auto;align-self:center;margin:4px 0 6px}
-.mq h3{margin:0;font:900 20px/1.1 "Bodoni Moda",Georgia,serif}
+.mq{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;color:var(--o-ink);padding:6px 4px}
+.mq svg{width:100%;max-width:180px;height:auto;margin:0 0 4px;overflow:visible}
+.o-list{list-style:none;margin:0;padding:0;font-size:14px;line-height:1.45}
+.mq h3{margin:0;font:900 20px/1.1 "Bodoni Moda",Georgia,serif;color:var(--ink)}
 .o-killer .mq h3{font:400 20px/1.1 "Anton",Impact,sans-serif;text-transform:uppercase;letter-spacing:.03em}
 .mq .o-sub{font:600 12px var(--mono);color:var(--o-acc);text-transform:uppercase;letter-spacing:.08em}
-.mq textarea{width:100%;min-height:140px;resize:vertical;background:transparent;color:var(--o-ink);border:1.5px solid var(--o-line);border-radius:var(--radius);padding:8px 10px;font:15px/1.4 var(--body)}
-.mq textarea:focus{outline:2px solid var(--o-acc);outline-offset:1px}
 .mq .ready{display:flex;align-items:center;gap:8px;font:600 13px var(--mono);cursor:pointer}
 .mq .ready input{width:20px;height:20px;accent-color:var(--o-acc)}
 .mq.done h3{text-decoration:line-through;opacity:.6}
@@ -147,7 +147,7 @@ h2{margin:40px 0 6px;font:900 34px/1.1 var(--display)}
     <div class="songs" id="pbSongs"></div>
   </section>
   <section id="outfitView" hidden>
-    <p class="pb-sum">3 outfits for each side, one for each part of the show (and each part's outfit page in the photobook). Changes you type and ticks are saved on this device only.</p>
+    <p class="pb-sum">3 outfits for each side, one for each part of the show (and each part's outfit page in the photobook). Ready ticks are saved on this device only.</p>
     <div id="outfitList"></div>
   </section>
   <section id="linksView" hidden>
@@ -284,38 +284,67 @@ function openProduct(id){
   }
   render();
 }
-// OUTFITS: 3 mannequins per side. Notes are saved as n:<side>:<n>, ticks as r:<side>:<n>.
-const MANNEQUIN = `<svg viewBox="0 0 120 220" aria-hidden="true">
-  <rect x="52" y="8" width="16" height="9" rx="3" fill="var(--o-stand)"/>
-  <rect x="54" y="16" width="12" height="14" fill="var(--o-body)"/>
-  <path d="M38 30C46 25 74 25 82 30C95 35 97 49 92 63C88 76 82 84 82 96C82 110 92 120 92 134C92 146 80 152 60 152C40 152 28 146 28 134C28 120 38 110 38 96C38 84 32 76 28 63C23 49 25 35 38 30Z" fill="var(--o-body)" stroke="var(--o-stand)" stroke-width="2"/>
-  <path d="M40 100Q60 106 80 100" fill="none" stroke="var(--o-acc)" stroke-width="2" stroke-dasharray="4 3"/>
-  <rect x="58" y="152" width="4" height="46" fill="var(--o-stand)"/>
-  <path d="M60 198L34 214M60 198L86 214M60 198V214" stroke="var(--o-stand)" stroke-width="4" stroke-linecap="round"/>
-</svg>`;
-// what's planned so far (shows on every device; edits in the boxes are saved on that device)
-const OUTFIT_NOTES = {
-  "pretty:1":"Pink ruffle skirt\nWhite shirt\nPink corset\nShoes: Pretty shoes (don't have them yet)",
-  "pretty:2":"Pretty merch shirt (Good Morning Sun Tee)\nShoes: Pretty shoes (don't have them yet)",
-  "pretty:3":"Shoes: Pretty shoes (don't have them yet)",
-  "killer:1":"Black ruffle skirt\nShoes: Black boots",
-  "killer:2":"Killer merch shirt (Killer Glow Tee)\nShoes: Black boots",
-  "killer:3":"Shoes: Black boots"
+// OUTFITS: 3 mannequins per side, each one wearing what's planned so far.
+// wear: the pieces drawn on the mannequin, bottom layer first. shoes: "boots" or "tbd" (not bought yet).
+// list: what's written under it. Ready ticks are saved on this device as r:<side>:<n>.
+const OUTFITS = {
+  "pretty:1": { wear:["shirt-white", "skirt-pink", "corset-pink"], shoes:"tbd",
+                list:["Pink ruffle skirt", "White shirt", "Pink corset", "Shoes: Pretty shoes (don't have them yet)"] },
+  "pretty:2": { wear:["tee-pretty"], shoes:"tbd",
+                list:["Pretty merch shirt (Good Morning Sun Tee)", "Shoes: Pretty shoes (don't have them yet)"] },
+  "pretty:3": { wear:[], shoes:"tbd",
+                list:["Shoes: Pretty shoes (don't have them yet)", "Rest of the outfit: not picked yet"] },
+  "killer:1": { wear:["skirt-black"], shoes:"boots", list:["Black ruffle skirt", "Black boots"] },
+  "killer:2": { wear:["tee-killer"], shoes:"boots", list:["Killer merch shirt (Killer Glow Tee)", "Black boots"] },
+  "killer:3": { wear:[], shoes:"boots", list:["Black boots", "Rest of the outfit: not picked yet"] }
 };
+// a tier of ruffles: top edge y0 (x0..x1), scalloped bottom edge y1 (x2..x3)
+const ruffle = (x0, x1, y0, x2, x3, y1, n) => {
+  const w = (x3 - x2) / n;
+  let d = `M${x0} ${y0}L${x1} ${y0}L${x3} ${y1}`;
+  for (let i = n; i > 0; i--) d += `Q${x2 + w * (i - .5)} ${y1 + 7} ${x2 + w * (i - 1)} ${y1}`;
+  return d + "Z";
+};
+const skirt = (fill, edge) => [[34, 86, 138, 160], [38, 82, 122, 143], [42, 78, 108, 127]]
+  .map(([l, r, y0, y1], i) => `<path d="${ruffle(l + 6, r - 6, y0, l, r, y1, 6 - i)}" fill="${fill}" stroke="${edge}" stroke-width="1.5"/>`).join("");
+const TEE = "M38 44Q60 37 82 44L95 63L86 70L80 62L79 114L41 114L40 62L34 70L25 63Z";
+const PIECES = {
+  "shirt-white": `<path d="${TEE}" fill="#ffffff" stroke="#e9b1c9" stroke-width="1.5"/><path d="M52 41L60 52L68 41" fill="#ffffff" stroke="#e9b1c9" stroke-width="1.5"/><path d="M60 52V112" stroke="#f3d3e2" stroke-width="1.5"/>`,
+  "skirt-pink": skirt("#f7a8cc", "#f25fc4"),
+  "skirt-black": skirt("#141216", "#ff3fae"),
+  "corset-pink": `<path d="M43 72Q60 66 77 72L73 98Q74 106 77 112L43 112Q46 106 47 98Z" fill="#f25fc4" stroke="#161015" stroke-width="1.5"/><path d="M57 74L63 78L57 82L63 86L57 90L63 94L57 98L63 102L57 106" fill="none" stroke="#ffffff" stroke-width="1.3"/>`,
+  "tee-pretty": `<path d="${TEE}" fill="#ffffff" stroke="#f25fc4" stroke-width="3"/><rect x="45" y="66" width="30" height="20" fill="#f7b8d4" transform="rotate(-4 60 76)"/><text x="60" y="81" text-anchor="middle" font-family="Bodoni Moda,Georgia,serif" font-weight="900" font-size="11" fill="#161015">pretty</text>`,
+  "tee-killer": `<path d="${TEE}" fill="#0b0a0c" stroke="#2c272f" stroke-width="1.5"/><text x="60" y="84" text-anchor="middle" font-family="Anton,Impact,sans-serif" font-size="13" letter-spacing=".5" fill="#ff3fae" style="filter:drop-shadow(0 0 3px #ff3fae)">KILLER</text>`
+};
+const SHOES = {
+  boots: `<path d="M43 168H56V204L59 213H40L42 204Z" fill="#0b0a0c" stroke="#ff3fae" stroke-width="1.2"/><path d="M64 168H77L78 204L80 213H61L64 204Z" fill="#0b0a0c" stroke="#ff3fae" stroke-width="1.2"/>`,
+  tbd: `<path d="M42 205H56L58 213H40Z" fill="none" stroke="#f25fc4" stroke-width="1.5" stroke-dasharray="3 2"/><path d="M64 205H78L80 213H62Z" fill="none" stroke="#f25fc4" stroke-width="1.5" stroke-dasharray="3 2"/><text x="84" y="213" font-family="Special Elite,monospace" font-size="11" fill="#f25fc4">? shoes</text>`
+};
+function mannequin(o){
+  return `<svg viewBox="0 0 120 252" role="img" aria-label="Mannequin wearing: ${esc(o.list.join(", "))}">
+    <rect x="58" y="150" width="4" height="92" fill="var(--o-stand)"/>
+    <ellipse cx="60" cy="244" rx="28" ry="5" fill="var(--o-stand)"/>
+    <g fill="var(--o-body)" stroke="var(--o-edge)" stroke-width="1.5">
+      <path d="M45 118L47 208H56L58 124ZM75 118L73 208H64L62 124Z"/>
+      <path d="M40 46L31 92L29 120L35 121L38 95L45 60ZM80 46L89 92L91 120L85 121L82 95L75 60Z"/>
+      <path d="M40 44Q60 37 80 44L78 70Q74 90 72 100Q78 110 76 122L44 122Q42 110 48 100Q46 90 42 70Z"/>
+      <rect x="55" y="30" width="10" height="11"/>
+      <ellipse cx="60" cy="20" rx="11" ry="13"/>
+    </g>
+    ${SHOES[o.shoes] || ""}
+    ${o.wear.map(w => PIECES[w] || "").join("")}
+  </svg>`;
+}
 const OUTFIT_SIDES = [ { key:"pretty", label:"Pretty side" }, { key:"killer", label:"Killer side" } ];
 function renderOutfits(){
   $("#outfitList").innerHTML = OUTFIT_SIDES.map(sd => `<div class="o-side o-${sd.key}"><h2>${sd.label}</h2><div class="mannequins">${[1, 2, 3].map(n => {
-    const k = `${sd.key}:${n}`;
-    return `<div class="mq${done["r:" + k] ? " done" : ""}">${MANNEQUIN}
+    const k = `${sd.key}:${n}`, o = OUTFITS[k] || { wear:[], list:[] };
+    return `<div class="mq${done["r:" + k] ? " done" : ""}">${mannequin(o)}
       <h3>Outfit ${n}</h3><span class="o-sub">Part ${n}</span>
-      <textarea data-on="${k}" aria-label="${sd.label} outfit ${n}" placeholder="What's the outfit?">${esc(done["n:" + k] ?? OUTFIT_NOTES[k] ?? "")}</textarea>
+      <ul class="o-list">${o.list.map(t => `<li>${esc(t)}</li>`).join("")}</ul>
       <label class="ready"><input type="checkbox" data-or="${k}" ${done["r:" + k] ? "checked" : ""}> Ready</label>
     </div>`; }).join("")}</div></div>`).join("");
 }
-document.addEventListener("input", e => {
-  const t = e.target.closest("[data-on]"); if (!t) return;
-  t.value === (OUTFIT_NOTES[t.dataset.on] ?? "") ? delete done["n:" + t.dataset.on] : done["n:" + t.dataset.on] = t.value; save();
-});
 document.addEventListener("change", e => {
   const c = e.target.closest("[data-or]"); if (!c) return;
   c.checked ? done["r:" + c.dataset.or] = true : delete done["r:" + c.dataset.or]; save();
