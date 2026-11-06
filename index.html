@@ -310,6 +310,7 @@ footer{border-top:1px solid var(--line);padding-block:24px 40px;display:flex;jus
 .card.pd-media,.card.pd-media:hover{transform:none}
 .card.pd-media .art{aspect-ratio:1/1}
 .card.pd-media.full .art{aspect-ratio:auto;min-height:340px;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;padding:28px 16px 16px}
+.card.pd-media.full{grid-column:auto;flex-direction:column}
 .card.pd-media.full .art svg{width:40%}
 .pd-info{display:flex;flex-direction:column;gap:14px;min-width:0}
 .pd-info .ver{font:600 12px/1 var(--mono);color:var(--accent);text-transform:var(--label-case);letter-spacing:var(--label-track)}
@@ -325,6 +326,12 @@ footer{border-top:1px solid var(--line);padding-block:24px 40px;display:flex;jus
 .tracks li:last-child{border-bottom:0}
 .tracks li::before{content:counter(t,decimal-leading-zero);font:600 13px/1 var(--mono);color:var(--accent);min-width:2ch}
 .tracks .only{font:600 10px/1 var(--mono);text-transform:uppercase;letter-spacing:.08em;background:var(--accent);color:var(--accent-ink);padding:4px 6px;border-radius:var(--radius-sm)}
+.about{margin:0;padding:0 0 0 20px;display:grid;gap:6px;font-size:15px;line-height:1.5}
+.about li::marker{color:var(--accent)}
+.facts{margin:0;display:grid;grid-template-columns:auto 1fr;background:var(--surface);border:1.5px solid var(--line);border-radius:var(--radius);font-size:14px}
+.facts dt,.facts dd{margin:0;padding:9px 14px;border-bottom:1px solid var(--line)}
+.facts dt{font:600 12px/1.6 var(--mono);text-transform:var(--label-case);letter-spacing:var(--label-track);color:var(--muted)}
+.facts dt:nth-last-of-type(1),.facts dd:last-child{border-bottom:0}
 @media (max-width:760px){ .pd{grid-template-columns:1fr;gap:20px} }
 @media (max-width:480px){
   /* phones: the page colors already show the side, so the AM/PM pill makes room for the bag */
@@ -530,6 +537,40 @@ const DESCRIPTIONS = {
   movie:"Pretty Killer: The Movie. It comes out after the concert, and it's the same on both sides.",
   test:"A $1 item for testing real checkout."
 };
+// "About this item" bullets on each product page ({side} = Pretty or Killer)
+const ABOUT = {
+  finnschoice:[ "K-pop Style CD ({side} ver.), Pretty Killer Tour Book, Mini CD Keychain and Mystery Trading Cards",
+    "Pretty Killer: The Movie is included free", "The CD, keychain and cards match the side you're shopping" ],
+  mtee:[ "The Pretty side's morning show shirt, in the album cover's style",
+    "Cutout \"pretty\" letters on a pink collage tile, \"good morning\" in script and a little knife underline",
+    "Heavyweight cotton, relaxed fit", "Hot pink ringer trim on the collar and sleeves", "Inside neck print: \"pretty side ♡\"",
+    "Only sold in person, at the merch stand during the Pretty show" ],
+  ntee:[ "The Killer side's night show shirt", "Glows when the lights go out",
+    "Only sold in person, at the merch stand during the Killer show" ],
+  book:[ "Hardcover", "480 pages", "The same book on both sides", "More about what's inside coming soon" ],
+  kpopcd:[ "The album on CD: 16 songs, including the {side} Interlude (only on the K-pop CD)",
+    "372-page photobook: a start page, then 3 parts, each with an outfit page and 23 pages for every song",
+    "Each song's pages have the cover explanation, the lyrics, a finale and the backstory",
+    "Also inside: a lenticular card, a charm, 2 photocards, stickers, a Pokémon-style card and a scratch-off" ],
+  cd:[ "The album on CD: all 15 songs from the {side} side", "In the {side} cover",
+    "Want the Interlude? It's only on the K-pop Style CD" ],
+  keychain:[ "A mini version of the {side} CD", "Clips onto a bag, backpack or keys" ],
+  stickers:[ "A pack of {side} side stickers", "The Pretty and Killer packs are different" ],
+  cards:[ "10 random cards in every pack", "{side} side cards", "You won't know which ones you got until you open it" ],
+  poster:[ "The {side} side tour poster", "8.5 × 11 in" ],
+  hat:[ "Reversible: Killer on the outside, flip it inside out for Pretty", "One hat covers both sides" ],
+  digital:[ "All 15 songs from the {side} side", "Listen online or download each song as an MP3",
+    "You get the download link after the show" ],
+  videopack:{
+    pretty:[ "Worked: the music video", "Worked: the dance practice", "Worked: behind the scenes of the music video", "Watch online or download to keep" ],
+    killer:[ "PK: the music video", "PK: the dance practice", "PK: behind the scenes of the music video", "Watch online or download to keep" ] },
+  movie:[ "Pretty Killer: The Movie", "Comes out after the concert", "Watch online or download to keep",
+    "The same on both sides", "Free with Finn's Choice" ],
+  test:[ "Only for testing checkout", "Charges a real $1" ]
+};
+const SHOW_DATES = "Killer: Sun, Mar 7, 2027 · Pretty: Mon, Mar 8, 2027";
+const VENUE = "15 Freeman Parkway";
+
 // products that show the tracklist on their page. true = also add the side's Interlude
 // as song 8 (only the K-pop CD has it).
 const TRACKLIST_ITEMS = { cd:false, digital:false, kpopcd:true };
@@ -985,6 +1026,16 @@ function renderDetail(){
         : list.length ? `<ol class="tracks">${list.map(t => `<li><span>${esc(t.n)}</span>${t.only ? `<span class="only">Only on the K-pop CD</span>` : ""}</li>`).join("")}</ol>`
         : `<p class="stock">The tracklist hasn't been announced yet.</p>`);
   }
+  const aboutList = ABOUT[p.id] ? (Array.isArray(ABOUT[p.id]) ? ABOUT[p.id] : ABOUT[p.id][side]) : [];
+  const about = aboutList.length ? `<div class="label">About this item</div><ul class="about">${aboutList.map(a => `<li>${esc(a.split("{side}").join(sideName))}</li>`).join("")}</ul>` : "";
+  const facts = [
+    ["Version", p.inPerson ? `${p.inPerson === "pretty" ? "Pretty" : "Killer"} side only` : p.shared ? "Same on both sides" : v ? v.label.split(" · ")[0] : ""],
+    ["Type", p.bundle ? "Bundle" : p.digital ? "Digital download" : "Physical item"],
+    ["Price", money(p.price) + (p.bundle ? ` (save ${money(full - p.price)})` : "")],
+    ["How you get it", p.inPerson ? `Buy it at the merch stand at ${VENUE}` : p.digital ? "Pre-order now, get the link after the show" : `Pre-order now, pick it up at the merch stand at ${VENUE}`],
+    ["Shows", SHOW_DATES]
+  ].filter(f => f[1]);
+  const details = `<div class="label">Details</div><dl class="facts">${facts.map(([k, val]) => `<dt>${k}</dt><dd>${esc(val)}</dd>`).join("")}</dl>`;
   box.innerHTML = `<button class="btn ghost" type="button" data-back>← Back to shop</button>
     <div class="pd">
       <div class="card pd-media${p.bundle ? " full" : ""}"><div class="art${hasPov(p) ? " pov" : ""}">${p.shared ? `<span class="tag both">Both sides</span>` : p.inPerson ? `<span class="tag">${p.showLabel}</span>` : `<span class="tag">${sideName} only</span>`}${artInner(p)}</div></div>
@@ -993,8 +1044,10 @@ function renderDetail(){
         <h2>${p.name}</h2>
         ${desc ? `<p class="desc">${esc(desc)}</p>` : ""}
         <div class="pd-buy">${buy}</div>
+        ${about}
         ${inside}
         ${trackHTML}
+        ${details}
       </div>
     </div>`;
 }
