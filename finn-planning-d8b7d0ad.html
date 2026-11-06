@@ -122,6 +122,27 @@ h2{margin:40px 0 6px;font:900 34px/1.1 var(--display)}
 .mq .ready{display:flex;align-items:center;gap:8px;font:600 13px var(--mono);cursor:pointer}
 .mq .ready input{width:20px;height:20px;accent-color:var(--o-acc)}
 .mq.done h3{text-decoration:line-through;opacity:.6}
+/* list maker */
+.lm-new,.lm-add{display:flex;gap:8px}
+.lm-new input,.lm-add input{flex:1;min-width:0;min-height:44px;padding:10px 12px;font:16px var(--body);color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:var(--radius)}
+.lm-new input:focus,.lm-add input:focus{outline:2px solid var(--accent);outline-offset:1px}
+.lm-btn{min-height:44px;padding:10px 16px;font:600 13px var(--mono);text-transform:uppercase;letter-spacing:.08em;background:var(--accent);color:var(--accent-ink);border:0;border-radius:var(--radius);cursor:pointer;white-space:nowrap}
+.lm-lists{display:flex;flex-direction:column;gap:16px;margin-top:20px}
+.lm-card{background:var(--surface);padding:16px 18px;border-radius:var(--radius);box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px}
+.lm-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.lm-head h3{margin:0;font:900 24px/1.15 var(--display);overflow-wrap:anywhere}
+[data-side="killer"] .lm-head h3{font-weight:400;text-transform:uppercase;letter-spacing:.03em}
+.lm-count{font:600 12px var(--mono);color:var(--muted);white-space:nowrap}
+.lm-items{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.lm-items li{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.lm-items li:last-child{border-bottom:0}
+.lm-items label{flex:1;display:flex;align-items:center;gap:10px;cursor:pointer;overflow-wrap:anywhere}
+.lm-items input{width:20px;height:20px;flex:none;accent-color:var(--accent)}
+.lm-items li.done span{text-decoration:line-through;opacity:.55}
+.lm-x{flex:none;width:32px;height:32px;background:none;border:1.5px solid var(--line);border-radius:var(--radius);color:var(--muted);cursor:pointer;font-size:16px;line-height:1}
+.lm-del{align-self:flex-start;background:none;border:0;padding:4px 0;font:600 12px var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);cursor:pointer;text-decoration:underline}
+.lm-del.sure{color:var(--accent)}
+.lm-empty{margin:0;color:var(--muted);font-size:14px}
 @media (max-width:640px){ .mannequins{grid-template-columns:1fr 1fr} }
 @media (max-width:400px){ .mannequins{grid-template-columns:1fr} }
 </style>
@@ -149,6 +170,11 @@ h2{margin:40px 0 6px;font:900 34px/1.1 var(--display)}
   <section id="outfitView" hidden>
     <p class="pb-sum">3 outfits for each side, one for each part of the show (and each part's outfit page in the photobook). Ready ticks are saved on this device only.</p>
     <div id="outfitList"></div>
+  </section>
+  <section id="listsView" hidden>
+    <p class="pb-sum">Make a list: give it a title, then add items. Lists are saved on this device only.</p>
+    <form class="lm-new" id="lmNew"><input id="lmTitle" maxlength="80" placeholder="List title" aria-label="List title" autocomplete="off"><button class="lm-btn" type="submit">New list</button></form>
+    <div class="lm-lists" id="lmLists"></div>
   </section>
   <section id="linksView" hidden>
     <p class="pb-sum">Where to buy or make each shop item.</p>
@@ -201,6 +227,7 @@ const PRODUCTS = [
     ]
   },
   { id: "outfits", name: "Outfits", outfits: true },
+  { id: "lists", name: "Lists", lists: true },
   { id: "links", name: "Shop links", links: true }
 ];
 
@@ -267,10 +294,16 @@ function openProduct(id){
   $("#pb").hidden = !PRODUCT.photobook;
   $("#make").hidden = !(PRODUCT.make || []).length;
   $("#makeList").innerHTML = (PRODUCT.make || []).map(m => `<a href="${esc(m.url)}" target="_blank" rel="noopener"><b>${esc(m.what)}</b><span>${esc(m.where)} ↗</span></a>`).join("");
-  const isLinks = !!PRODUCT.links, isOutfits = !!PRODUCT.outfits;
-  ["#eyebrow", "#meta", ".progress", "#list", "#foot"].forEach(sel => $(sel).hidden = isLinks || isOutfits);
+  const isLinks = !!PRODUCT.links, isOutfits = !!PRODUCT.outfits, isLists = !!PRODUCT.lists;
+  ["#eyebrow", "#meta", ".progress", "#list", "#foot"].forEach(sel => $(sel).hidden = isLinks || isOutfits || isLists);
   $("#linksView").hidden = !isLinks;
   $("#outfitView").hidden = !isOutfits;
+  $("#listsView").hidden = !isLists;
+  if (isLists){
+    $("#tabs").hidden = true; $("#meta").innerHTML = "";
+    document.documentElement.dataset.side = new Date().getHours() < 12 ? "pretty" : "killer";
+    renderLists(); return;
+  }
   if (isOutfits){
     $("#tabs").hidden = true; $("#meta").innerHTML = "";
     document.documentElement.dataset.side = new Date().getHours() < 12 ? "pretty" : "killer";
@@ -362,6 +395,53 @@ document.addEventListener("change", e => {
   const c = e.target.closest("[data-or]"); if (!c) return;
   c.checked ? done["r:" + c.dataset.or] = true : delete done["r:" + c.dataset.or]; save();
   c.closest(".mq").classList.toggle("done", c.checked);
+});
+// LIST MAKER: lists with a title and items, saved on this device (pk-lists).
+let lists = [];
+try { lists = JSON.parse(localStorage.getItem("pk-lists")) || []; } catch(e){}
+const saveLists = () => { try { localStorage.setItem("pk-lists", JSON.stringify(lists)); } catch(e){} };
+let sureDelete = null;   // the list whose Delete was tapped once
+function renderLists(focusId){
+  $("#lmLists").innerHTML = lists.length ? lists.map(l => {
+    const n = l.items.filter(i => i.done).length;
+    return `<div class="lm-card" data-list="${l.id}">
+      <div class="lm-head"><h3>${esc(l.title)}</h3><span class="lm-count">${l.items.length ? `${n} of ${l.items.length} done` : "No items yet"}</span></div>
+      ${l.items.length ? `<ul class="lm-items">${l.items.map((it, i) => `<li class="${it.done ? "done" : ""}">
+        <label><input type="checkbox" data-lm-tick="${i}" ${it.done ? "checked" : ""}><span>${esc(it.t)}</span></label>
+        <button class="lm-x" type="button" data-lm-rm="${i}" aria-label="Remove ${esc(it.t)}">×</button></li>`).join("")}</ul>` : ""}
+      <form class="lm-add" data-lm-add><input maxlength="120" placeholder="Add an item" aria-label="Add an item to ${esc(l.title)}" autocomplete="off"><button class="lm-btn" type="submit">Add</button></form>
+      <button class="lm-del${sureDelete === l.id ? " sure" : ""}" type="button" data-lm-del>${sureDelete === l.id ? "Tap again to delete this list" : "Delete list"}</button>
+    </div>`; }).join("") : `<p class="lm-empty">No lists yet. Type a title above and tap New list.</p>`;
+  if (focusId){ const f = document.querySelector(`[data-list="${focusId}"] .lm-add input`); if (f) f.focus(); }
+}
+document.addEventListener("submit", e => {
+  if (e.target.id === "lmNew"){
+    e.preventDefault();
+    const t = $("#lmTitle").value.trim(); if (!t) return;
+    const l = { id: Date.now().toString(36), title: t, items: [] };
+    lists.unshift(l); saveLists(); $("#lmTitle").value = ""; renderLists(l.id); return;
+  }
+  const add = e.target.closest("[data-lm-add]"); if (!add) return;
+  e.preventDefault();
+  const l = lists.find(x => x.id === add.closest("[data-list]").dataset.list), inp = add.querySelector("input"), t = inp.value.trim();
+  if (!l || !t) return;
+  l.items.push({ t, done: false }); saveLists(); renderLists(l.id);
+});
+document.addEventListener("click", e => {
+  const card = e.target.closest("[data-list]"); if (!card) return;
+  const l = lists.find(x => x.id === card.dataset.list); if (!l) return;
+  const rm = e.target.closest("[data-lm-rm]");
+  if (rm){ l.items.splice(+rm.dataset.lmRm, 1); saveLists(); renderLists(); return; }
+  if (e.target.closest("[data-lm-del]")){
+    if (sureDelete === l.id){ lists = lists.filter(x => x !== l); sureDelete = null; saveLists(); }
+    else sureDelete = l.id;
+    renderLists();
+  }
+});
+document.addEventListener("change", e => {
+  const c = e.target.closest("[data-lm-tick]"); if (!c) return;
+  const l = lists.find(x => x.id === c.closest("[data-list]").dataset.list); if (!l) return;
+  l.items[+c.dataset.lmTick].done = c.checked; saveLists(); renderLists();
 });
 function renderLinks(){
   const host = u => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch(e){ return ""; } };
