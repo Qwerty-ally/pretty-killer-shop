@@ -1032,7 +1032,7 @@ function renderDetail(){
     ["Version", p.inPerson ? `${p.inPerson === "pretty" ? "Pretty" : "Killer"} side only` : p.shared ? "Same on both sides" : v ? v.label.split(" · ")[0] : ""],
     ["Type", p.bundle ? "Bundle" : p.digital ? "Digital download" : "Physical item"],
     ["Price", money(p.price) + (p.bundle ? ` (save ${money(full - p.price)})` : "")],
-    ["How you get it", p.inPerson ? `Buy it at the merch stand at ${VENUE}` : p.digital ? "Pre-order now, get the link after the show" : `Pre-order now, pick it up at the merch stand at ${VENUE}`],
+    ["How you get it", p.inPerson ? `Buy it at the merch stand at ${VENUE}` : p.digital ? "Pre-order now, get the link after the show" : "Pre-order now, shipped after the show"],
     ["Shows", SHOW_DATES]
   ].filter(f => f[1]);
   const details = `<div class="label">Details</div><dl class="facts">${facts.map(([k, val]) => `<dt>${k}</dt><dd>${esc(val)}</dd>`).join("")}</dl>`;
