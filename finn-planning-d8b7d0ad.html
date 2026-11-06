@@ -117,7 +117,7 @@ h2{margin:40px 0 6px;font:900 34px/1.1 var(--display)}
 .mq h3{margin:0;font:900 20px/1.1 "Bodoni Moda",Georgia,serif}
 .o-killer .mq h3{font:400 20px/1.1 "Anton",Impact,sans-serif;text-transform:uppercase;letter-spacing:.03em}
 .mq .o-sub{font:600 12px var(--mono);color:var(--o-acc);text-transform:uppercase;letter-spacing:.08em}
-.mq textarea{width:100%;min-height:76px;resize:vertical;background:transparent;color:var(--o-ink);border:1.5px solid var(--o-line);border-radius:var(--radius);padding:8px 10px;font:15px/1.4 var(--body)}
+.mq textarea{width:100%;min-height:140px;resize:vertical;background:transparent;color:var(--o-ink);border:1.5px solid var(--o-line);border-radius:var(--radius);padding:8px 10px;font:15px/1.4 var(--body)}
 .mq textarea:focus{outline:2px solid var(--o-acc);outline-offset:1px}
 .mq .ready{display:flex;align-items:center;gap:8px;font:600 13px var(--mono);cursor:pointer}
 .mq .ready input{width:20px;height:20px;accent-color:var(--o-acc)}
@@ -147,7 +147,7 @@ h2{margin:40px 0 6px;font:900 34px/1.1 var(--display)}
     <div class="songs" id="pbSongs"></div>
   </section>
   <section id="outfitView" hidden>
-    <p class="pb-sum">3 outfits for each side, one for each part of the show (and each part's outfit page in the photobook). Notes and ticks are saved on this device only.</p>
+    <p class="pb-sum">3 outfits for each side, one for each part of the show (and each part's outfit page in the photobook). Changes you type and ticks are saved on this device only.</p>
     <div id="outfitList"></div>
   </section>
   <section id="linksView" hidden>
@@ -293,19 +293,28 @@ const MANNEQUIN = `<svg viewBox="0 0 120 220" aria-hidden="true">
   <rect x="58" y="152" width="4" height="46" fill="var(--o-stand)"/>
   <path d="M60 198L34 214M60 198L86 214M60 198V214" stroke="var(--o-stand)" stroke-width="4" stroke-linecap="round"/>
 </svg>`;
+// what's planned so far (shows on every device; edits in the boxes are saved on that device)
+const OUTFIT_NOTES = {
+  "pretty:1":"Pink ruffle skirt\nWhite shirt\nPink corset\nShoes: Pretty shoes (don't have them yet)",
+  "pretty:2":"Pretty merch shirt (Good Morning Sun Tee)\nShoes: Pretty shoes (don't have them yet)",
+  "pretty:3":"Shoes: Pretty shoes (don't have them yet)",
+  "killer:1":"Black ruffle skirt\nShoes: Black boots",
+  "killer:2":"Killer merch shirt (Killer Glow Tee)\nShoes: Black boots",
+  "killer:3":"Shoes: Black boots"
+};
 const OUTFIT_SIDES = [ { key:"pretty", label:"Pretty side" }, { key:"killer", label:"Killer side" } ];
 function renderOutfits(){
   $("#outfitList").innerHTML = OUTFIT_SIDES.map(sd => `<div class="o-side o-${sd.key}"><h2>${sd.label}</h2><div class="mannequins">${[1, 2, 3].map(n => {
     const k = `${sd.key}:${n}`;
     return `<div class="mq${done["r:" + k] ? " done" : ""}">${MANNEQUIN}
       <h3>Outfit ${n}</h3><span class="o-sub">Part ${n}</span>
-      <textarea data-on="${k}" aria-label="${sd.label} outfit ${n}" placeholder="What's the outfit?">${esc(done["n:" + k] || "")}</textarea>
+      <textarea data-on="${k}" aria-label="${sd.label} outfit ${n}" placeholder="What's the outfit?">${esc(done["n:" + k] ?? OUTFIT_NOTES[k] ?? "")}</textarea>
       <label class="ready"><input type="checkbox" data-or="${k}" ${done["r:" + k] ? "checked" : ""}> Ready</label>
     </div>`; }).join("")}</div></div>`).join("");
 }
 document.addEventListener("input", e => {
   const t = e.target.closest("[data-on]"); if (!t) return;
-  t.value.trim() ? done["n:" + t.dataset.on] = t.value : delete done["n:" + t.dataset.on]; save();
+  t.value === (OUTFIT_NOTES[t.dataset.on] ?? "") ? delete done["n:" + t.dataset.on] : done["n:" + t.dataset.on] = t.value; save();
 });
 document.addEventListener("change", e => {
   const c = e.target.closest("[data-or]"); if (!c) return;
