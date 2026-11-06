@@ -154,7 +154,7 @@ const PRODUCTS = [
     make: [ { what:"Photobook", where:"Barnes & Noble Press · build a book", url:BN_PRESS } ],
     items: [
       { side:"both", name:"CD", note:"The album" },
-      { side:"both", name:"Photobook", note:"349 pages: a start page, then 3 parts, each an outfit page and 5 songs at 23 pages per song (see below)" },
+      { side:"both", name:"Photobook", note:"372 pages: a start page, then 3 parts, each an outfit page and 5 songs (part 2 has 6, with the Interlude) at 23 pages per song (see below)" },
       { side:"both", name:"Lenticular card" },
       { side:"both", name:"Charm" },
       { side:"both", name:"Photocards", qty:"2" },
@@ -202,8 +202,9 @@ const SHOP_ITEMS = [
 ];
 
 /* PHOTOBOOK (from "CD K-pop Final"): a start page, then 3 parts. Each part is an outfit page
-   and 5 songs, 23 pages per song. That's the 15 songs on that version's side of the tracklist
-   (part 1 = songs 1-5, part 2 = 6-10, part 3 = 11-15). Song names come from the tracklist. */
+   and its songs, 23 pages per song. That's the 15 songs on that version's side of the tracklist
+   plus the Interlude as song 8, so 16 songs (part 1 = songs 1-5, part 2 = 6-11, part 3 = 12-16).
+   Song names come from the tracklist; the Interlude is added here, not in the tracklist. */
 // the 23 pages of every song, in order, from the "CD K-pop Final" grid:
 // ○ = random, □ = related to the song, ♡ = something with the name
 const SONG_PAGES = ["Cover explanation", "Lyrics", "♡", "○", "○", "○",
@@ -215,7 +216,8 @@ const PHOTOBOOK = {
              { n:1, what:"cover explanation" }, { n:1, what:"lyrics" }, { n:1, what:"finale" }, { n:1, what:"backstory" } ],
   start: 1,          // start page
   parts: 3,
-  songsPerPart: 5,
+  songsPerPart: [5, 6, 5],
+  interludeAt: 7,    // the Interlude is song 8 (index 7) on both sides
   outfitPerPart: 1   // outfit page at the start of each part
 };
 let tracks = { pretty:[], killer:[] };
@@ -279,8 +281,8 @@ function render(){
 function renderPhotobook(){
   if (!PRODUCT.photobook) return;
   const P = PHOTOBOOK, per = P.perSong.reduce((a, x) => a + x.n, 0);
-  const songs = P.parts * P.songsPerPart, total = P.start + P.parts * (P.outfitPerPart + P.songsPerPart * per);
-  $("#pbSum").textContent = `${v === "killer" ? "Killer" : "Pretty"} ver.: ${P.start} start page + ${P.parts} parts × (${P.outfitPerPart} outfit page + ${P.songsPerPart} songs × ${per} pages) = ${total} pages.`;
+  const songs = P.songsPerPart.reduce((a, n) => a + n, 0), total = P.start + P.parts * P.outfitPerPart + songs * per;
+  $("#pbSum").textContent = `${v === "killer" ? "Killer" : "Pretty"} ver.: ${P.start} start page + ${P.parts} parts × ${P.outfitPerPart} outfit page + ${songs} songs (${P.songsPerPart.join(" + ")}) × ${per} pages = ${total} pages.`;
   $("#pbPages").innerHTML = P.perSong.map(x => `<span><b>${x.n}</b> ${esc(x.what)}</span>`).join("") + `<span>= ${per} pages per song</span>`
     + `<div style="flex-basis:100%"></div><div class="pgrid" aria-label="The 23 pages of a song, in order">${SONG_PAGES.map(t => `<span class="${t.length === 1 ? "sym" : ""}">${esc(t)}</span>`).join("")}</div>`
     + `<div class="legend" style="flex-basis:100%"><span><b>○</b> random</span><span><b>□</b> related to the song</span><span><b>♡</b> something with the name</span></div>`;
@@ -289,8 +291,9 @@ function renderPhotobook(){
   let html = row(`pb:${v}:start`, "★", "Start page", P.start, " extra");
   for (let part = 0; part < P.parts; part++){
     html += `<div class="part">Part ${part + 1}</div>` + row(`pb:${v}:outfit${part + 1}`, "+", "Outfit page", P.outfitPerPart, " extra");
-    for (let s = 0; s < P.songsPerPart; s++){
-      const i = part * P.songsPerPart + s, n = (tracks[v][i] || "").trim();
+    const first = P.songsPerPart.slice(0, part).reduce((a, n) => a + n, 0);
+    for (let s = 0; s < P.songsPerPart[part]; s++){
+      const i = first + s, n = (i === P.interludeAt ? "Interlude" : tracks[v][i < P.interludeAt ? i : i - 1] || "").trim();
       html += row(`pb:${v}:${i}`, String(i + 1).padStart(2, "0"), n ? esc(n) : "To be announced", per, n ? "" : " tba");
     }
   }
