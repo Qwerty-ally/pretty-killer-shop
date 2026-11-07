@@ -193,6 +193,7 @@ h2{margin:40px 0 6px;font:900 34px/1.1 var(--display)}
    make: where each part gets made (what, where, url), shown under "Where to make it".
    ===================================================================== */
 const BN_PRESS = "https://press.barnesandnoble.com/build-a-book/choose-book-type";   // Barnes & Noble Press: build a book
+const MERCH_SHIRT = "https://www.amazon.com/dp/B0D21PGT38?th=1&psc=1";   // the shirt both merch tees are printed on
 const PRODUCTS = [
   {
     id: "kpopcd",
@@ -237,8 +238,8 @@ const PRODUCTS = [
    under "Where to make it" on their own tabs. */
 const SHOP_ITEMS = [
   { id:"finnschoice", name:"Finn's Choice", price:"$115", note:"Bundle of the K-pop CD, Tour Book, Keychain and Trading Cards (see each item)" },
-  { id:"mtee", name:"Good Morning Sun Tee", price:"$20" },
-  { id:"ntee", name:"Killer Glow Tee", price:"$20" },
+  { id:"mtee", name:"Good Morning Sun Tee", price:"$20", buy:[ { what:"Shirt", url:MERCH_SHIRT } ], note:"1 more link to come" },
+  { id:"ntee", name:"Killer Glow Tee", price:"$20", buy:[ { what:"Shirt", url:MERCH_SHIRT } ], note:"1 more link to come" },
   { id:"book", name:"Pretty Killer Tour Book", price:"$45", buy:[ { what:"Tour Book", url:BN_PRESS } ] },
   { id:"kpopcd", name:"K-pop Style CD", price:"$45", buy:[ { what:"Photobook", url:BN_PRESS } ], note:"More links to come" },
   { id:"cd", name:"Standard CD", price:"$22" },
