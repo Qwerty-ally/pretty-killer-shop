@@ -354,6 +354,44 @@ footer{border-top:1px solid var(--line);padding-block:24px 40px;display:flex;jus
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
 }
+
+/* ============ FINN'S ROOM (pop-up on arrival) ============ */
+.room-pop{position:fixed;inset:0;z-index:65;background:rgba(20,8,16,.6);display:grid;place-items:center;padding:16px}
+.room-pop[hidden]{display:none}
+body.room-open{overflow:hidden}
+.room-box{position:relative;width:min(1120px,100%);max-height:calc(100dvh - 32px);overflow:auto;background:var(--surface);color:var(--ink);border-radius:var(--radius);box-shadow:0 30px 80px -20px rgba(0,0,0,.6);padding:18px 18px 16px;display:flex;flex-direction:column;gap:12px}
+[data-side="killer"] .room-box{border:1.5px solid var(--accent)}
+.room-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.room-head h2{margin:0;font:400 clamp(26px,5vw,40px)/1.05 var(--display)}
+[data-side="pretty"] .room-head h2{font-weight:900}
+[data-side="killer"] .room-head h2{text-transform:uppercase;letter-spacing:.03em}
+.room-head p{margin:4px 0 0;color:var(--muted);font-size:14px}
+.room-head .x{flex:none;color:var(--ink);font-size:22px;width:44px;height:44px}
+.room-scroll{overflow-x:auto;border-radius:calc(var(--radius) / 2);-webkit-overflow-scrolling:touch}
+.room-scroll svg{display:block;width:100%;min-width:700px;height:auto}
+.room-swipe{display:none;margin:0;font:600 12px var(--mono);color:var(--muted);text-transform:var(--label-case);letter-spacing:var(--label-track)}
+@media (max-width:760px){ .room-swipe{display:block} }
+.room-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.room-cap{margin:0;font:600 14px var(--mono);min-height:1.4em}
+.room-cap b{color:var(--accent)}
+.ri{cursor:pointer;transform-box:fill-box;transform-origin:center bottom;transition:transform .18s ease,filter .18s ease;outline:none}
+.ri:hover,.ri:focus-visible{transform:translateY(-4px) scale(1.04);filter:drop-shadow(0 0 7px var(--accent)) drop-shadow(0 0 2px var(--accent))}
+.room-pop{--rm-wall:#fde4ee;--rm-wall2:#fbd6e5;--rm-floor:#e9bf9c;--rm-plank:#d6a47f;--rm-wood:#fffafc;--rm-edge:#d99ab8;--rm-sky:#bfe6ff;--rm-cur:#f7a8cc;--rm-metal:#d99ab8;--rm-frame:#f7b8d4;--rm-sheet:#ffffff;--rm-blanket:#f25fc4;--rm-blanket2:#f7a8cc;--rm-pillow:#fffafc;--rm-rug:#f7b8d4;--rm-shade:#fff1c4;--rm-gift:#161015;--rm-ribbon:#f25fc4;--rm-kpop:#f25fc4;--rm-leaf:#7cbf8c;--rm-glow:rgba(255,236,170,.55)}
+[data-side="killer"] .room-pop{--rm-wall:#17131b;--rm-wall2:#1c1721;--rm-floor:#211c25;--rm-plank:#2e2833;--rm-wood:#2a2530;--rm-edge:#ff3fae;--rm-sky:#0b0920;--rm-cur:#3b1430;--rm-metal:#55505c;--rm-frame:#0b0a0c;--rm-sheet:#3b3442;--rm-blanket:#0b0a0c;--rm-blanket2:#2a2530;--rm-pillow:#3b3442;--rm-rug:#2a0f22;--rm-shade:#ff3fae;--rm-gift:#ff3fae;--rm-ribbon:#0b0a0c;--rm-kpop:#0b0a0c;--rm-leaf:#3f6b4b;--rm-glow:rgba(255,63,174,.28)}
+.room-pop .rw{fill:var(--rm-wall)} .room-pop .rw2{fill:var(--rm-wall2)}
+.room-pop .rfl{fill:var(--rm-floor)} .room-pop .rpl{stroke:var(--rm-plank);stroke-width:2;fill:none}
+.room-pop .rwd{fill:var(--rm-wood);stroke:var(--rm-edge);stroke-width:2.5}
+.room-pop .rsky{fill:var(--rm-sky)} .room-pop .rcur{fill:var(--rm-cur);stroke:var(--rm-edge);stroke-width:2}
+.room-pop .rmt{fill:var(--rm-metal)} .room-pop .rfr{fill:var(--rm-frame);stroke:var(--rm-edge);stroke-width:2.5}
+.room-pop .rsh{fill:var(--rm-sheet);stroke:var(--rm-edge);stroke-width:2} .room-pop .rbl{fill:var(--rm-blanket);stroke:var(--rm-edge);stroke-width:2}
+.room-pop .rbl2{fill:var(--rm-blanket2)} .room-pop .rpw{fill:var(--rm-pillow);stroke:var(--rm-edge);stroke-width:2}
+.room-pop .rrug{fill:var(--rm-rug)} .room-pop .rshd{fill:var(--rm-shade);stroke:var(--rm-edge);stroke-width:2}
+.room-pop .rgift{fill:var(--rm-gift);stroke:var(--rm-edge);stroke-width:2} .room-pop .rrib{fill:var(--rm-ribbon)}
+.room-pop .rkp{fill:var(--rm-kpop);stroke:var(--rm-edge);stroke-width:2} .room-pop .rleaf{fill:var(--rm-leaf)}
+.room-pop .racc{fill:var(--accent)} .room-pop .rglow{fill:var(--rm-glow)}
+[data-side="pretty"] .rm-night,[data-side="killer"] .rm-day{display:none}
+[data-side="killer"] .rm-neon{filter:drop-shadow(0 0 4px #ff3fae) drop-shadow(0 0 10px #ff3fae)}
+.rm-twinkle{animation:twinkle 3s ease-in-out infinite}
 </style>
 </head>
 <body>
@@ -378,6 +416,7 @@ footer{border-top:1px solid var(--line);padding-block:24px 40px;display:flex;jus
 <main class="wrap">
   <div class="shop-head">
     <h2 id="shopTitle">The pretty drop</h2>
+    <button class="btn ghost room-again" type="button" id="openRoom">🛏 Visit Finn's room</button>
     <p id="shopNote"></p>
   </div>
   <div class="shop-tools">
@@ -401,6 +440,179 @@ footer{border-top:1px solid var(--line);padding-block:24px 40px;display:flex;jus
     <span>© 2026 Finn Shapiro · Pretty Killer Tour</span>
     <span class="testhint">Test mode: type <kbd>am</kbd> or <kbd>pm</kbd> to switch sides, <kbd>auto</kbd> to follow the clock</span>
   </footer>
+</div>
+
+<!-- Finn's room: pops up when you get to the shop; everything in it is merch -->
+<div class="room-pop" id="room" hidden role="dialog" aria-modal="true" aria-labelledby="roomTitle">
+  <div class="room-box">
+    <div class="room-head">
+      <div><h2 id="roomTitle">Welcome to Finn's room</h2><p id="roomSub">Everything in here is merch. Tap anything to see it in the shop.</p></div>
+      <button class="x" type="button" id="closeRoom" aria-label="Close Finn's room">×</button>
+    </div>
+    <p class="room-swipe">← Swipe to look around the room →</p>
+    <div class="room-scroll">
+      <svg viewBox="0 0 1000 600" role="group" aria-label="Finn's bedroom. Every item is a product you can tap.">
+        <defs>
+          <pattern id="rmStripe" width="40" height="40" patternUnits="userSpaceOnUse"><rect class="rw" width="40" height="40"/><rect class="rw2" width="20" height="40"/></pattern>
+          <radialGradient id="rmLamp"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+        </defs>
+        <!-- walls + floor -->
+        <rect width="1000" height="460" fill="url(#rmStripe)"/>
+        <rect y="455" width="1000" height="145" class="rfl"/>
+        <path class="rpl" d="M0 492H1000M0 534H1000M0 578H1000M120 455V492M380 455V492M660 455V492M900 455V492M60 492V534M300 492V534M560 492V534M820 492V534M180 534V578M450 534V578M720 534V578M960 534V578"/>
+        <rect y="448" width="1000" height="10" class="rwd"/>
+        <ellipse cx="590" cy="528" rx="250" ry="42" class="rrug"/>
+        <ellipse cx="590" cy="528" rx="220" ry="32" fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="6 6" opacity=".6"/>
+
+        <!-- window: sun in the morning, moon at night -->
+        <rect x="70" y="50" width="160" height="160" rx="6" class="rwd"/>
+        <rect x="80" y="60" width="140" height="140" class="rsky"/>
+        <g class="rm-day"><circle cx="118" cy="100" r="18" fill="#ffd76a"/><ellipse cx="172" cy="150" rx="26" ry="10" fill="#fff"/><ellipse cx="160" cy="142" rx="14" ry="10" fill="#fff"/></g>
+        <g class="rm-night"><circle cx="182" cy="96" r="17" fill="#f2ecf0"/><circle cx="191" cy="90" r="15" class="rsky"/><circle cx="105" cy="85" r="2" fill="#fff" class="rm-twinkle"/><circle cx="130" cy="160" r="1.6" fill="#fff"/><circle cx="200" cy="170" r="2" fill="#ff3fae" class="rm-twinkle"/><circle cx="95" cy="140" r="1.5" fill="#fff"/></g>
+        <path d="M150 60V200M80 130H220" stroke="var(--rm-wood)" stroke-width="6"/>
+        <path d="M54 44H246" stroke="var(--rm-metal)" stroke-width="5" stroke-linecap="round"/>
+        <path d="M60 44H102Q92 120 106 222H60Z" class="rcur"/>
+        <path d="M240 44H198Q208 120 194 222H240Z" class="rcur"/>
+
+        <!-- string lights (pretty) / neon sign (killer) -->
+        <g class="rm-day"><path d="M430 52Q510 82 590 56Q670 82 750 52" fill="none" stroke="#c98aa8" stroke-width="1.5"/>
+          <g fill="#ffe58a"><circle cx="450" cy="62" r="5" class="rm-twinkle" style="animation-delay:0.0s"/><circle cx="480" cy="70" r="5" class="rm-twinkle" style="animation-delay:0.4s"/><circle cx="510" cy="72" r="5" class="rm-twinkle" style="animation-delay:0.8s"/><circle cx="540" cy="68" r="5" class="rm-twinkle" style="animation-delay:1.2s"/><circle cx="570" cy="60" r="5" class="rm-twinkle" style="animation-delay:1.6s"/><circle cx="610" cy="62" r="5" class="rm-twinkle" style="animation-delay:2.0s"/><circle cx="640" cy="70" r="5" class="rm-twinkle" style="animation-delay:2.4s"/><circle cx="670" cy="72" r="5" class="rm-twinkle" style="animation-delay:2.8s"/><circle cx="700" cy="68" r="5" class="rm-twinkle" style="animation-delay:3.2s"/><circle cx="730" cy="60" r="5" class="rm-twinkle" style="animation-delay:3.6s"/></g></g>
+        <g class="rm-night rm-neon"><text x="590" y="100" text-anchor="middle" font-family="Anton,Impact,sans-serif" font-size="52" letter-spacing="4" fill="none" stroke="#ff3fae" stroke-width="2.5">KILLER</text></g>
+
+        <!-- clothes rack -->
+        <rect x="52" y="262" width="6" height="200" class="rmt"/><rect x="242" y="262" width="6" height="200" class="rmt"/>
+        <rect x="50" y="268" width="200" height="5" rx="2" class="rmt"/>
+        <path d="M38 464H72M228 464H262" stroke="var(--rm-metal)" stroke-width="6" stroke-linecap="round"/>
+        <g class="ri" data-room="mtee">
+          <path d="M105 290V281Q105 270 111 270Q117 270 117 276M75 300L105 289L135 300" fill="none" stroke="#9a92a3" stroke-width="2.5" stroke-linecap="round"/><path d="M87 296Q105 303 123 296L141 310L133 327L126 321L126 382L84 382L84 321L77 327L69 310Z" fill="#ffffff" stroke="#e3a9c4" stroke-width="2" stroke-linejoin="round"/>
+          <circle cx="105" cy="338" r="10" fill="#ffd76a"/><path d="M105 322V318M105 358V354M89 338H85M125 338H121M94 327L91 324M116 349L119 352M116 327L119 324M94 349L91 352" stroke="#ffc23d" stroke-width="2" stroke-linecap="round"/>
+          <text x="105" y="372" text-anchor="middle" font-family="Karla,sans-serif" font-weight="800" font-size="6.5" fill="#161015">GOOD MORNING</text>
+        </g>
+        <g class="ri" data-room="ntee">
+          <path d="M195 290V281Q195 270 201 270Q207 270 207 276M165 300L195 289L225 300" fill="none" stroke="#9a92a3" stroke-width="2.5" stroke-linecap="round"/><path d="M177 296Q195 303 213 296L231 310L223 327L216 321L216 382L174 382L174 321L167 327L159 310Z" fill="#0b0a0c" stroke="#3a3340" stroke-width="2" stroke-linejoin="round"/>
+          <text x="195" y="352" text-anchor="middle" font-family="Anton,Impact,sans-serif" font-size="14" letter-spacing=".5" fill="#ff3fae" style="filter:drop-shadow(0 0 3px #ff3fae)">KILLER</text>
+        </g>
+        <g class="ri" data-room="hat">
+          <path d="M226 258Q229 234 245 232Q261 234 264 258Z" fill="#0b0a0c" stroke="#ff3fae" stroke-width="1.8"/>
+          <path d="M228 251H262" stroke="#ff3fae" stroke-width="4"/>
+          <path d="M214 258Q245 272 276 258Q245 250 214 258Z" fill="#161015" stroke="#ff3fae" stroke-width="1.8"/>
+          <path d="M216 260Q245 270 274 260" fill="none" stroke="#f7b8d4" stroke-width="1.5" stroke-dasharray="3 2"/>
+        </g>
+
+        <!-- poster + sticker sheet on the wall -->
+        <g class="ri" data-room="poster" transform="rotate(-3 336 122)">
+          <rect x="290" y="58" width="92" height="128" fill="#f7b8d4" stroke="#161015" stroke-width="2"/>
+          <rect x="290" y="122" width="92" height="64" fill="#0b0a0c"/>
+          <text x="336" y="104" text-anchor="middle" font-family="Bodoni Moda,Georgia,serif" font-weight="900" font-size="20" fill="#161015">pretty</text>
+          <text x="336" y="162" text-anchor="middle" font-family="Anton,Impact,sans-serif" font-size="21" letter-spacing="1" fill="#ff3fae">KILLER</text>
+          <text x="336" y="178" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="6" fill="#cfcbd3">TOUR 2027</text>
+          <rect x="280" y="52" width="24" height="9" fill="rgba(255,255,255,.7)" transform="rotate(-30 292 56)"/><rect x="368" y="52" width="24" height="9" fill="rgba(255,255,255,.7)" transform="rotate(30 380 56)"/>
+        </g>
+        <g class="ri" data-room="stickers" transform="translate(4 22) rotate(3 332 258)">
+          <rect x="292" y="212" width="82" height="92" rx="5" fill="#ffffff" stroke="#c98aa8" stroke-width="2"/>
+          <circle cx="313" cy="236" r="11" fill="#f25fc4"/><text x="313" y="240" text-anchor="middle" font-family="Bodoni Moda,Georgia,serif" font-weight="900" font-size="10" fill="#fff">p</text>
+          <text x="352" y="246" text-anchor="middle" font-size="26" fill="#161015">★</text>
+          <text x="313" y="290" text-anchor="middle" font-size="26" fill="#ff3fae">♥</text>
+          <circle cx="352" cy="279" r="12" fill="#161015"/><text x="352" y="283" text-anchor="middle" font-family="Anton,Impact,sans-serif" font-size="10" fill="#ff3fae">PK</text>
+        </g>
+
+        <!-- shelf above the bed -->
+        <rect x="440" y="198" width="300" height="9" rx="2" class="rwd"/>
+        <path d="M470 207L470 222L486 207ZM710 207L710 222L694 207Z" class="rwd"/>
+        <g class="ri" data-room="kpopcd">
+          <rect x="499" y="108" width="17" height="24" rx="2" fill="#ffffff" stroke="#c98aa8" stroke-width="1.5" transform="rotate(10 507 120)"/>
+          <rect x="456" y="118" width="62" height="80" rx="3" class="rkp"/>
+          <rect x="463" y="126" width="48" height="48" rx="2" fill="#f7b8d4"/>
+          <text x="487" y="158" text-anchor="middle" font-family="Anton,Impact,sans-serif" font-size="20" fill="#161015">PK</text>
+          <text x="487" y="189" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="7" fill="#fff">K-POP CD</text>
+        </g>
+        <g class="ri" data-room="cd">
+          <rect x="530" y="146" width="54" height="52" rx="2" fill="rgba(255,255,255,.35)" stroke="#c9c2d0" stroke-width="2"/>
+          <circle cx="561" cy="172" r="20" fill="#e9e4ee" stroke="#c9c2d0" stroke-width="1.5"/><circle cx="561" cy="172" r="12" fill="none" stroke="var(--accent)" stroke-width="3" opacity=".7"/><circle cx="561" cy="172" r="4" fill="#9a92a3"/>
+          <rect x="530" y="146" width="7" height="52" fill="var(--accent)"/>
+        </g>
+        <g class="ri" data-room="book">
+          <rect x="598" y="116" width="58" height="82" rx="2" fill="#161015" stroke="#c9c2d0" stroke-width="1.5"/>
+          <rect x="598" y="116" width="8" height="82" fill="#f25fc4"/>
+          <text x="631" y="146" text-anchor="middle" font-family="Anton,Impact,sans-serif" font-size="12" letter-spacing=".5" fill="#ff3fae">TOUR</text>
+          <text x="631" y="161" text-anchor="middle" font-family="Anton,Impact,sans-serif" font-size="12" letter-spacing=".5" fill="#ff3fae">BOOK</text>
+          <text x="631" y="186" text-anchor="middle" font-family="Bodoni Moda,Georgia,serif" font-weight="900" font-size="9" fill="#f7b8d4">pretty killer</text>
+        </g>
+        <rect x="682" y="176" width="30" height="22" rx="3" class="rwd"/>
+        <path d="M697 176Q680 150 688 136Q699 152 697 176Q700 146 714 140Q716 160 697 176Z" class="rleaf"/>
+
+        <!-- TV on the wall: the movie -->
+        <g class="ri" data-room="movie">
+          <rect x="812" y="58" width="172" height="112" rx="7" fill="#0b0a0c" stroke="#3a3340" stroke-width="2"/>
+          <rect x="821" y="66" width="154" height="94" rx="3" fill="#2a1424"/>
+          <path d="M821 66H975V100Q900 92 821 112Z" fill="#f25fc4" opacity=".35"/>
+          <text x="898" y="106" text-anchor="middle" font-family="Bodoni Moda,Georgia,serif" font-weight="900" font-size="17" fill="#fff">pretty killer</text>
+          <text x="898" y="124" text-anchor="middle" font-family="Anton,Impact,sans-serif" font-size="11" letter-spacing="2" fill="#ff3fae">THE MOVIE</text>
+          <circle cx="898" cy="143" r="9" fill="#fff" opacity=".9"/><path d="M895 138L903 143L895 148Z" fill="#161015"/>
+          <path d="M890 170V182M906 170V182M878 183H918" stroke="#3a3340" stroke-width="3" stroke-linecap="round"/>
+        </g>
+
+        <!-- bed -->
+        <path d="M398 362V272Q398 240 430 240H750Q782 240 782 272V362Z" class="rfr"/>
+        <g fill="var(--rm-edge)" opacity=".5"><circle cx="450" cy="268" r="2.5"/><circle cx="500" cy="268" r="2.5"/><circle cx="550" cy="268" r="2.5"/><circle cx="600" cy="268" r="2.5"/><circle cx="650" cy="268" r="2.5"/><circle cx="700" cy="268" r="2.5"/><circle cx="750" cy="268" r="2.5"/><circle cx="450" cy="300" r="2.5"/><circle cx="500" cy="300" r="2.5"/><circle cx="550" cy="300" r="2.5"/><circle cx="600" cy="300" r="2.5"/><circle cx="650" cy="300" r="2.5"/><circle cx="700" cy="300" r="2.5"/><circle cx="750" cy="300" r="2.5"/></g>
+        <rect x="384" y="344" width="412" height="30" rx="9" class="rsh"/>
+        <path d="M384 360H796V420Q796 433 783 433H397Q384 433 384 420Z" class="rbl"/>
+        <rect x="386" y="361" width="408" height="15" class="rbl2"/>
+        <path d="M420 392Q470 404 520 392M600 400Q660 412 720 398" fill="none" stroke="var(--rm-edge)" stroke-width="1.5" opacity=".5"/>
+        <rect x="394" y="432" width="13" height="30" rx="2" class="rwd"/><rect x="773" y="432" width="13" height="30" rx="2" class="rwd"/>
+        <rect x="408" y="300" width="96" height="50" rx="22" class="rpw"/>
+        <rect x="496" y="306" width="84" height="44" rx="20" class="rpw"/>
+        <g class="ri" data-room="videopack">
+          <rect x="540" y="290" width="34" height="60" rx="6" fill="#161015" stroke="#c9c2d0" stroke-width="2" transform="rotate(-12 557 320)"/>
+          <rect x="545" y="297" width="24" height="44" rx="2" fill="#f25fc4" transform="rotate(-12 557 320)"/>
+          <path d="M552 312L564 319L552 326Z" fill="#fff" transform="rotate(-12 557 320)"/>
+        </g>
+        <g class="ri" data-room="finnschoice">
+          <rect x="604" y="318" width="64" height="44" rx="2" class="rgift"/>
+          <rect x="598" y="306" width="76" height="15" rx="2" class="rgift"/>
+          <rect x="631" y="306" width="10" height="56" class="rrib"/>
+          <path d="M636 306Q616 284 612 300Q616 310 636 306Q656 284 660 300Q656 310 636 306Z" class="rrib" stroke="var(--rm-edge)" stroke-width="1.5"/>
+          <rect x="648" y="330" width="22" height="13" rx="2" fill="#fff" transform="rotate(8 659 336)"/>
+          <text x="659" y="340" text-anchor="middle" font-family="Yellowtail,cursive" font-size="8" fill="#161015" transform="rotate(8 659 336)">Finn</text>
+        </g>
+        <g class="ri" data-room="digital">
+          <rect x="692" y="298" width="86" height="54" rx="4" fill="#161015" stroke="#c9c2d0" stroke-width="3"/>
+          <text x="718" y="334" text-anchor="middle" font-size="24" fill="var(--accent)">♪</text>
+          <text x="752" y="326" text-anchor="middle" font-family="Anton,Impact,sans-serif" font-size="12" fill="#fff">PK</text>
+          <rect x="702" y="341" width="66" height="3" rx="1.5" fill="#4a4450"/><rect x="702" y="341" width="30" height="3" rx="1.5" fill="var(--accent)"/>
+          <path d="M682 362H788L780 352H690Z" fill="#c9c2d0"/>
+        </g>
+
+        <!-- nightstand, lamp, cards, keychain -->
+        <ellipse cx="846" cy="300" rx="70" ry="60" fill="url(#rmLamp)" class="rm-night" opacity=".25"/>
+        <ellipse cx="846" cy="300" rx="70" ry="60" class="rglow"/>
+        <rect x="806" y="358" width="128" height="10" rx="2" class="rwd"/>
+        <rect x="814" y="368" width="112" height="90" class="rwd"/>
+        <rect x="824" y="380" width="92" height="34" rx="3" class="rwd"/>
+        <path d="M820 458V468M920 458V468" stroke="var(--rm-edge)" stroke-width="4"/>
+        <ellipse cx="846" cy="356" rx="16" ry="4" class="rmt"/>
+        <rect x="844" y="302" width="4" height="54" class="rmt"/>
+        <path d="M820 302H872L862 270H830Z" class="rshd"/>
+        <g class="ri" data-room="cards">
+          <rect x="878" y="322" width="24" height="34" rx="3" fill="#161015" stroke="#ff3fae" stroke-width="1.5" transform="rotate(-14 890 356)"/>
+          <rect x="888" y="320" width="24" height="34" rx="3" fill="#f7b8d4" stroke="#161015" stroke-width="1.5"/>
+          <rect x="898" y="322" width="24" height="34" rx="3" fill="#ffffff" stroke="#f25fc4" stroke-width="1.5" transform="rotate(14 910 356)"/>
+          <text x="910" y="345" text-anchor="middle" font-family="Bodoni Moda,Georgia,serif" font-weight="900" font-size="15" fill="#f25fc4" transform="rotate(14 910 356)">?</text>
+        </g>
+        <g class="ri" data-room="keychain">
+          <circle cx="870" cy="397" r="4.5" fill="#c9c2d0"/>
+          <path d="M870 401V410" stroke="#c9c2d0" stroke-width="2"/>
+          <circle cx="870" cy="414" r="5" fill="none" stroke="#c9c2d0" stroke-width="2"/>
+          <rect x="856" y="420" width="28" height="30" rx="3" fill="#161015" stroke="#ff3fae" stroke-width="1.5"/>
+          <circle cx="870" cy="436" r="10" fill="#e9e4ee"/><circle cx="870" cy="436" r="6" fill="none" stroke="var(--accent)" stroke-width="2.5"/><circle cx="870" cy="436" r="2" fill="#161015"/>
+        </g>
+      </svg>
+    </div>
+    <div class="room-foot">
+      <p class="room-cap" id="roomCap" aria-live="polite">Tap anything in the room to shop it.</p>
+      <button class="btn" type="button" id="roomShop">Shop everything</button>
+    </div>
+  </div>
 </div>
 
 <!-- Cart drawer -->
@@ -1260,6 +1472,44 @@ document.addEventListener("keydown", e => {
   else if (typed.endsWith("auto")){ set(null); typed=""; setSide(clockSide(), false); toast("Following the clock again"); }
 });
 
+/* ---------- Finn's room: pops up on arrival; every item in it opens its product page ---------- */
+const room = $("#room");
+function openRoom(){
+  $("#roomTitle").textContent = side === "pretty" ? "Welcome to Finn's room" : "Finn's room, after dark";
+  $("#roomCap").textContent = "Tap anything in the room to shop it.";
+  room.querySelectorAll(".ri").forEach(g => {
+    const p = product(g.dataset.room);
+    g.setAttribute("tabindex", "0"); g.setAttribute("role", "link");
+    g.setAttribute("aria-label", `${p.name}, ${money(p.price)}`);
+  });
+  room.hidden = false; document.body.classList.add("room-open");
+  $("#closeRoom").focus();
+}
+function closeRoom(){ room.hidden = true; document.body.classList.remove("room-open"); }
+function roomGo(g){
+  closeRoom();
+  fromShop = true; shopScroll = 0;
+  location.hash = "item-" + g.dataset.room;
+}
+function roomCaption(g){
+  const p = product(g.dataset.room);
+  $("#roomCap").innerHTML = `<b>${esc(p.name)}</b> · ${money(p.price)}${p.inPerson ? " · at the merch stand" : ""} · tap to see it`;
+}
+room.addEventListener("click", e => {
+  const g = e.target.closest(".ri"); if (g) return roomGo(g);
+  if (e.target === room) closeRoom();
+});
+room.addEventListener("mouseover", e => { const g = e.target.closest(".ri"); if (g) roomCaption(g); });
+room.addEventListener("focusin", e => { const g = e.target.closest(".ri"); if (g) roomCaption(g); });
+room.addEventListener("keydown", e => {
+  const g = e.target.closest(".ri");
+  if (g && (e.key === "Enter" || e.key === " ")){ e.preventDefault(); roomGo(g); }
+  if (e.key === "Escape"){ e.stopPropagation(); closeRoom(); }
+});
+$("#closeRoom").addEventListener("click", closeRoom);
+$("#roomShop").addEventListener("click", closeRoom);
+$("#openRoom").addEventListener("click", openRoom);
+
 /* ---------- helpers + boot ---------- */
 function $(s){ return document.querySelector(s); }
 let toastTimer;
@@ -1298,9 +1548,12 @@ function openProductLink(){
 (function boot(){
   setSide(override || clockSide(), false);
   tickClock(); setInterval(tickClock, 30000);
+  // the room greets you, except when you came back from checkout or followed a product link
+  const showRoom = !new URLSearchParams(location.search).has("paid") && !/^#(item|p)-/.test(location.hash);
   handleStripeReturn();
   openProductLink();
   itemSide(openItem()); renderDetail();
+  if (showRoom) openRoom();
 })();
 </script>
 </body>
