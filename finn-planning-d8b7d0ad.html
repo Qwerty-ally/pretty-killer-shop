@@ -145,6 +145,7 @@ h2{margin:40px 0 6px;font:900 34px/1.1 var(--display)}
 .lm-empty{margin:0;color:var(--muted);font-size:14px}
 @media (max-width:640px){ .mannequins{grid-template-columns:1fr 1fr} }
 @media (max-width:400px){ .mannequins{grid-template-columns:1fr} }
+.full-url{flex-basis:100%;font:12px var(--mono);color:var(--muted);overflow-wrap:anywhere;margin:-2px 0 6px}
 </style>
 </head>
 <body>
@@ -236,23 +237,25 @@ const PRODUCTS = [
    pages: the item's own pages (the digital items: where buyers watch, listen and download).
    An item with no links says "No link yet". The Tour Book and K-pop CD links also show
    under "Where to make it" on their own tabs. */
+const CUSTOM_CD = "https://intheclouds.io/products/custom-cds";
 const SHOP_ITEMS = [
-  { id:"finnschoice", name:"Finn's Choice", price:"$115", note:"Bundle of the K-pop CD, Tour Book, Keychain and Trading Cards (see each item)" },
+  { id:"finnschoice", name:"Finn's Choice", price:"$115", note:"Bundle of the K-pop CD, Tour Book, Keychain and Trading Cards", self:"Uses the links of each item inside" },
   { id:"mtee", name:"Good Morning Sun Tee", price:"$20", buy:[ { what:"Shirt", url:MERCH_SHIRT }, { what:"UV color-changing iron-on vinyl", url:"https://www.amazon.com/dp/B0BTZWYD2N?th=1" } ] },
   { id:"ntee", name:"Killer Glow Tee", price:"$20", buy:[ { what:"Shirt", url:MERCH_SHIRT }, { what:"Glow-in-the-dark iron-on vinyl", url:"https://www.amazon.com/dp/B08315V61J?psc=1" } ] },
   { id:"book", name:"Pretty Killer Tour Book", price:"$45", buy:[ { what:"Tour Book", url:BN_PRESS } ] },
-  { id:"kpopcd", name:"K-pop Style CD", price:"$45", buy:[ { what:"Photobook", url:BN_PRESS } ], note:"More links to come" },
-  { id:"cd", name:"Standard CD", price:"$22" },
+  { id:"kpopcd", name:"K-pop Style CD", price:"$45", buy:[ { what:"CD", url:CUSTOM_CD }, { what:"Photobook", url:BN_PRESS } ], note:"Still need links: lenticular card, charm, photocards, stickers, Pokémon-style card, scratch-off" },
+  { id:"cd", name:"Standard CD", price:"$22", buy:[ { what:"Custom CD", url:CUSTOM_CD } ] },
   { id:"keychain", name:"Mini CD Keychain", price:"$15", buy:[ { what:"Custom changeable CD keychain", url:"https://vograce.com/products/custom-changeable-cd-keychains?variant=44470727573733" } ] },
   { id:"stickers", name:"Sticker Pack", price:"$8", buy:[ { what:"Custom sticker sheet (4×6)", url:"https://www.etsy.com/listing/4513022212/custom-sticker-sheet-4x6-personalized" } ] },
-  { id:"cards", name:"Mystery Trading Cards", price:"$10" },
-  { id:"poster", name:"Tour Poster", price:"$5" },
-  { id:"hat", name:"Reversible Bucket Hat", price:"$30" },
+  { id:"cards", name:"Mystery Trading Cards", price:"$10", buy:[ { what:"Custom booster pack", url:"https://www.etsy.com/listing/4386632422/custom-booster-pack-for-card-games-full" } ] },
+  { id:"poster", name:"Tour Poster", price:"$5", self:"No link needed, Finn prints it" },
+  { id:"hat", name:"Reversible Bucket Hat", price:"$30", buy:[ { what:"All-over print reversible bucket hat", url:"https://www.printful.com/custom/hats/bucket-hats/all-over-print-reversible-bucket-hat" } ] },
   { id:"digital", name:"Digital Album", price:"$10", pages:[ { label:"Pretty ver. page", url:"digital-album-pretty-07750074.html", cls:"p" }, { label:"Killer ver. page", url:"digital-album-killer-ea4f65f1.html", cls:"k" } ] },
   { id:"videopack", name:"Video Pack", price:"$5", pages:[ { label:"Pretty ver. page", url:"video-pack-pretty-1d64d3bb.html", cls:"p" }, { label:"Killer ver. page", url:"video-pack-killer-fc1055f4.html", cls:"k" } ] },
   { id:"movie", name:"Pretty Killer: The Movie", price:"$15", note:"Coming soon (comes out after the concert)", pages:[ { label:"Its page", url:"movie-896dba76.html" } ] },
   // not sold in the shop: things Finn needs a link for
-  { id:"ducttape", name:"Pretty Killer Duct Tape", price:"Not in the shop", note:"For Finn only, not sold in the shop" }
+  { id:"ducttape", name:"Pretty Killer Duct Tape", price:"Not in the shop", note:"For Finn only, not sold in the shop", buy:[ { what:"Custom printed tape (100 ft)", url:"https://www.etsy.com/listing/1065927294/custom-packaging-tape-100ft-printed?variation0=2202874368&variation1=6591996169" } ] },
+  { id:"nails", name:"Nails", price:"Not in the shop", note:"For Finn to wear, not sold in the shop", buy:[ { what:"Pretty nails (pink cat-eye)", url:"https://www.amazon.com/dp/B0G43MHCQP?th=1" }, { what:"Killer nails (black stiletto)", url:"https://www.amazon.com/dp/B09ZTXD54M?psc=1" } ] }
 ];
 
 /* PHOTOBOOK (from "CD K-pop Final"): a start page, then 3 parts. Each part is an outfit page
@@ -450,9 +453,9 @@ function renderLinks(){
   const host = u => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch(e){ return ""; } };
   $("#linkList").innerHTML = SHOP_ITEMS.map(it => `<div class="link"><h3>${esc(it.name)}</h3><span class="qty">${esc(it.price)}</span>
       ${it.note ? `<p style="grid-column:1/-1;margin:0;color:var(--muted);font-size:14px">${esc(it.note)}</p>` : ""}
-      <div class="sub">${(it.pages || []).map(pg => `<a class="${pg.cls || ""}" href="${esc(pg.url)}" target="_blank" rel="noopener">${esc(pg.label)} ↗</a><button type="button" data-copy="${esc(new URL(pg.url, location.href).href)}">Copy</button>`).join("")}${(it.buy || []).length
+      <div class="sub">${(it.pages || []).map(pg => { const full = new URL(pg.url, location.href).href; return `<a class="${pg.cls || ""}" href="${esc(full)}" target="_blank" rel="noopener">${esc(pg.label)} ↗</a><button type="button" data-copy="${esc(full)}">Copy</button><span class="full-url">${esc(full)}</span>`; }).join("")}${(it.buy || []).length
         ? it.buy.map(b => `<a href="${esc(b.url)}" target="_blank" rel="noopener">${esc(b.what)} · ${esc(host(b.url))} ↗</a><button type="button" data-copy="${esc(b.url)}">Copy</button>`).join("")
-        : (it.pages || []).length ? "" : `<span style="color:var(--muted);font:600 13px var(--mono)">No link yet</span>`}</div></div>`).join("");
+        : (it.pages || []).length ? "" : `<span style="color:var(--muted);font:600 13px var(--mono)">${esc(it.self || "No link yet")}</span>`}</div></div>`).join("");
 }
 
 function render(){
