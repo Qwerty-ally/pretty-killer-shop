@@ -146,6 +146,10 @@ h2{margin:40px 0 6px;font:900 34px/1.1 var(--display)}
 @media (max-width:640px){ .mannequins{grid-template-columns:1fr 1fr} }
 @media (max-width:400px){ .mannequins{grid-template-columns:1fr} }
 .full-url{flex-basis:100%;font:12px var(--mono);color:var(--muted);overflow-wrap:anywhere;margin:-2px 0 6px}
+.ord{grid-column:1/-1;display:flex;align-items:center;gap:8px;font:600 13px var(--mono);cursor:pointer;width:max-content}
+.ord input{width:20px;height:20px;accent-color:var(--accent)}
+.link.is-ordered .ord{color:var(--accent)}
+.ord-count{margin:0 0 4px;font:600 13px var(--mono);color:var(--muted)}
 </style>
 </head>
 <body>
@@ -449,9 +453,20 @@ document.addEventListener("change", e => {
   const l = lists.find(x => x.id === c.closest("[data-list]").dataset.list); if (!l) return;
   l.items[+c.dataset.lmTick].done = c.checked; saveLists(); renderLists();
 });
+// "Ordered for photos" ticks on the Shop Links tab, saved on this device
+let ordered = {};
+try { ordered = JSON.parse(localStorage.getItem("pk-ordered")) || {}; } catch(e){}
+document.addEventListener("change", e => {
+  const c = e.target.closest("[data-ordered]"); if (!c) return;
+  if (c.checked) ordered[c.dataset.ordered] = true; else delete ordered[c.dataset.ordered];
+  try { localStorage.setItem("pk-ordered", JSON.stringify(ordered)); } catch(err){}
+  renderLinks();
+});
 function renderLinks(){
   const host = u => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch(e){ return ""; } };
-  $("#linkList").innerHTML = SHOP_ITEMS.map(it => `<div class="link"><h3>${esc(it.name)}</h3><span class="qty">${esc(it.price)}</span>
+  const n = SHOP_ITEMS.filter(it => ordered[it.id]).length;
+  $("#linkList").innerHTML = `<p class="ord-count">${n} of ${SHOP_ITEMS.length} ordered for photos</p>` + SHOP_ITEMS.map(it => `<div class="link${ordered[it.id] ? " is-ordered" : ""}"><h3>${esc(it.name)}</h3><span class="qty">${esc(it.price)}</span>
+      <label class="ord"><input type="checkbox" data-ordered="${it.id}" ${ordered[it.id] ? "checked" : ""}> Ordered for photos</label>
       ${it.note ? `<p style="grid-column:1/-1;margin:0;color:var(--muted);font-size:14px">${esc(it.note)}</p>` : ""}
       <div class="sub">${(it.pages || []).map(pg => { const full = new URL(pg.url, location.href).href; return `<a class="${pg.cls || ""}" href="${esc(full)}" target="_blank" rel="noopener">${esc(pg.label)} ↗</a><button type="button" data-copy="${esc(full)}">Copy</button><span class="full-url">${esc(full)}</span>`; }).join("")}${(it.buy || []).length
         ? it.buy.map(b => `<a href="${esc(b.url)}" target="_blank" rel="noopener">${esc(b.what)} · ${esc(host(b.url))} ↗</a><button type="button" data-copy="${esc(b.url)}">Copy</button>`).join("")
