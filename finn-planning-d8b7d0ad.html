@@ -143,6 +143,20 @@ h2{margin:40px 0 6px;font:900 34px/1.1 var(--display)}
 .lm-del{align-self:flex-start;background:none;border:0;padding:4px 0;font:600 12px var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);cursor:pointer;text-decoration:underline}
 .lm-del.sure{color:var(--accent)}
 .lm-empty{margin:0;color:var(--muted);font-size:14px}
+.lm-group{margin:10px 0 0;font:600 12px var(--mono);text-transform:uppercase;letter-spacing:.12em;color:var(--accent)}
+.lm-group.k{color:#ff3fae}
+.lm-items li{flex-wrap:wrap;row-gap:6px}
+.lm-items li > label{flex:1 1 60%;min-width:0}
+.lm-items li > :not(label):not(form){flex:none}
+.lm-items li > a.lm-go + select, .lm-items li > label + select{margin-left:auto}
+.lm-sel{flex:none;min-height:32px;padding:4px 6px;font:600 12px var(--mono);color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:var(--radius)}
+.lm-go{flex:none;font:600 12px var(--mono);text-transform:uppercase;color:var(--accent);text-decoration:none;white-space:nowrap}
+.lm-add input.lm-url{flex:.8}
+.lm-linkform{flex-basis:100%;display:flex;gap:8px;padding-left:30px}
+.lm-linkform input{flex:1;min-width:0;min-height:36px;padding:6px 10px;font:14px var(--body);color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:var(--radius)}
+@media (max-width:520px){ .lm-add{flex-wrap:wrap} .lm-add input{flex-basis:100%} }
+.o-from{margin:4px 0 0;padding:0;list-style:none;font-size:13px;color:var(--o-acc)}
+.o-from a{color:inherit}
 @media (max-width:640px){ .mannequins{grid-template-columns:1fr 1fr} }
 @media (max-width:400px){ .mannequins{grid-template-columns:1fr} }
 .full-url{flex-basis:100%;font:12px var(--mono);color:var(--muted);overflow-wrap:anywhere;margin:-2px 0 6px}
@@ -177,7 +191,7 @@ h2{margin:40px 0 6px;font:900 34px/1.1 var(--display)}
     <div id="outfitList"></div>
   </section>
   <section id="listsView" hidden>
-    <p class="pb-sum">Make a list: give it a title, then add items. Lists are saved on this device only.</p>
+    <p class="pb-sum">Make a list: give it a title, then add items. Pick an outfit next to an item to sort it into Pretty or Killer Outfit 1, 2 or 3, and tap 🔗 to add a link. Lists are saved on this device only.</p>
     <form class="lm-new" id="lmNew"><input id="lmTitle" maxlength="80" placeholder="List title" aria-label="List title" autocomplete="off"><button class="lm-btn" type="submit">New list</button></form>
     <div class="lm-lists" id="lmLists"></div>
   </section>
@@ -398,6 +412,7 @@ function renderOutfits(){
     return `<div class="mq${done["r:" + k] ? " done" : ""}">${mannequin(o, sd.key)}
       <h3>Outfit ${n}</h3><span class="o-sub">Part ${n}</span>
       <ul class="o-list">${o.list.map(t => `<li>${esc(t)}</li>`).join("")}</ul>
+      ${(() => { const mine = lists.flatMap(l => l.items.filter(it => it.o === k)); return mine.length ? `<ul class="o-from" aria-label="From your lists">${mine.map(it => `<li>+ ${it.url ? `<a href="${esc(it.url)}" target="_blank" rel="noopener">${esc(it.t)} ↗</a>` : esc(it.t)}</li>`).join("")}</ul>` : ""; })()}
       <label class="ready"><input type="checkbox" data-or="${k}" ${done["r:" + k] ? "checked" : ""}> Ready</label>
     </div>`; }).join("")}</div></div>`).join("");
 }
@@ -411,15 +426,35 @@ let lists = [];
 try { lists = JSON.parse(localStorage.getItem("pk-lists")) || []; } catch(e){}
 const saveLists = () => { try { localStorage.setItem("pk-lists", JSON.stringify(lists)); } catch(e){} };
 let sureDelete = null;   // the list whose Delete was tapped once
+let linkOpen = null;     // "listId:itemIndex" whose link box is open
+// each item can be sorted into an outfit (it.o = "pretty:1" ... "killer:3") and have a link (it.url)
+const OUTFIT_KEYS = ["pretty:1", "pretty:2", "pretty:3", "killer:1", "killer:2", "killer:3"];
+const outfitName = k => `${k.startsWith("killer") ? "Killer" : "Pretty"} · Outfit ${k.slice(-1)}`;
+const cleanUrl = u => { u = String(u || "").trim(); if (!u) return ""; if (!/^https?:\/\//i.test(u)) u = "https://" + u;
+  try { const x = new URL(u); return /^https?:$/.test(x.protocol) ? x.href : ""; } catch(e){ return ""; } };
+function itemRow(l, it, i){
+  const open = linkOpen === `${l.id}:${i}`;
+  return `<li class="${it.done ? "done" : ""}">
+    <label><input type="checkbox" data-lm-tick="${i}" ${it.done ? "checked" : ""}><span>${esc(it.t)}</span></label>
+    ${it.url ? `<a class="lm-go" href="${esc(it.url)}" target="_blank" rel="noopener">Link ↗</a>` : ""}
+    <select class="lm-sel" data-lm-outfit="${i}" aria-label="Outfit for ${esc(it.t)}">
+      <option value="">No outfit</option>${OUTFIT_KEYS.map(k => `<option value="${k}" ${it.o === k ? "selected" : ""}>${k.startsWith("killer") ? "Killer" : "Pretty"} outfit ${k.slice(-1)}</option>`).join("")}
+    </select>
+    <button class="lm-x" type="button" data-lm-link="${i}" aria-label="${it.url ? "Change" : "Add"} link for ${esc(it.t)}" aria-expanded="${open}">🔗</button>
+    <button class="lm-x" type="button" data-lm-rm="${i}" aria-label="Remove ${esc(it.t)}">×</button>
+    ${open ? `<form class="lm-linkform" data-lm-linkform="${i}"><input type="text" inputmode="url" value="${esc(it.url || "")}" placeholder="Paste a link" aria-label="Link for ${esc(it.t)}" autocomplete="off"><button class="lm-btn" type="submit">Save</button></form>` : ""}
+  </li>`;
+}
 function renderLists(focusId){
   $("#lmLists").innerHTML = lists.length ? lists.map(l => {
     const n = l.items.filter(i => i.done).length;
+    const rows = l.items.map((it, i) => ({ it, i }));
+    const groups = [...OUTFIT_KEYS, ""].map(k => ({ k, rows: rows.filter(r => (r.it.o || "") === k) })).filter(g => g.rows.length);
+    const sorted = groups.some(g => g.k);
     return `<div class="lm-card" data-list="${l.id}">
       <div class="lm-head"><h3>${esc(l.title)}</h3><span class="lm-count">${l.items.length ? `${n} of ${l.items.length} done` : "No items yet"}</span></div>
-      ${l.items.length ? `<ul class="lm-items">${l.items.map((it, i) => `<li class="${it.done ? "done" : ""}">
-        <label><input type="checkbox" data-lm-tick="${i}" ${it.done ? "checked" : ""}><span>${esc(it.t)}</span></label>
-        <button class="lm-x" type="button" data-lm-rm="${i}" aria-label="Remove ${esc(it.t)}">×</button></li>`).join("")}</ul>` : ""}
-      <form class="lm-add" data-lm-add><input maxlength="120" placeholder="Add an item" aria-label="Add an item to ${esc(l.title)}" autocomplete="off"><button class="lm-btn" type="submit">Add</button></form>
+      ${groups.map(g => `${sorted ? `<p class="lm-group${g.k.startsWith("killer") ? " k" : ""}">${g.k ? outfitName(g.k) : "Not sorted yet"}</p>` : ""}<ul class="lm-items">${g.rows.map(r => itemRow(l, r.it, r.i)).join("")}</ul>`).join("")}
+      <form class="lm-add" data-lm-add><input maxlength="120" placeholder="Add an item" aria-label="Add an item to ${esc(l.title)}" autocomplete="off"><input class="lm-url" type="text" inputmode="url" placeholder="Link (optional)" aria-label="Link for the new item" autocomplete="off"><button class="lm-btn" type="submit">Add</button></form>
       <button class="lm-del${sureDelete === l.id ? " sure" : ""}" type="button" data-lm-del>${sureDelete === l.id ? "Tap again to delete this list" : "Delete list"}</button>
     </div>`; }).join("") : `<p class="lm-empty">No lists yet. Type a title above and tap New list.</p>`;
   if (focusId){ const f = document.querySelector(`[data-list="${focusId}"] .lm-add input`); if (f) f.focus(); }
@@ -431,22 +466,47 @@ document.addEventListener("submit", e => {
     const l = { id: Date.now().toString(36), title: t, items: [] };
     lists.unshift(l); saveLists(); $("#lmTitle").value = ""; renderLists(l.id); return;
   }
+  const lf = e.target.closest("[data-lm-linkform]");
+  if (lf){
+    e.preventDefault();
+    const l = lists.find(x => x.id === lf.closest("[data-list]").dataset.list), it = l && l.items[+lf.dataset.lmLinkform];
+    if (!it) return;
+    const u = cleanUrl(lf.querySelector("input").value);
+    if (u) it.url = u; else delete it.url;
+    linkOpen = null; saveLists(); renderLists(); return;
+  }
   const add = e.target.closest("[data-lm-add]"); if (!add) return;
   e.preventDefault();
   const l = lists.find(x => x.id === add.closest("[data-list]").dataset.list), inp = add.querySelector("input"), t = inp.value.trim();
   if (!l || !t) return;
-  l.items.push({ t, done: false }); saveLists(); renderLists(l.id);
+  const it = { t, done: false }, u = cleanUrl(add.querySelector(".lm-url").value);
+  if (u) it.url = u;
+  l.items.push(it); saveLists(); renderLists(l.id);
 });
 document.addEventListener("click", e => {
   const card = e.target.closest("[data-list]"); if (!card) return;
   const l = lists.find(x => x.id === card.dataset.list); if (!l) return;
   const rm = e.target.closest("[data-lm-rm]");
-  if (rm){ l.items.splice(+rm.dataset.lmRm, 1); saveLists(); renderLists(); return; }
+  if (rm){ l.items.splice(+rm.dataset.lmRm, 1); linkOpen = null; saveLists(); renderLists(); return; }
+  const lk = e.target.closest("[data-lm-link]");
+  if (lk){
+    const id = `${l.id}:${lk.dataset.lmLink}`;
+    linkOpen = linkOpen === id ? null : id; renderLists();
+    const f = document.querySelector(`[data-list="${l.id}"] [data-lm-linkform] input`); if (f) f.focus();
+    return;
+  }
   if (e.target.closest("[data-lm-del]")){
     if (sureDelete === l.id){ lists = lists.filter(x => x !== l); sureDelete = null; saveLists(); }
     else sureDelete = l.id;
     renderLists();
   }
+});
+document.addEventListener("change", e => {
+  const s = e.target.closest("[data-lm-outfit]"); if (!s) return;
+  const l = lists.find(x => x.id === s.closest("[data-list]").dataset.list), it = l && l.items[+s.dataset.lmOutfit];
+  if (!it) return;
+  if (s.value) it.o = s.value; else delete it.o;
+  saveLists(); renderLists();
 });
 document.addEventListener("change", e => {
   const c = e.target.closest("[data-lm-tick]"); if (!c) return;
