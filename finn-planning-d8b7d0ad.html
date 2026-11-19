@@ -172,11 +172,69 @@ h2{margin:40px 0 6px;font:900 34px/1.1 var(--display)}
 .ord input{width:20px;height:20px;accent-color:var(--accent)}
 .link.is-ordered .ord{color:var(--accent)}
 .ord-count{margin:0 0 4px;font:600 13px var(--mono);color:var(--muted)}
+/* countdown bar (every tab) */
+.cd{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin:0 0 14px;padding:10px 14px;background:var(--surface);border-left:4px solid var(--accent);border-radius:var(--radius);box-shadow:var(--shadow);font:600 13px/1.4 var(--mono);color:var(--muted)}
+.cd b{color:var(--accent);font-size:18px}
+.cd-n{white-space:nowrap}
+/* side / show pickers on the new tabs */
+.x-sides{display:flex;gap:8px;margin:0 0 16px;flex-wrap:wrap}
+.tab[data-side-tab="killer"]{background:#0b0a0c;color:#ff3fae;border-color:#2c272f}
+.tab[data-side-tab="pretty"]{background:#fffafc;color:#161015;border-color:#e9b1c9}
+.x-card{background:var(--surface);padding:16px 18px;border-radius:var(--radius);box-shadow:var(--shadow);margin:0 0 14px;display:flex;flex-direction:column;gap:8px}
+.x-card h3{margin:0;font:900 22px/1.15 var(--display)}
+[data-side="killer"] .x-card h3{font-weight:400;text-transform:uppercase;letter-spacing:.03em}
+.x-next{margin:0 0 14px;font:600 14px var(--mono);color:var(--muted)}
+.x-next b{color:var(--accent)}
+.lm-items li.next > label span{color:var(--accent);font-weight:800}
+.lm-items li.next > label span::after{content:"  ← next";font:600 11px var(--mono);text-transform:uppercase;letter-spacing:.08em}
+.x-stats{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 16px}
+.x-stats span{font:600 13px var(--mono);background:var(--surface);padding:8px 12px;border-radius:var(--radius);box-shadow:var(--shadow)}
+.x-stats b{color:var(--accent);font-size:16px}
+/* setlist builder */
+.sl-change{margin:18px 0 8px;padding:8px 12px;font:600 12px/1.4 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--accent);border:1.5px dashed var(--accent);border-radius:var(--radius)}
+.sl-part{margin:6px 0 8px;font:900 26px/1.1 var(--display)}
+[data-side="killer"] .sl-part{font-weight:400;text-transform:uppercase}
+.sl-part small{font:600 12px var(--mono);color:var(--muted);text-transform:none;letter-spacing:0;margin-left:6px}
+.sl-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;min-height:44px}
+.sl-song{display:flex;align-items:center;gap:8px;background:var(--surface);padding:6px 8px 6px 14px;border-radius:var(--radius);box-shadow:var(--shadow);cursor:grab}
+.sl-song.dragging{opacity:.35}
+.sl-song.over{outline:2px solid var(--accent)}
+.sl-no{font:600 12px var(--mono);color:var(--muted);min-width:22px}
+.sl-nm{flex:1;min-width:0;font-weight:700;overflow-wrap:anywhere}
+.sl-song.inter .sl-nm{color:var(--accent);font-style:italic}
+.sl-empty{padding:12px;border:1.5px dashed var(--line);color:var(--muted);text-align:center;font-size:14px;border-radius:var(--radius)}
+/* budget */
+.bg-list{display:flex;flex-direction:column;gap:10px}
+.bg-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 12px;background:var(--surface);padding:12px 14px;border-radius:var(--radius);box-shadow:var(--shadow)}
+.bg-row h3{margin:0;font:900 18px/1.2 var(--display);overflow-wrap:anywhere}
+[data-side="killer"] .bg-row h3{font-weight:400;text-transform:uppercase;letter-spacing:.03em}
+.bg-in{grid-column:1/-1;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.bg-in label{display:flex;flex-direction:column;gap:4px;font:600 11px var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.bg-in input{width:7.5em;min-height:40px;padding:6px 8px;font:16px var(--body);color:var(--ink);background:var(--ground);border:1.5px solid var(--line);border-radius:var(--radius)}
+.bg-in input:focus{outline:2px solid var(--accent);outline-offset:1px}
+.bg-out{margin-left:auto;text-align:right;font:600 12px var(--mono);color:var(--muted)}
+.bg-out b{display:block;font-size:18px;color:var(--accent)}
+.bg-out b.neg{color:#e5484d}
+/* outfit photo boards */
+.o-photos{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:6px}
+.o-ph{position:relative}
+.o-ph-open{padding:0;border:0;background:none;cursor:zoom-in;display:block}
+.o-ph img{width:58px;height:58px;object-fit:cover;border-radius:var(--radius);border:1.5px solid var(--line);display:block}
+.o-ph-x{position:absolute;top:-8px;right:-8px;width:24px;height:24px;border-radius:50%;border:0;background:var(--ink);color:var(--ground);font-size:14px;line-height:1;cursor:pointer}
+.o-ph-add{position:relative;display:inline-flex;align-items:center;justify-content:center;min-width:58px;height:58px;padding:0 8px;border:1.5px dashed var(--o-acc);color:var(--o-acc);border-radius:var(--radius);font:600 12px var(--mono);cursor:pointer}
+.o-ph-add:focus-within{outline:2px solid var(--o-acc);outline-offset:2px}
+.o-ph-msg{flex-basis:100%;margin:0;font:12px var(--mono);color:var(--o-acc)}
+.vh{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none}
+#lightbox{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.86);display:grid;place-items:center;padding:16px;cursor:zoom-out;border:0;width:100%;height:100%}
+#lightbox img{max-width:100%;max-height:88vh;border-radius:var(--radius)}
+.ch-text{width:100%;min-height:72px;padding:10px 12px;font:15px/1.45 var(--body);color:var(--ink);background:var(--ground);border:1.5px solid var(--line);border-radius:var(--radius);resize:vertical}
+.ch-text:focus{outline:2px solid var(--accent);outline-offset:1px}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header class="bar"><b>Finn Planning</b><span class="private">Just for Finn</span></header>
+  <div class="cd" id="cd" role="timer" aria-live="off"></div>
   <div class="ptabs" id="ptabs" role="tablist" aria-label="Item"></div>
   <span class="eyebrow" id="eyebrow"></span>
   <h1 id="name"></h1>
@@ -195,7 +253,7 @@ h2{margin:40px 0 6px;font:900 34px/1.1 var(--display)}
     <div class="songs" id="pbSongs"></div>
   </section>
   <section id="outfitView" hidden>
-    <p class="pb-sum">3 outfits for each side, one for each part of the show (and each part's outfit page in the photobook). Ready ticks are saved on this device only.</p>
+    <p class="pb-sum">3 outfits for each side, one for each part of the show (and each part's outfit page in the photobook). Tap + Photo to add idea pictures to an outfit. Ready ticks and photos are saved on this device only.</p>
     <div id="outfitList"></div>
   </section>
   <section id="listsView" hidden>
@@ -207,6 +265,12 @@ h2{margin:40px 0 6px;font:900 34px/1.1 var(--display)}
     <p class="pb-sum">Where to buy or make each shop item.</p>
     <div class="links" id="linkList"></div>
   </section>
+  <section id="showdayView" hidden><div id="sdBody"></div></section>
+  <section id="setlistView" hidden><div id="slBody"></div></section>
+  <section id="practiceView" hidden><div id="prBody"></div></section>
+  <section id="budgetView" hidden><div id="bgBody"></div></section>
+  <button id="lightbox" type="button" aria-label="Close photo" hidden><img alt=""></button>
+  <section id="chantsView" hidden><div id="chBody"></div></section>
   <p class="foot" id="foot">Ticking an item marks it ready. The ticks are saved on this device only.</p>
 </div>
 
@@ -255,8 +319,13 @@ const PRODUCTS = [
     ]
   },
   { id: "outfits", name: "Outfits", outfits: true },
+  { id: "setlist", name: "Setlist", view: "setlist" },
+  { id: "practice", name: "Practice", view: "practice" },
+  { id: "chants", name: "Fan chants", view: "chants" },
+  { id: "showday", name: "Show day", view: "showday" },
   { id: "lists", name: "Lists", lists: true },
-  { id: "links", name: "Shop links", links: true }
+  { id: "links", name: "Shop links", links: true },
+  { id: "budget", name: "Budget", view: "budget" }
 ];
 
 /* SHOP LINKS: where Finn buys (or makes) each shop item. buy: [{ what, url }].
@@ -303,7 +372,10 @@ const PHOTOBOOK = {
   interludeAt: 7,    // the Pretty / Killer Interlude is song 8 (index 7)
   outfitPerPart: 1   // outfit page at the start of each part
 };
-let tracks = { pretty:[], killer:[] };
+let tracks = {
+  pretty: ["Sincerely Carrie","Skydiving","Artist","Bestie","From","Bring it Back","Sweet","Strong","Spring","Comparing","Discography","Take Your Time","Daisy","Anne","Worked"],
+  killer: ["PK","Shoot then go","Heist","Musician","Heart Attack","Lucky","Switch","Own it","Crazy","Put Up A Fight","Attention Please","Ego","Hairography","Space","I Made It"]
+};
 
 const $ = s => document.querySelector(s);
 const esc = t => String(t ?? "").replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" })[c]);
@@ -326,11 +398,13 @@ function openProduct(id){
   $("#pb").hidden = !PRODUCT.photobook;
   $("#make").hidden = !(PRODUCT.make || []).length;
   $("#makeList").innerHTML = (PRODUCT.make || []).map(m => `<a href="${esc(m.url)}" target="_blank" rel="noopener"><b>${esc(m.what)}</b><span>${esc(m.where)} ↗</span></a>`).join("");
-  const isLinks = !!PRODUCT.links, isOutfits = !!PRODUCT.outfits, isLists = !!PRODUCT.lists;
-  ["#eyebrow", "#meta", ".progress", "#list", "#foot"].forEach(sel => $(sel).hidden = isLinks || isOutfits || isLists);
+  const isLinks = !!PRODUCT.links, isOutfits = !!PRODUCT.outfits, isLists = !!PRODUCT.lists, view = PRODUCT.view || "";
+  ["#eyebrow", "#meta", ".progress", "#list", "#foot"].forEach(sel => $(sel).hidden = isLinks || isOutfits || isLists || !!view);
+  Object.keys(EXTRA_VIEWS).forEach(x => $(`#${x}View`).hidden = view !== x);
   $("#linksView").hidden = !isLinks;
   $("#outfitView").hidden = !isOutfits;
   $("#listsView").hidden = !isLists;
+  if (view){ $("#tabs").hidden = true; $("#meta").innerHTML = ""; $("#make").hidden = true; EXTRA_VIEWS[view](); return; }
   if (isLists){
     $("#tabs").hidden = true; $("#meta").innerHTML = "";
     document.documentElement.dataset.side = new Date().getHours() < 12 ? "pretty" : "killer";
@@ -422,6 +496,7 @@ function renderOutfits(){
       <ul class="o-list">${o.list.map(t => `<li>${esc(t)}</li>`).join("")}</ul>
       ${(() => { const mine = lists.flatMap(l => l.items.filter(it => (it.os || []).includes(k))); return mine.length ? `<ul class="o-from" aria-label="From your lists">${mine.map(it => `<li>+ ${it.url ? `<a href="${esc(it.url)}" target="_blank" rel="noopener">${esc(it.t)} ↗</a>` : esc(it.t)}</li>`).join("")}</ul>` : ""; })()}
       <label class="ready"><input type="checkbox" data-or="${k}" ${done["r:" + k] ? "checked" : ""}> Ready</label>
+      ${outfitPhotos(k, `${sd.label} outfit ${n}`)}
     </div>`; }).join("")}</div></div>`).join("");
 }
 document.addEventListener("change", e => {
@@ -596,7 +671,9 @@ function renderPhotobook(){
 fetch("https://firestore.googleapis.com/v1/projects/finn-pretty-killer-tix/databases/(default)/documents/tracklist/prettykiller")
   .then(r => r.json()).then(d => {
     const f = d.fields || {}, list = side => ((f[side] && f[side].arrayValue.values) || []).map(x => x.stringValue || "");
-    tracks = { pretty: list("pretty"), killer: list("killer") }; renderPhotobook();
+    const p = list("pretty"), k = list("killer");
+    if (p.length || k.length){ tracks = { pretty: p.length ? p : tracks.pretty, killer: k.length ? k : tracks.killer }; renderPhotobook();
+      if (PRODUCT && PRODUCT.view && PRODUCT.view !== "budget" && PRODUCT.view !== "showday") EXTRA_VIEWS[PRODUCT.view](); }
   }).catch(() => {});
 document.addEventListener("click", e => {
   const p = e.target.closest("[data-p]"); if (p) return openProduct(p.dataset.p);
@@ -605,6 +682,287 @@ document.addEventListener("click", e => {
   const b = e.target.closest("[data-v]"); if (b){ v = b.dataset.v; render(); }
 });
 document.addEventListener("change", e => { const c = e.target.closest("[data-k]"); if (!c) return; c.checked ? done[c.dataset.k] = true : delete done[c.dataset.k]; save(); render(); });
+/* =====================================================================
+   EXTRA TABS: countdown (top of every tab), Show day, Setlist, Practice,
+   Budget, and photo boards on the Outfits tab. All saved on this device only.
+   ===================================================================== */
+const xLoad = (k, d) => { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch(e){ return d; } };
+const xKeep = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch(e){ return false; } };
+const xId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+const SIDES = [ { key:"killer", label:"Killer" }, { key:"pretty", label:"Pretty" } ];
+const sidePicker = (cur, attr, labels = {}) => `<div class="x-sides" role="group" aria-label="Pick a side">${SIDES.map(s =>
+  `<button class="tab" type="button" ${attr}="${s.key}" data-side-tab="${s.key}" aria-pressed="${cur === s.key}">${esc(labels[s.key] || s.label)}</button>`).join("")}</div>`;
+const INTERLUDE = side => (side === "killer" ? "Killer" : "Pretty") + " Interlude";
+const timeSide = () => new Date().getHours() < 12 ? "pretty" : "killer";
+
+// ---- countdown to the shows ----
+const SHOWS = [
+  { side:"killer", name:"Killer show", day:"Saturday, February 27, 2027", at:new Date(2027, 1, 27) },
+  { side:"pretty", name:"Pretty show", day:"Sunday, February 28, 2027", at:new Date(2027, 1, 28) }
+];
+function tickCountdown(){
+  const now = new Date(), today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const todayShow = SHOWS.find(s => +s.at === +today), next = SHOWS.find(s => s.at > now);
+  let html;
+  if (todayShow) html = `<b>Today is the ${todayShow.name}!</b> Go get it.`;
+  else if (next){
+    const ms = next.at - now, d = Math.floor(ms / 864e5), h = Math.floor(ms / 36e5) % 24, m = Math.floor(ms / 6e4) % 60;
+    html = `<span class="cd-n"><b>${d}</b> days <b>${h}</b> h <b>${m}</b> m</span><span>until the ${next.name} · ${next.day}${next.side === "killer" ? " (Pretty show the next day)" : ""}</span>`;
+  } else html = `<b>Both Pretty Killer shows are done.</b> You did it!`;
+  $("#cd").innerHTML = html;
+}
+tickCountdown(); setInterval(tickCountdown, 30000);
+
+// ---- 1. Show day checklist: one list, ticked separately for each show ----
+const SHOWDAY_DEFAULT = [
+  ["Pack", ["Outfit 1", "Outfit 2", "Outfit 3", "Shoes", "Nails", "Light stick (charged)", "Phone and charger", "Water and a snack", "Makeup", "Merch for the merch table"]],
+  ["Before the show", ["Eat something", "Warm up your voice", "Test the light stick", "Check the setlist", "Get dressed in Outfit 1", "Take photos"]],
+  ["During the show", ["Part 1", "Change into Outfit 2", "Part 2", "Change into Outfit 3", "Part 3", "Encore"]],
+  ["After the show", ["Thank the fans", "Pack up the merch table", "Take photos for the tour diary"]]
+];
+let showday = xLoad("pk-showday", null);
+if (!showday || !Array.isArray(showday.items)) showday = { items: SHOWDAY_DEFAULT.flatMap(([s, ts], a) => ts.map((t, b) => ({ id:`d${a}-${b}`, s, t }))), done: {} };
+const saveShowday = () => xKeep("pk-showday", showday);
+let sdShow = "killer", sdSure = false;
+function renderShowday(focusSec){
+  document.documentElement.dataset.side = sdShow;
+  const on = it => !!showday.done[`${sdShow}:${it.id}`];
+  const n = showday.items.filter(on).length, next = showday.items.find(it => !on(it));
+  const sections = [...new Set([...SHOWDAY_DEFAULT.map(x => x[0]), ...showday.items.map(it => it.s)])];
+  $("#sdBody").innerHTML = sidePicker(sdShow, "data-sd-show", { killer:"Killer show · Feb 27", pretty:"Pretty show · Feb 28" })
+    + `<div class="progress"><span>${n} of ${showday.items.length} done</span><span class="track"><i style="width:${showday.items.length ? n / showday.items.length * 100 : 0}%"></i></span></div>`
+    + `<p class="x-next">${next ? `Next up: <b>${esc(next.t)}</b>` : "<b>Everything is done. Have the best show!</b>"}</p>`
+    + sections.map(sec => {
+      const its = showday.items.filter(it => it.s === sec);
+      return `<div class="x-card" data-sd-sec="${esc(sec)}"><h3>${esc(sec)}</h3>
+        ${its.length ? `<ul class="lm-items">${its.map(it => `<li class="${on(it) ? "done" : ""}${it === next ? " next" : ""}">
+          <label><input type="checkbox" data-sd-tick="${it.id}" ${on(it) ? "checked" : ""}><span>${esc(it.t)}</span></label>
+          <button class="lm-x" type="button" data-sd-rm="${it.id}" aria-label="Remove ${esc(it.t)}">×</button></li>`).join("")}</ul>` : `<p class="lm-empty">Nothing here yet.</p>`}
+        <form class="lm-add" data-sd-add="${esc(sec)}"><input maxlength="120" placeholder="Add to ${esc(sec)}" aria-label="Add to ${esc(sec)}" autocomplete="off"><button class="lm-btn" type="submit">Add</button></form>
+      </div>`; }).join("")
+    + `<button class="lm-del${sdSure ? " sure" : ""}" type="button" data-sd-reset>${sdSure ? "Tap again to untick everything for this show" : "Untick everything for this show"}</button>`;
+  if (focusSec){ const f = document.querySelector(`[data-sd-add="${CSS.escape(focusSec)}"] input`); if (f) f.focus(); }
+}
+
+// ---- 2. Setlist builder: drag songs (or use the arrows) between Part 1, 2 and 3 ----
+let setlists = xLoad("pk-setlist", {});
+let slSide = "killer", slDrag = null;
+function defaultSetlist(side){
+  const t = tracks[side] || [];
+  return [t.slice(0, 5), [...t.slice(5, 7), INTERLUDE(side), ...t.slice(7, 10)], t.slice(10)];
+}
+const getSetlist = side => (setlists[side] && setlists[side].flat().length) ? setlists[side] : defaultSetlist(side);
+const outfitLine = (side, n) => { const o = OUTFITS[`${side}:${n}`]; return `Outfit ${n}${o && o.list.length ? ": " + o.list[0] : ""}`; };
+function renderSetlist(){
+  document.documentElement.dataset.side = slSide;
+  const parts = getSetlist(slSide), total = parts.flat().length;
+  let no = 0;
+  $("#slBody").innerHTML = sidePicker(slSide, "data-sl-side")
+    + `<p class="pb-sum">${total} songs. Drag a song to move it, or use the arrows: ↑ on the first song of a part moves it to the part before, ↓ on the last song moves it to the next part.</p>`
+    + parts.map((songs, p) => `<div class="sl-change">${p ? "Outfit change → " : "Start in "}${esc(outfitLine(slSide, p + 1))}</div>
+      <h3 class="sl-part">Part ${p + 1}<small>${songs.length} song${songs.length === 1 ? "" : "s"}</small></h3>
+      <ol class="sl-list" data-sl-part="${p}">${songs.map((s, i) => `<li class="sl-song${/ Interlude$/.test(s) ? " inter" : ""}" draggable="true" data-sl-p="${p}" data-sl-i="${i}">
+        <span class="sl-no">${String(++no).padStart(2, "0")}</span><span class="sl-nm">${esc(s)}</span>
+        <button class="lm-x" type="button" data-sl-move="up" aria-label="Move ${esc(s)} up" ${!p && !i ? "disabled" : ""}>↑</button>
+        <button class="lm-x" type="button" data-sl-move="down" aria-label="Move ${esc(s)} down" ${p === parts.length - 1 && i === songs.length - 1 ? "disabled" : ""}>↓</button></li>`).join("")
+        || `<li class="sl-empty">Drop songs here</li>`}</ol>`).join("")
+    + `<p style="margin:18px 0 0"><button class="lm-del" type="button" data-sl-reset>Reset to the album order</button></p>`;
+}
+function moveSong(from, to, at){
+  const parts = getSetlist(slSide).map(a => a.slice());
+  const [song] = parts[from.p].splice(from.i, 1);
+  if (from.p === to && at > from.i) at--;
+  parts[to].splice(Math.min(at, parts[to].length), 0, song);
+  setlists[slSide] = parts; xKeep("pk-setlist", setlists); renderSetlist();
+}
+document.addEventListener("dragstart", e => {
+  const li = e.target.closest && e.target.closest("[data-sl-i]"); if (!li) return;
+  slDrag = { p: +li.dataset.slP, i: +li.dataset.slI }; li.classList.add("dragging");
+  e.dataTransfer.effectAllowed = "move"; try { e.dataTransfer.setData("text/plain", li.textContent.trim()); } catch(err){}
+});
+document.addEventListener("dragover", e => {
+  if (!slDrag || !(e.target.closest && e.target.closest("[data-sl-part]"))) return;
+  e.preventDefault();
+  document.querySelectorAll(".sl-song.over").forEach(x => x.classList.remove("over"));
+  const li = e.target.closest("[data-sl-i]"); if (li) li.classList.add("over");
+});
+document.addEventListener("drop", e => {
+  const ol = slDrag && e.target.closest && e.target.closest("[data-sl-part]"); if (!ol) return;
+  e.preventDefault();
+  const li = e.target.closest("[data-sl-i]"), from = slDrag; slDrag = null;
+  moveSong(from, +ol.dataset.slPart, li ? +li.dataset.slI : Infinity);
+});
+document.addEventListener("dragend", () => { slDrag = null; document.querySelectorAll(".dragging,.over").forEach(x => x.classList.remove("dragging", "over")); });
+
+// ---- 6. Practice tracker: tick songs you practiced today, keep a streak going ----
+let practice = xLoad("pk-practice", {});   // { "2026-11-19": ["killer:PK", ...] }
+let prSide = "killer";
+const dayKey = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+function practiceStreak(){
+  const d = new Date(); let n = 0;
+  if (!(practice[dayKey(d)] || []).length) d.setDate(d.getDate() - 1);
+  while ((practice[dayKey(d)] || []).length){ n++; d.setDate(d.getDate() - 1); }
+  return n;
+}
+function renderPractice(){
+  document.documentElement.dataset.side = prSide;
+  const today = dayKey(new Date()), todays = practice[today] || [], days = Object.keys(practice).sort();
+  const songs = getSetlist(prSide).flat(), streak = practiceStreak();
+  const stat = key => { const ds = days.filter(d => (practice[d] || []).includes(key)); return { n: ds.length, last: ds[ds.length - 1] }; };
+  const nice = d => new Date(d + "T12:00:00").toLocaleDateString(undefined, { month:"short", day:"numeric" });
+  const never = songs.filter(s => !stat(`${prSide}:${s}`).n).length;
+  $("#prBody").innerHTML = sidePicker(prSide, "data-pr-side")
+    + `<div class="x-stats"><span>🔥 <b>${streak}</b> day streak</span><span><b>${todays.length}</b> practiced today</span><span><b>${never}</b> ${prSide === "killer" ? "Killer" : "Pretty"} songs never practiced</span></div>`
+    + `<p class="pb-sum">Tick a song when you practice it today. Practice at least one song every day to keep your streak. Songs are in your setlist order.</p>`
+    + `<div class="songs">${songs.map((s, i) => { const key = `${prSide}:${s}`, st = stat(key), on = todays.includes(key);
+      return `<label class="song${on ? " done" : ""}"><input type="checkbox" data-pr="${esc(key)}" ${on ? "checked" : ""}>
+        <span class="no">${String(i + 1).padStart(2, "0")}</span><span class="nm">${esc(s)}</span>
+        <span class="pg">${st.n ? `${st.n}× · ${st.last === today ? "today" : nice(st.last)}` : "not yet"}</span></label>`; }).join("")}</div>`;
+}
+
+// ---- 4. Budget: what each shop item costs to make vs. what it sells for ----
+let budget = xLoad("pk-budget", {});   // { itemId: { cost, qty } }
+const money2 = n => (n < 0 ? "−$" : "$") + Math.abs(n).toFixed(2).replace(/\.00$/, "");
+const priceOf = it => parseFloat(String(it.price).replace(/[^0-9.]/g, ""));
+const budgetItems = () => SHOP_ITEMS.filter(it => /^\$\d/.test(it.price));
+function budgetNums(it){
+  const b = budget[it.id] || {}, price = priceOf(it), cost = parseFloat(b.cost), qty = parseInt(b.qty, 10);
+  const each = isNaN(cost) ? null : price - cost;
+  return { b, price, cost, qty: isNaN(qty) ? 0 : qty, each, total: each === null ? null : each * (isNaN(qty) ? 0 : qty) };
+}
+function budgetTotals(){
+  let sales = 0, costs = 0, missing = 0;
+  budgetItems().forEach(it => { const x = budgetNums(it); if (x.each === null){ missing++; return; } sales += x.price * x.qty; costs += x.cost * x.qty; });
+  return `<span>Money in <b>${money2(sales)}</b></span><span>Cost to make <b>${money2(costs)}</b></span><span>Profit <b>${money2(sales - costs)}</b></span>${missing ? `<span>${missing} item${missing === 1 ? "" : "s"} with no cost yet</span>` : ""}`;
+}
+function budgetOut(it){
+  const x = budgetNums(it);
+  if (x.each === null) return `Profit each<b>?</b>`;
+  return `Profit each<b class="${x.each < 0 ? "neg" : ""}">${money2(x.each)}</b>${x.qty ? `× ${x.qty} = ${money2(x.total)}` : ""}`;
+}
+function renderBudget(){
+  document.documentElement.dataset.side = timeSide();
+  $("#bgBody").innerHTML = `<p class="pb-sum">Type what each item costs you to make, and how many you plan to sell. The profit works itself out. Saved on this device only.</p>`
+    + `<div class="x-stats" id="bgTotals">${budgetTotals()}</div><div class="bg-list">`
+    + budgetItems().map(it => { const x = budgetNums(it); return `<div class="bg-row"><h3>${esc(it.name)}</h3><span class="qty">Sells for ${esc(it.price)}</span>
+      <div class="bg-in">
+        <label>Cost to make ($)<input type="number" inputmode="decimal" min="0" step="0.01" data-bg="${it.id}" data-bg-f="cost" value="${esc(x.b.cost ?? "")}" placeholder="0"></label>
+        <label>Plan to sell<input type="number" inputmode="numeric" min="0" step="1" data-bg="${it.id}" data-bg-f="qty" value="${esc(x.b.qty ?? "")}" placeholder="0"></label>
+        <div class="bg-out" data-bg-out="${it.id}">${budgetOut(it)}</div>
+      </div></div>`; }).join("") + `</div>`;
+}
+document.addEventListener("input", e => {
+  const inp = e.target.closest("[data-bg]"); if (!inp) return;
+  const id = inp.dataset.bg, it = SHOP_ITEMS.find(x => x.id === id); if (!it) return;
+  budget[id] = { ...(budget[id] || {}), [inp.dataset.bgF]: inp.value };
+  xKeep("pk-budget", budget);
+  document.querySelector(`[data-bg-out="${id}"]`).innerHTML = budgetOut(it);
+  $("#bgTotals").innerHTML = budgetTotals();
+});
+
+// ---- 5. Photo boards: inspiration pictures on each mannequin ----
+let ophotos = xLoad("pk-outfit-photos", {});   // { "killer:1": [dataURL, ...] }
+let ophMsg = {};
+function outfitPhotos(k, label){
+  return `<div class="o-photos">${(ophotos[k] || []).map((src, j) => `<span class="o-ph">
+      <button class="o-ph-open" type="button" data-oph-open="${k}|${j}" aria-label="Open photo ${j + 1}"><img src="${esc(src)}" alt="Idea photo ${j + 1} for ${esc(label)}"></button>
+      <button class="o-ph-x" type="button" data-oph-rm="${k}|${j}" aria-label="Remove photo ${j + 1}">×</button></span>`).join("")}
+    <label class="o-ph-add">+ Photo<input class="vh" type="file" accept="image/*" data-oph-add="${k}" aria-label="Add a photo to ${esc(label)}"></label>
+    ${ophMsg[k] ? `<p class="o-ph-msg" role="status">${esc(ophMsg[k])}</p>` : ""}</div>`;
+}
+function shrinkPhoto(file){
+  return new Promise((ok, bad) => {
+    const url = URL.createObjectURL(file), img = new Image();
+    img.onload = () => {
+      const s = Math.min(1, 480 / Math.max(img.width, img.height)), c = document.createElement("canvas");
+      c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url);
+      ok(c.toDataURL("image/jpeg", .75));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); bad(); };
+    img.src = url;
+  });
+}
+document.addEventListener("change", async e => {
+  const inp = e.target.closest("[data-oph-add]"); if (!inp || !inp.files.length) return;
+  const k = inp.dataset.ophAdd; ophMsg[k] = "";
+  for (const f of inp.files){
+    try {
+      const src = await shrinkPhoto(f);
+      (ophotos[k] = ophotos[k] || []).push(src);
+      if (!xKeep("pk-outfit-photos", ophotos)){ ophotos[k].pop(); ophMsg[k] = "No room left on this device for more photos. Remove some first."; break; }
+    } catch(err){ ophMsg[k] = "That file couldn't be opened as a photo."; }
+  }
+  renderOutfits();
+});
+
+// ---- clicks, ticks and forms for the new tabs ----
+document.addEventListener("click", e => {
+  const t = e.target.closest("[data-sd-show],[data-sl-side],[data-pr-side],[data-sd-rm],[data-sd-reset],[data-sl-move],[data-sl-reset],[data-oph-open],[data-oph-rm],#lightbox");
+  if (!t) return;
+  if (t.id === "lightbox"){ t.hidden = true; return; }
+  if (t.dataset.sdShow){ sdShow = t.dataset.sdShow; sdSure = false; return renderShowday(); }
+  if (t.dataset.slSide){ slSide = t.dataset.slSide; return renderSetlist(); }
+  if (t.dataset.prSide){ prSide = t.dataset.prSide; return renderPractice(); }
+  if (t.dataset.sdRm){ showday.items = showday.items.filter(it => it.id !== t.dataset.sdRm); saveShowday(); return renderShowday(); }
+  if (t.hasAttribute("data-sd-reset")){
+    if (sdSure){ Object.keys(showday.done).forEach(k => { if (k.startsWith(sdShow + ":")) delete showday.done[k]; }); saveShowday(); sdSure = false; }
+    else sdSure = true;
+    return renderShowday();
+  }
+  if (t.dataset.slMove){
+    const li = t.closest("[data-sl-i]"), p = +li.dataset.slP, i = +li.dataset.slI, parts = getSetlist(slSide);
+    if (t.dataset.slMove === "up"){ if (i > 0) moveSong({ p, i }, p, i - 1); else if (p > 0) moveSong({ p, i }, p - 1, Infinity); }
+    else { if (i < parts[p].length - 1) moveSong({ p, i }, p, i + 2); else if (p < parts.length - 1) moveSong({ p, i }, p + 1, 0); }
+    const again = document.querySelector(`[data-sl-move="${t.dataset.slMove}"][aria-label="${CSS.escape(t.getAttribute("aria-label"))}"]`); if (again && !again.disabled) again.focus();
+    return;
+  }
+  if (t.hasAttribute("data-sl-reset")){ delete setlists[slSide]; xKeep("pk-setlist", setlists); return renderSetlist(); }
+  if (t.dataset.ophOpen){ const [k, j] = t.dataset.ophOpen.split("|"); const lb = $("#lightbox"); lb.querySelector("img").src = ophotos[k][+j]; lb.hidden = false; lb.focus(); return; }
+  if (t.dataset.ophRm){ const [k, j] = t.dataset.ophRm.split("|"); ophotos[k].splice(+j, 1); if (!ophotos[k].length) delete ophotos[k]; xKeep("pk-outfit-photos", ophotos); ophMsg[k] = ""; return renderOutfits(); }
+});
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#lightbox").hidden) $("#lightbox").hidden = true; });
+document.addEventListener("change", e => {
+  const sd = e.target.closest("[data-sd-tick]");
+  if (sd){ const k = `${sdShow}:${sd.dataset.sdTick}`; sd.checked ? showday.done[k] = true : delete showday.done[k]; saveShowday(); return renderShowday(); }
+  const pr = e.target.closest("[data-pr]");
+  if (pr){
+    const today = dayKey(new Date()), a = new Set(practice[today] || []);
+    pr.checked ? a.add(pr.dataset.pr) : a.delete(pr.dataset.pr);
+    if (a.size) practice[today] = [...a]; else delete practice[today];
+    xKeep("pk-practice", practice); return renderPractice();
+  }
+});
+document.addEventListener("submit", e => {
+  const f = e.target.closest("[data-sd-add]"); if (!f) return;
+  e.preventDefault();
+  const t = f.querySelector("input").value.trim(); if (!t) return;
+  showday.items.push({ id: xId(), s: f.dataset.sdAdd, t }); saveShowday(); renderShowday(f.dataset.sdAdd);
+});
+const EXTRA_VIEWS = { showday: renderShowday, setlist: renderSetlist, practice: renderPractice, budget: renderBudget };
+
+// ---- Fan chants: write the chant for each song (what fans shout and when) ----
+let chants = xLoad("pk-chants", {});   // { "killer:PK": "text" }
+let chSide = "killer";
+function renderChants(){
+  document.documentElement.dataset.side = chSide;
+  const songs = getSetlist(chSide).flat(), n = songs.filter(s => (chants[`${chSide}:${s}`] || "").trim()).length;
+  $("#chBody").innerHTML = sidePicker(chSide, "data-ch-side")
+    + `<div class="x-stats"><span><b>${n}</b> of ${songs.length} songs have a chant</span></div>`
+    + `<p class="pb-sum">Write what fans shout and when, like: "After the first chorus: Pretty! Killer!" or your name in the intro. Saved on this device only.</p>`
+    + songs.map((s, i) => { const k = `${chSide}:${s}`; return `<div class="x-card"><h3>${String(i + 1).padStart(2, "0")} · ${esc(s)}</h3>
+      <textarea class="ch-text" data-ch="${esc(k)}" rows="3" placeholder="Chant for ${esc(s)}" aria-label="Fan chant for ${esc(s)}">${esc(chants[k] || "")}</textarea></div>`; }).join("");
+}
+document.addEventListener("input", e => {
+  const ta = e.target.closest("[data-ch]"); if (!ta) return;
+  const v = ta.value; if (v.trim()) chants[ta.dataset.ch] = v; else delete chants[ta.dataset.ch];
+  xKeep("pk-chants", chants);
+  const songs = getSetlist(chSide).flat(), n = songs.filter(s => (chants[`${chSide}:${s}`] || "").trim()).length;
+  const st = document.querySelector("#chBody .x-stats b"); if (st) st.textContent = n;
+});
+document.addEventListener("click", e => { const b = e.target.closest("[data-ch-side]"); if (b){ chSide = b.dataset.chSide; renderChants(); } });
+EXTRA_VIEWS.chants = renderChants;
+
 openProduct(location.hash.slice(1));
 </script>
 </body>
