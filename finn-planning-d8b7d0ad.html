@@ -110,6 +110,10 @@ h2{margin:40px 0 6px;font:900 34px/1.1 var(--display)}
 .o-side.o-killer{--o-acc:#ff3fae;--o-body:#3b3442;--o-shade:#1c1920;--o-edge:#ff3fae;--o-stand:#ff3fae}
 :root[data-side="killer"] .o-pretty{--o-stand:#f7b8d4}
 .o-side h2{margin:24px 0 12px}
+.o-switch{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 16px;font:600 13px var(--mono);color:var(--muted)}
+.o-switch select{min-height:40px;padding:6px 8px;font:600 14px var(--mono);color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:var(--radius)}
+.o-switch .lm-btn{min-height:40px}
+.o-switch output{flex-basis:100%;color:var(--o-acc)}
 .o-killer h2{font:400 34px/1.1 "Anton",Impact,sans-serif;text-transform:uppercase;color:#ff3fae}
 .o-pretty h2{font:900 34px/1.1 "Bodoni Moda",Georgia,serif;color:var(--ink)}
 .mannequins{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
@@ -488,9 +492,38 @@ function mannequin(o, sideKey){
   </svg>`;
 }
 const OUTFIT_SIDES = [ { key:"pretty", label:"Pretty side" }, { key:"killer", label:"Killer side" } ];
+let outfitOrder = {}; try { outfitOrder = JSON.parse(localStorage.getItem("pk-outfit-order")) || {}; } catch(e){}   // { killer:[3,2,1] } = spot 1 shows planned outfit 3 ...
+const outfitAt = (side, n) => OUTFITS[`${side}:${(outfitOrder[side] || [1, 2, 3])[n - 1]}`] || { wear:[], list:[] };
+let switchMsg = {};
+function switchOutfits(side, a, b){
+  if (a === b) return;
+  const ka = `${side}:${a}`, kb = `${side}:${b}`, swapKey = k => k === ka ? kb : k === kb ? ka : k;
+  const order = (outfitOrder[side] || [1, 2, 3]).slice(); [order[a - 1], order[b - 1]] = [order[b - 1], order[a - 1]];
+  outfitOrder[side] = order; xKeep("pk-outfit-order", outfitOrder);
+  [ophotos[ka], ophotos[kb]] = [ophotos[kb], ophotos[ka]];
+  [ka, kb].forEach(k => { if (!ophotos[k]) delete ophotos[k]; }); xKeep("pk-outfit-photos", ophotos);
+  const ra = !!done["r:" + ka], rb = !!done["r:" + kb];
+  rb ? done["r:" + ka] = true : delete done["r:" + ka]; ra ? done["r:" + kb] = true : delete done["r:" + kb]; save();
+  lists.forEach(l => l.items.forEach(it => { if (it.os) it.os = OUTFIT_KEYS.filter(x => it.os.map(swapKey).includes(x)); })); saveLists();
+  switchMsg[side] = `Switched Outfit ${a} and Outfit ${b}.`;
+  renderOutfits();
+}
+document.addEventListener("submit", e => {
+  const fm = e.target.closest("[data-o-switch]"); if (!fm) return;
+  e.preventDefault();
+  switchOutfits(fm.dataset.oSwitch, +fm.querySelector("[name=a]").value, +fm.querySelector("[name=b]").value);
+});
 function renderOutfits(){
-  $("#outfitList").innerHTML = OUTFIT_SIDES.map(sd => `<div class="o-side o-${sd.key}"><h2>${sd.label}</h2><div class="mannequins">${[1, 2, 3].map(n => {
-    const k = `${sd.key}:${n}`, o = OUTFITS[k] || { wear:[], list:[] };
+  $("#outfitList").innerHTML = OUTFIT_SIDES.map(sd => `<div class="o-side o-${sd.key}"><h2>${sd.label}</h2>
+    <form class="o-switch" data-o-switch="${sd.key}"><span>Switch</span>
+      <select name="a" aria-label="${sd.label}: first outfit to switch">${[1, 2, 3].map(n => `<option value="${n}">Outfit ${n}</option>`).join("")}</select>
+      <span>with</span>
+      <select name="b" aria-label="${sd.label}: second outfit to switch">${[1, 2, 3].map(n => `<option value="${n}" ${n === 3 ? "selected" : ""}>Outfit ${n}</option>`).join("")}</select>
+      <button class="lm-btn" type="submit">Switch</button>
+      ${switchMsg[sd.key] ? `<output>${esc(switchMsg[sd.key])}</output>` : ""}
+    </form>
+    <div class="mannequins">${[1, 2, 3].map(n => {
+    const k = `${sd.key}:${n}`, o = outfitAt(sd.key, n);
     return `<div class="mq${done["r:" + k] ? " done" : ""}">${mannequin(o, sd.key)}
       <h3>Outfit ${n}</h3><span class="o-sub">Part ${n}</span>
       <ul class="o-list">${o.list.map(t => `<li>${esc(t)}</li>`).join("")}</ul>
@@ -752,7 +785,7 @@ function defaultSetlist(side){
   return [t.slice(0, 5), [...t.slice(5, 7), INTERLUDE(side), ...t.slice(7, 10)], t.slice(10)];
 }
 const getSetlist = side => (setlists[side] && setlists[side].flat().length) ? setlists[side] : defaultSetlist(side);
-const outfitLine = (side, n) => { const o = OUTFITS[`${side}:${n}`]; return `Outfit ${n}${o && o.list.length ? ": " + o.list[0] : ""}`; };
+const outfitLine = (side, n) => { const o = outfitAt(side, n); return `Outfit ${n}${o && o.list.length ? ": " + o.list[0] : ""}`; };
 function renderSetlist(){
   document.documentElement.dataset.side = slSide;
   const parts = getSetlist(slSide), total = parts.flat().length;
